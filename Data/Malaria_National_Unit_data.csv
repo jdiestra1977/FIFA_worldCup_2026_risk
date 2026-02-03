@@ -1,0 +1,955 @@
+﻿"ISO3","Name","Admin Level","Metric","Units","Year","Value"
+"AFG","Afghanistan","admin0","Incidence Rate","Cases per Thousand",2022,0.518036565796733
+"AFG","Afghanistan","admin0","Incidence Rate","Cases per Thousand",2023,0.9521386649522919
+"AFG","Afghanistan","admin0","Incidence Rate","Cases per Thousand",2024,0.8061626624403121
+"AFG","Afghanistan","admin0","Infection Prevalence","per 100 Children",2022,0.019977977708358702
+"AFG","Afghanistan","admin0","Infection Prevalence","per 100 Children",2023,0.0369869403711894
+"AFG","Afghanistan","admin0","Infection Prevalence","per 100 Children",2024,0.0314632416234692
+"AFG","Afghanistan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.30088131851669303
+"AFG","Afghanistan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.374844118632161
+"AFG","Afghanistan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.38779856752767794
+"AGO","Angola","admin0","Incidence Rate","Cases per Thousand",2022,236.79710128238298
+"AGO","Angola","admin0","Incidence Rate","Cases per Thousand",2023,224.175120138117
+"AGO","Angola","admin0","Incidence Rate","Cases per Thousand",2024,223.203774850154
+"AGO","Angola","admin0","Infection Prevalence","per 100 Children",2022,21.2384163783559
+"AGO","Angola","admin0","Infection Prevalence","per 100 Children",2023,19.33207102186
+"AGO","Angola","admin0","Infection Prevalence","per 100 Children",2024,19.3503359152252
+"AGO","Angola","admin0","Mortality Rate","Deaths per 100 Thousand",2022,54.3726653932536
+"AGO","Angola","admin0","Mortality Rate","Deaths per 100 Thousand",2023,40.575857200831095
+"AGO","Angola","admin0","Mortality Rate","Deaths per 100 Thousand",2024,39.8039385082629
+"ARG","Argentina","admin0","Incidence Rate","Cases per Thousand",2022,0
+"ARG","Argentina","admin0","Incidence Rate","Cases per Thousand",2023,0
+"ARG","Argentina","admin0","Incidence Rate","Cases per Thousand",2024,0
+"ARG","Argentina","admin0","Infection Prevalence","per 100 Children",2022,0
+"ARG","Argentina","admin0","Infection Prevalence","per 100 Children",2023,0
+"ARG","Argentina","admin0","Infection Prevalence","per 100 Children",2024,0
+"ARG","Argentina","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"ARG","Argentina","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"ARG","Argentina","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"ARM","Armenia","admin0","Incidence Rate","Cases per Thousand",2022,0
+"ARM","Armenia","admin0","Incidence Rate","Cases per Thousand",2023,0
+"ARM","Armenia","admin0","Incidence Rate","Cases per Thousand",2024,0
+"ARM","Armenia","admin0","Infection Prevalence","per 100 Children",2022,0
+"ARM","Armenia","admin0","Infection Prevalence","per 100 Children",2023,0
+"ARM","Armenia","admin0","Infection Prevalence","per 100 Children",2024,0
+"ARM","Armenia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"ARM","Armenia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"ARM","Armenia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"AZE","Azerbaijan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"AZE","Azerbaijan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"AZE","Azerbaijan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"AZE","Azerbaijan","admin0","Infection Prevalence","per 100 Children",2022,0
+"AZE","Azerbaijan","admin0","Infection Prevalence","per 100 Children",2023,0
+"AZE","Azerbaijan","admin0","Infection Prevalence","per 100 Children",2024,0
+"AZE","Azerbaijan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"AZE","Azerbaijan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"AZE","Azerbaijan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"BDI","Burundi","admin0","Incidence Rate","Cases per Thousand",2022,267.86804512754804
+"BDI","Burundi","admin0","Incidence Rate","Cases per Thousand",2023,245.34057273511002
+"BDI","Burundi","admin0","Incidence Rate","Cases per Thousand",2024,244.30556875657
+"BDI","Burundi","admin0","Infection Prevalence","per 100 Children",2022,23.6216409946574
+"BDI","Burundi","admin0","Infection Prevalence","per 100 Children",2023,21.4252670151413
+"BDI","Burundi","admin0","Infection Prevalence","per 100 Children",2024,21.4532003723103
+"BDI","Burundi","admin0","Mortality Rate","Deaths per 100 Thousand",2022,113.231996378803
+"BDI","Burundi","admin0","Mortality Rate","Deaths per 100 Thousand",2023,92.9150582043919
+"BDI","Burundi","admin0","Mortality Rate","Deaths per 100 Thousand",2024,92.90509326005801
+"BEN","Benin","admin0","Incidence Rate","Cases per Thousand",2022,377.49113611579696
+"BEN","Benin","admin0","Incidence Rate","Cases per Thousand",2023,363.118979494841
+"BEN","Benin","admin0","Incidence Rate","Cases per Thousand",2024,364.515103588974
+"BEN","Benin","admin0","Infection Prevalence","per 100 Children",2022,36.6169628773822
+"BEN","Benin","admin0","Infection Prevalence","per 100 Children",2023,35.4472145996865
+"BEN","Benin","admin0","Infection Prevalence","per 100 Children",2024,35.8775505744716
+"BEN","Benin","admin0","Mortality Rate","Deaths per 100 Thousand",2022,94.66695687368369
+"BEN","Benin","admin0","Mortality Rate","Deaths per 100 Thousand",2023,88.4139513840541
+"BEN","Benin","admin0","Mortality Rate","Deaths per 100 Thousand",2024,87.3681382391337
+"BFA","Burkina Faso","admin0","Incidence Rate","Cases per Thousand",2022,274.781722686445
+"BFA","Burkina Faso","admin0","Incidence Rate","Cases per Thousand",2023,272.740793256024
+"BFA","Burkina Faso","admin0","Incidence Rate","Cases per Thousand",2024,265.64228901117696
+"BFA","Burkina Faso","admin0","Infection Prevalence","per 100 Children",2022,21.073473718197498
+"BFA","Burkina Faso","admin0","Infection Prevalence","per 100 Children",2023,21.1189847002578
+"BFA","Burkina Faso","admin0","Infection Prevalence","per 100 Children",2024,20.4166777620993
+"BFA","Burkina Faso","admin0","Mortality Rate","Deaths per 100 Thousand",2022,89.3282627560909
+"BFA","Burkina Faso","admin0","Mortality Rate","Deaths per 100 Thousand",2023,88.0063892399982
+"BFA","Burkina Faso","admin0","Mortality Rate","Deaths per 100 Thousand",2024,87.752680204775
+"BGD","Bangladesh","admin0","Incidence Rate","Cases per Thousand",2022,0.434385335736181
+"BGD","Bangladesh","admin0","Incidence Rate","Cases per Thousand",2023,0.32411291216169197
+"BGD","Bangladesh","admin0","Incidence Rate","Cases per Thousand",2024,0.338697195125394
+"BGD","Bangladesh","admin0","Infection Prevalence","per 100 Children",2022,0.017637509934632298
+"BGD","Bangladesh","admin0","Infection Prevalence","per 100 Children",2023,0.0129603603594716
+"BGD","Bangladesh","admin0","Infection Prevalence","per 100 Children",2024,0.013681614008870501
+"BGD","Bangladesh","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.628730761725119
+"BGD","Bangladesh","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.5046313030603811
+"BGD","Bangladesh","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.581588824978775
+"BLZ","Belize","admin0","Incidence Rate","Cases per Thousand",2022,0
+"BLZ","Belize","admin0","Incidence Rate","Cases per Thousand",2023,0
+"BLZ","Belize","admin0","Incidence Rate","Cases per Thousand",2024,0
+"BLZ","Belize","admin0","Infection Prevalence","per 100 Children",2022,0
+"BLZ","Belize","admin0","Infection Prevalence","per 100 Children",2023,0
+"BLZ","Belize","admin0","Infection Prevalence","per 100 Children",2024,0
+"BLZ","Belize","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"BLZ","Belize","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"BLZ","Belize","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"BOL","Bolivia","admin0","Incidence Rate","Cases per Thousand",2022,0.0982431099736586
+"BOL","Bolivia","admin0","Incidence Rate","Cases per Thousand",2023,0.183631105541744
+"BOL","Bolivia","admin0","Incidence Rate","Cases per Thousand",2024,0.186427717623243
+"BOL","Bolivia","admin0","Infection Prevalence","per 100 Children",2022,0.0038178275956266402
+"BOL","Bolivia","admin0","Infection Prevalence","per 100 Children",2023,0.00716196171785318
+"BOL","Bolivia","admin0","Infection Prevalence","per 100 Children",2024,0.00727800775897243
+"BOL","Bolivia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0296075475777938
+"BOL","Bolivia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0388432752230148
+"BOL","Bolivia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0360995566012287
+"BRA","Brazil","admin0","Incidence Rate","Cases per Thousand",2022,0.19729331849585
+"BRA","Brazil","admin0","Incidence Rate","Cases per Thousand",2023,0.25237256272252
+"BRA","Brazil","admin0","Incidence Rate","Cases per Thousand",2024,0.281655420524019
+"BRA","Brazil","admin0","Infection Prevalence","per 100 Children",2022,0.00857132405885116
+"BRA","Brazil","admin0","Infection Prevalence","per 100 Children",2023,0.0108255906578413
+"BRA","Brazil","admin0","Infection Prevalence","per 100 Children",2024,0.0121227842727199
+"BRA","Brazil","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.031804950729075396
+"BRA","Brazil","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0388534396821236
+"BRA","Brazil","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0384287469413345
+"BTN","Bhutan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"BTN","Bhutan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"BTN","Bhutan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"BTN","Bhutan","admin0","Infection Prevalence","per 100 Children",2022,0
+"BTN","Bhutan","admin0","Infection Prevalence","per 100 Children",2023,0
+"BTN","Bhutan","admin0","Infection Prevalence","per 100 Children",2024,0
+"BTN","Bhutan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"BTN","Bhutan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"BTN","Bhutan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"BWA","Botswana","admin0","Incidence Rate","Cases per Thousand",2022,0.6164824984946611
+"BWA","Botswana","admin0","Incidence Rate","Cases per Thousand",2023,0.8580202364604931
+"BWA","Botswana","admin0","Incidence Rate","Cases per Thousand",2024,0.776688197817176
+"BWA","Botswana","admin0","Infection Prevalence","per 100 Children",2022,0.0236028007434502
+"BWA","Botswana","admin0","Infection Prevalence","per 100 Children",2023,0.032865721545411605
+"BWA","Botswana","admin0","Infection Prevalence","per 100 Children",2024,0.029781201990690197
+"BWA","Botswana","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.07324308601296449
+"BWA","Botswana","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.150018260775542
+"BWA","Botswana","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.111360873958391
+"CAF","Central African Republic","admin0","Incidence Rate","Cases per Thousand",2022,305.964744632958
+"CAF","Central African Republic","admin0","Incidence Rate","Cases per Thousand",2023,305.089217718855
+"CAF","Central African Republic","admin0","Incidence Rate","Cases per Thousand",2024,305.255832847396
+"CAF","Central African Republic","admin0","Infection Prevalence","per 100 Children",2022,31.4744430377341
+"CAF","Central African Republic","admin0","Infection Prevalence","per 100 Children",2023,31.915894390523903
+"CAF","Central African Republic","admin0","Infection Prevalence","per 100 Children",2024,32.255920905811806
+"CAF","Central African Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2022,98.80235018795459
+"CAF","Central African Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2023,98.2316043158404
+"CAF","Central African Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2024,98.8046565615918
+"CHN","China","admin0","Incidence Rate","Cases per Thousand",2022,0
+"CHN","China","admin0","Incidence Rate","Cases per Thousand",2023,0
+"CHN","China","admin0","Incidence Rate","Cases per Thousand",2024,0
+"CHN","China","admin0","Infection Prevalence","per 100 Children",2022,0
+"CHN","China","admin0","Infection Prevalence","per 100 Children",2023,0
+"CHN","China","admin0","Infection Prevalence","per 100 Children",2024,0
+"CHN","China","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"CHN","China","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"CHN","China","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"CIV","Côte d'Ivoire","admin0","Incidence Rate","Cases per Thousand",2022,263.25604796805004
+"CIV","Côte d'Ivoire","admin0","Incidence Rate","Cases per Thousand",2023,248.57313560709298
+"CIV","Côte d'Ivoire","admin0","Incidence Rate","Cases per Thousand",2024,237.429076866807
+"CIV","Côte d'Ivoire","admin0","Infection Prevalence","per 100 Children",2022,23.5975385770709
+"CIV","Côte d'Ivoire","admin0","Infection Prevalence","per 100 Children",2023,22.1470442545728
+"CIV","Côte d'Ivoire","admin0","Infection Prevalence","per 100 Children",2024,20.7741528510399
+"CIV","Côte d'Ivoire","admin0","Mortality Rate","Deaths per 100 Thousand",2022,83.98222780868541
+"CIV","Côte d'Ivoire","admin0","Mortality Rate","Deaths per 100 Thousand",2023,80.5808318710762
+"CIV","Côte d'Ivoire","admin0","Mortality Rate","Deaths per 100 Thousand",2024,77.4205193832909
+"CMR","Cameroon","admin0","Incidence Rate","Cases per Thousand",2022,262.665801715245
+"CMR","Cameroon","admin0","Incidence Rate","Cases per Thousand",2023,258.512932020463
+"CMR","Cameroon","admin0","Incidence Rate","Cases per Thousand",2024,256.97297602384003
+"CMR","Cameroon","admin0","Infection Prevalence","per 100 Children",2022,22.6869297276326
+"CMR","Cameroon","admin0","Infection Prevalence","per 100 Children",2023,22.7746860050082
+"CMR","Cameroon","admin0","Infection Prevalence","per 100 Children",2024,22.7848817063451
+"CMR","Cameroon","admin0","Mortality Rate","Deaths per 100 Thousand",2022,95.1429282214623
+"CMR","Cameroon","admin0","Mortality Rate","Deaths per 100 Thousand",2023,83.20078405877369
+"CMR","Cameroon","admin0","Mortality Rate","Deaths per 100 Thousand",2024,84.1095832088005
+"COD","Democratic Republic of the Congo","admin0","Incidence Rate","Cases per Thousand",2022,317.361933065329
+"COD","Democratic Republic of the Congo","admin0","Incidence Rate","Cases per Thousand",2023,313.443527070953
+"COD","Democratic Republic of the Congo","admin0","Incidence Rate","Cases per Thousand",2024,308.947490270972
+"COD","Democratic Republic of the Congo","admin0","Infection Prevalence","per 100 Children",2022,33.8187607655534
+"COD","Democratic Republic of the Congo","admin0","Infection Prevalence","per 100 Children",2023,33.6317943575334
+"COD","Democratic Republic of the Congo","admin0","Infection Prevalence","per 100 Children",2024,33.2893731240264
+"COD","Democratic Republic of the Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2022,76.8580526475588
+"COD","Democratic Republic of the Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2023,72.9417862763849
+"COD","Democratic Republic of the Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2024,72.3558524226755
+"COG","Congo","admin0","Incidence Rate","Cases per Thousand",2022,224.876524504103
+"COG","Congo","admin0","Incidence Rate","Cases per Thousand",2023,224.978230982339
+"COG","Congo","admin0","Incidence Rate","Cases per Thousand",2024,225.55870337311302
+"COG","Congo","admin0","Infection Prevalence","per 100 Children",2022,20.8353451131911
+"COG","Congo","admin0","Infection Prevalence","per 100 Children",2023,20.9651535352914
+"COG","Congo","admin0","Infection Prevalence","per 100 Children",2024,21.285179556236
+"COG","Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2022,44.1734566169783
+"COG","Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2023,42.9614021128315
+"COG","Congo","admin0","Mortality Rate","Deaths per 100 Thousand",2024,43.3464631658956
+"COL","Colombia","admin0","Incidence Rate","Cases per Thousand",2022,1.14859285487695
+"COL","Colombia","admin0","Incidence Rate","Cases per Thousand",2023,1.31558298289453
+"COL","Colombia","admin0","Incidence Rate","Cases per Thousand",2024,1.5127978471608001
+"COL","Colombia","admin0","Infection Prevalence","per 100 Children",2022,0.049108108592535796
+"COL","Colombia","admin0","Infection Prevalence","per 100 Children",2023,0.0567387342845401
+"COL","Colombia","admin0","Infection Prevalence","per 100 Children",2024,0.0659091023330689
+"COL","Colombia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.19187584875334998
+"COL","Colombia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.272552535695071
+"COL","Colombia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.25796229554564504
+"COM","Comoros","admin0","Incidence Rate","Cases per Thousand",2022,54.194169965399304
+"COM","Comoros","admin0","Incidence Rate","Cases per Thousand",2023,52.4581764139969
+"COM","Comoros","admin0","Incidence Rate","Cases per Thousand",2024,50.733893107261906
+"COM","Comoros","admin0","Infection Prevalence","per 100 Children",2022,2.1350869964514003
+"COM","Comoros","admin0","Infection Prevalence","per 100 Children",2023,2.06461669687246
+"COM","Comoros","admin0","Infection Prevalence","per 100 Children",2024,2.03615112819875
+"COM","Comoros","admin0","Mortality Rate","Deaths per 100 Thousand",2022,2.6204589594876797
+"COM","Comoros","admin0","Mortality Rate","Deaths per 100 Thousand",2023,3.5809289648946
+"COM","Comoros","admin0","Mortality Rate","Deaths per 100 Thousand",2024,2.64326258134235
+"CPV","Cape Verde","admin0","Incidence Rate","Cases per Thousand",2022,0
+"CPV","Cape Verde","admin0","Incidence Rate","Cases per Thousand",2023,0
+"CPV","Cape Verde","admin0","Incidence Rate","Cases per Thousand",2024,0
+"CPV","Cape Verde","admin0","Infection Prevalence","per 100 Children",2022,0
+"CPV","Cape Verde","admin0","Infection Prevalence","per 100 Children",2023,0
+"CPV","Cape Verde","admin0","Infection Prevalence","per 100 Children",2024,0
+"CPV","Cape Verde","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"CPV","Cape Verde","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"CPV","Cape Verde","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"CRI","Costa Rica","admin0","Incidence Rate","Cases per Thousand",2022,0.0767660485388186
+"CRI","Costa Rica","admin0","Incidence Rate","Cases per Thousand",2023,0.09838186042557501
+"CRI","Costa Rica","admin0","Incidence Rate","Cases per Thousand",2024,0.0979125482680349
+"CRI","Costa Rica","admin0","Infection Prevalence","per 100 Children",2022,0.00293547647996513
+"CRI","Costa Rica","admin0","Infection Prevalence","per 100 Children",2023,0.00376236520190093
+"CRI","Costa Rica","admin0","Infection Prevalence","per 100 Children",2024,0.0037444954874826597
+"CRI","Costa Rica","admin0","Mortality Rate","Deaths per 100 Thousand",2022,9.99853078659085e-10
+"CRI","Costa Rica","admin0","Mortality Rate","Deaths per 100 Thousand",2023,1.1976429255233498e-9
+"CRI","Costa Rica","admin0","Mortality Rate","Deaths per 100 Thousand",2024,1.62231773311372e-9
+"DJI","Djibouti","admin0","Incidence Rate","Cases per Thousand",2022,56.1253934706595
+"DJI","Djibouti","admin0","Incidence Rate","Cases per Thousand",2023,54.5271005586662
+"DJI","Djibouti","admin0","Incidence Rate","Cases per Thousand",2024,80.2111114756537
+"DJI","Djibouti","admin0","Infection Prevalence","per 100 Children",2022,2.4881885745803403
+"DJI","Djibouti","admin0","Infection Prevalence","per 100 Children",2023,2.41131102177664
+"DJI","Djibouti","admin0","Infection Prevalence","per 100 Children",2024,4.80054492813064
+"DJI","Djibouti","admin0","Mortality Rate","Deaths per 100 Thousand",2022,14.677821744183301
+"DJI","Djibouti","admin0","Mortality Rate","Deaths per 100 Thousand",2023,9.97267485523057
+"DJI","Djibouti","admin0","Mortality Rate","Deaths per 100 Thousand",2024,11.091626327273701
+"DOM","Dominican Republic","admin0","Incidence Rate","Cases per Thousand",2022,0.0654612848019169
+"DOM","Dominican Republic","admin0","Incidence Rate","Cases per Thousand",2023,0.0487323964159598
+"DOM","Dominican Republic","admin0","Incidence Rate","Cases per Thousand",2024,0.047283945015805795
+"DOM","Dominican Republic","admin0","Infection Prevalence","per 100 Children",2022,0.00250353377138651
+"DOM","Dominican Republic","admin0","Infection Prevalence","per 100 Children",2023,0.0018635594988200598
+"DOM","Dominican Republic","admin0","Infection Prevalence","per 100 Children",2024,0.0018082644725710602
+"DOM","Dominican Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0147982062268909
+"DOM","Dominican Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0222360668133879
+"DOM","Dominican Republic","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.020790253654993898
+"DZA","Algeria","admin0","Incidence Rate","Cases per Thousand",2022,0
+"DZA","Algeria","admin0","Incidence Rate","Cases per Thousand",2023,0
+"DZA","Algeria","admin0","Incidence Rate","Cases per Thousand",2024,0
+"DZA","Algeria","admin0","Infection Prevalence","per 100 Children",2022,0
+"DZA","Algeria","admin0","Infection Prevalence","per 100 Children",2023,0
+"DZA","Algeria","admin0","Infection Prevalence","per 100 Children",2024,0
+"DZA","Algeria","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"DZA","Algeria","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"DZA","Algeria","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"ECU","Ecuador","admin0","Incidence Rate","Cases per Thousand",2022,0.0204754792067105
+"ECU","Ecuador","admin0","Incidence Rate","Cases per Thousand",2023,0.00392389641610084
+"ECU","Ecuador","admin0","Incidence Rate","Cases per Thousand",2024,0.00199208150096761
+"ECU","Ecuador","admin0","Infection Prevalence","per 100 Children",2022,0.0008003324726296209
+"ECU","Ecuador","admin0","Infection Prevalence","per 100 Children",2023,0.000150893581544893
+"ECU","Ecuador","admin0","Infection Prevalence","per 100 Children",2024,0.0000768613118195713
+"ECU","Ecuador","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0025685839465724803
+"ECU","Ecuador","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0048120057165402805
+"ECU","Ecuador","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.00180716398350183
+"ERI","Eritrea","admin0","Incidence Rate","Cases per Thousand",2022,19.7795790157726
+"ERI","Eritrea","admin0","Incidence Rate","Cases per Thousand",2023,26.429897421964498
+"ERI","Eritrea","admin0","Incidence Rate","Cases per Thousand",2024,22.3854417867893
+"ERI","Eritrea","admin0","Infection Prevalence","per 100 Children",2022,0.774357041154206
+"ERI","Eritrea","admin0","Infection Prevalence","per 100 Children",2023,1.04281580159108
+"ERI","Eritrea","admin0","Infection Prevalence","per 100 Children",2024,0.881621084934918
+"ERI","Eritrea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,5.46620373230469
+"ERI","Eritrea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,6.5746751384991295
+"ERI","Eritrea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,6.590821294133529
+"ETH","Ethiopia","admin0","Incidence Rate","Cases per Thousand",2022,65.9149923931033
+"ETH","Ethiopia","admin0","Incidence Rate","Cases per Thousand",2023,112.517878466966
+"ETH","Ethiopia","admin0","Incidence Rate","Cases per Thousand",2024,72.30797084572791
+"ETH","Ethiopia","admin0","Infection Prevalence","per 100 Children",2022,2.76869277000191
+"ETH","Ethiopia","admin0","Infection Prevalence","per 100 Children",2023,4.97950585809853
+"ETH","Ethiopia","admin0","Infection Prevalence","per 100 Children",2024,3.12278456610967
+"ETH","Ethiopia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,9.09942342317982
+"ETH","Ethiopia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,10.8280485373963
+"ETH","Ethiopia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,12.4240912193449
+"GAB","Gabon","admin0","Incidence Rate","Cases per Thousand",2022,187.69198155326998
+"GAB","Gabon","admin0","Incidence Rate","Cases per Thousand",2023,190.16309111710999
+"GAB","Gabon","admin0","Incidence Rate","Cases per Thousand",2024,191.233329802116
+"GAB","Gabon","admin0","Infection Prevalence","per 100 Children",2022,16.6478830357705
+"GAB","Gabon","admin0","Infection Prevalence","per 100 Children",2023,17.2321955618979
+"GAB","Gabon","admin0","Infection Prevalence","per 100 Children",2024,17.5075665161772
+"GAB","Gabon","admin0","Mortality Rate","Deaths per 100 Thousand",2022,31.9680194747137
+"GAB","Gabon","admin0","Mortality Rate","Deaths per 100 Thousand",2023,32.4159653378959
+"GAB","Gabon","admin0","Mortality Rate","Deaths per 100 Thousand",2024,32.879680502452
+"GEO","Georgia","admin0","Incidence Rate","Cases per Thousand",2022,0
+"GEO","Georgia","admin0","Incidence Rate","Cases per Thousand",2023,0
+"GEO","Georgia","admin0","Incidence Rate","Cases per Thousand",2024,0
+"GEO","Georgia","admin0","Infection Prevalence","per 100 Children",2022,0
+"GEO","Georgia","admin0","Infection Prevalence","per 100 Children",2023,0
+"GEO","Georgia","admin0","Infection Prevalence","per 100 Children",2024,0
+"GEO","Georgia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"GEO","Georgia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"GEO","Georgia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"GHA","Ghana","admin0","Incidence Rate","Cases per Thousand",2022,211.375420248128
+"GHA","Ghana","admin0","Incidence Rate","Cases per Thousand",2023,193.685738802674
+"GHA","Ghana","admin0","Incidence Rate","Cases per Thousand",2024,189.158391721789
+"GHA","Ghana","admin0","Infection Prevalence","per 100 Children",2022,17.8157864234202
+"GHA","Ghana","admin0","Infection Prevalence","per 100 Children",2023,16.0139785331056
+"GHA","Ghana","admin0","Infection Prevalence","per 100 Children",2024,15.540013445563
+"GHA","Ghana","admin0","Mortality Rate","Deaths per 100 Thousand",2022,51.0658338355916
+"GHA","Ghana","admin0","Mortality Rate","Deaths per 100 Thousand",2023,49.1335201683802
+"GHA","Ghana","admin0","Mortality Rate","Deaths per 100 Thousand",2024,48.2493288728053
+"GIN","Guinea","admin0","Incidence Rate","Cases per Thousand",2022,254.959465355366
+"GIN","Guinea","admin0","Incidence Rate","Cases per Thousand",2023,252.254333515259
+"GIN","Guinea","admin0","Incidence Rate","Cases per Thousand",2024,250.86317269304598
+"GIN","Guinea","admin0","Infection Prevalence","per 100 Children",2022,20.4680717415153
+"GIN","Guinea","admin0","Infection Prevalence","per 100 Children",2023,20.5344202339732
+"GIN","Guinea","admin0","Infection Prevalence","per 100 Children",2024,20.4832609060007
+"GIN","Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,69.7483388950936
+"GIN","Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,69.8515065876599
+"GIN","Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,70.2768990069366
+"GMB","Gambia","admin0","Incidence Rate","Cases per Thousand",2022,143.118042659583
+"GMB","Gambia","admin0","Incidence Rate","Cases per Thousand",2023,132.478332015109
+"GMB","Gambia","admin0","Incidence Rate","Cases per Thousand",2024,166.375288900112
+"GMB","Gambia","admin0","Infection Prevalence","per 100 Children",2022,6.02703996110089
+"GMB","Gambia","admin0","Infection Prevalence","per 100 Children",2023,5.56053048485557
+"GMB","Gambia","admin0","Infection Prevalence","per 100 Children",2024,7.448587419277029
+"GMB","Gambia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,25.679000024988
+"GMB","Gambia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,28.050943389855398
+"GMB","Gambia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,32.880781004161
+"GNB","Guinea-Bissau","admin0","Incidence Rate","Cases per Thousand",2022,110.783131350273
+"GNB","Guinea-Bissau","admin0","Incidence Rate","Cases per Thousand",2023,103.909628726053
+"GNB","Guinea-Bissau","admin0","Incidence Rate","Cases per Thousand",2024,103.219415051025
+"GNB","Guinea-Bissau","admin0","Infection Prevalence","per 100 Children",2022,6.89629568887932
+"GNB","Guinea-Bissau","admin0","Infection Prevalence","per 100 Children",2023,6.298000449435801
+"GNB","Guinea-Bissau","admin0","Infection Prevalence","per 100 Children",2024,6.25983055850731
+"GNB","Guinea-Bissau","admin0","Mortality Rate","Deaths per 100 Thousand",2022,25.410433955068402
+"GNB","Guinea-Bissau","admin0","Mortality Rate","Deaths per 100 Thousand",2023,20.5041127781998
+"GNB","Guinea-Bissau","admin0","Mortality Rate","Deaths per 100 Thousand",2024,20.2884179456088
+"GNQ","Equatorial Guinea","admin0","Incidence Rate","Cases per Thousand",2022,235.325154231606
+"GNQ","Equatorial Guinea","admin0","Incidence Rate","Cases per Thousand",2023,229.418098145892
+"GNQ","Equatorial Guinea","admin0","Incidence Rate","Cases per Thousand",2024,228.803179539832
+"GNQ","Equatorial Guinea","admin0","Infection Prevalence","per 100 Children",2022,22.219975779046898
+"GNQ","Equatorial Guinea","admin0","Infection Prevalence","per 100 Children",2023,21.5833043670067
+"GNQ","Equatorial Guinea","admin0","Infection Prevalence","per 100 Children",2024,21.7711643387736
+"GNQ","Equatorial Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,84.1609018525728
+"GNQ","Equatorial Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,74.72715892938079
+"GNQ","Equatorial Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,73.9554190014637
+"GTM","Guatemala","admin0","Incidence Rate","Cases per Thousand",2022,0.00253017232186997
+"GTM","Guatemala","admin0","Incidence Rate","Cases per Thousand",2023,0
+"GTM","Guatemala","admin0","Incidence Rate","Cases per Thousand",2024,0
+"GTM","Guatemala","admin0","Infection Prevalence","per 100 Children",2022,0.000096878843035391
+"GTM","Guatemala","admin0","Infection Prevalence","per 100 Children",2023,0
+"GTM","Guatemala","admin0","Infection Prevalence","per 100 Children",2024,0
+"GTM","Guatemala","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.00022551839750859802
+"GTM","Guatemala","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"GTM","Guatemala","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"GUF","French Guiana","admin0","Incidence Rate","Cases per Thousand",2022,0
+"GUF","French Guiana","admin0","Incidence Rate","Cases per Thousand",2023,1.28489915045923
+"GUF","French Guiana","admin0","Incidence Rate","Cases per Thousand",2024,0.356928080460008
+"GUF","French Guiana","admin0","Infection Prevalence","per 100 Children",2022,0
+"GUF","French Guiana","admin0","Infection Prevalence","per 100 Children",2023,0.050034794179671806
+"GUF","French Guiana","admin0","Infection Prevalence","per 100 Children",2024,0.0138083619524574
+"GUF","French Guiana","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"GUF","French Guiana","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"GUF","French Guiana","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"GUY","Guyana","admin0","Incidence Rate","Cases per Thousand",2022,16.8420663197376
+"GUY","Guyana","admin0","Incidence Rate","Cases per Thousand",2023,22.019002823110398
+"GUY","Guyana","admin0","Incidence Rate","Cases per Thousand",2024,18.3400346424697
+"GUY","Guyana","admin0","Infection Prevalence","per 100 Children",2022,0.778794110214061
+"GUY","Guyana","admin0","Infection Prevalence","per 100 Children",2023,1.04868574526301
+"GUY","Guyana","admin0","Infection Prevalence","per 100 Children",2024,0.8568873432478259
+"GUY","Guyana","admin0","Mortality Rate","Deaths per 100 Thousand",2022,4.73681629599554
+"GUY","Guyana","admin0","Mortality Rate","Deaths per 100 Thousand",2023,6.03441760704612
+"GUY","Guyana","admin0","Mortality Rate","Deaths per 100 Thousand",2024,6.2662359730514
+"HND","Honduras","admin0","Incidence Rate","Cases per Thousand",2022,0.233515279111935
+"HND","Honduras","admin0","Incidence Rate","Cases per Thousand",2023,0.114030457171198
+"HND","Honduras","admin0","Incidence Rate","Cases per Thousand",2024,0.174180261094052
+"HND","Honduras","admin0","Infection Prevalence","per 100 Children",2022,0.0101264995469122
+"HND","Honduras","admin0","Infection Prevalence","per 100 Children",2023,0.00461523346742535
+"HND","Honduras","admin0","Infection Prevalence","per 100 Children",2024,0.00803018047614384
+"HND","Honduras","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0191385533936635
+"HND","Honduras","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0120341459567045
+"HND","Honduras","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0150335234805692
+"HTI","Haiti","admin0","Incidence Rate","Cases per Thousand",2022,5.39650588013798
+"HTI","Haiti","admin0","Incidence Rate","Cases per Thousand",2023,4.99897988849406
+"HTI","Haiti","admin0","Incidence Rate","Cases per Thousand",2024,5.879968112966679
+"HTI","Haiti","admin0","Infection Prevalence","per 100 Children",2022,0.21016531810428
+"HTI","Haiti","admin0","Infection Prevalence","per 100 Children",2023,0.194393702587385
+"HTI","Haiti","admin0","Infection Prevalence","per 100 Children",2024,0.232153109988192
+"HTI","Haiti","admin0","Mortality Rate","Deaths per 100 Thousand",2022,3.21756722396808
+"HTI","Haiti","admin0","Mortality Rate","Deaths per 100 Thousand",2023,3.74002518428148
+"HTI","Haiti","admin0","Mortality Rate","Deaths per 100 Thousand",2024,4.13393110590533
+"IDN","Indonesia","admin0","Incidence Rate","Cases per Thousand",2022,2.3175415268947903
+"IDN","Indonesia","admin0","Incidence Rate","Cases per Thousand",2023,2.00409226919687
+"IDN","Indonesia","admin0","Incidence Rate","Cases per Thousand",2024,1.9214706170159699
+"IDN","Indonesia","admin0","Infection Prevalence","per 100 Children",2022,0.121088987917151
+"IDN","Indonesia","admin0","Infection Prevalence","per 100 Children",2023,0.10489376237156399
+"IDN","Indonesia","admin0","Infection Prevalence","per 100 Children",2024,0.10033497530584101
+"IDN","Indonesia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.16841655034677802
+"IDN","Indonesia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.14444106190856001
+"IDN","Indonesia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.161565140827675
+"IND","India","admin0","Incidence Rate","Cases per Thousand",2022,0.854370045176766
+"IND","India","admin0","Incidence Rate","Cases per Thousand",2023,0.972046695025578
+"IND","India","admin0","Incidence Rate","Cases per Thousand",2024,0.974473962627523
+"IND","India","admin0","Infection Prevalence","per 100 Children",2022,0.0363144314101922
+"IND","India","admin0","Infection Prevalence","per 100 Children",2023,0.041916816894280604
+"IND","India","admin0","Infection Prevalence","per 100 Children",2024,0.041995612812485296
+"IND","India","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.9008331788316271
+"IND","India","admin0","Mortality Rate","Deaths per 100 Thousand",2023,1.10077211888996
+"IND","India","admin0","Mortality Rate","Deaths per 100 Thousand",2024,1.06514736220473
+"IRN","Iran","admin0","Incidence Rate","Cases per Thousand",2022,0.00253089999522132
+"IRN","Iran","admin0","Incidence Rate","Cases per Thousand",2023,0.009684345577744
+"IRN","Iran","admin0","Incidence Rate","Cases per Thousand",2024,0.009615757267900779
+"IRN","Iran","admin0","Infection Prevalence","per 100 Children",2022,0.000097068235803168
+"IRN","Iran","admin0","Infection Prevalence","per 100 Children",2023,0.00037212474550132397
+"IRN","Iran","admin0","Infection Prevalence","per 100 Children",2024,0.000369609877027534
+"IRN","Iran","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"IRN","Iran","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0000164370102329144
+"IRN","Iran","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0000204849859373419
+"IRQ","Iraq","admin0","Incidence Rate","Cases per Thousand",2022,0
+"IRQ","Iraq","admin0","Incidence Rate","Cases per Thousand",2023,0
+"IRQ","Iraq","admin0","Incidence Rate","Cases per Thousand",2024,0
+"IRQ","Iraq","admin0","Infection Prevalence","per 100 Children",2022,0
+"IRQ","Iraq","admin0","Infection Prevalence","per 100 Children",2023,0
+"IRQ","Iraq","admin0","Infection Prevalence","per 100 Children",2024,0
+"IRQ","Iraq","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"IRQ","Iraq","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"IRQ","Iraq","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"KEN","Kenya","admin0","Incidence Rate","Cases per Thousand",2022,62.1570344236831
+"KEN","Kenya","admin0","Incidence Rate","Cases per Thousand",2023,59.672868585218694
+"KEN","Kenya","admin0","Incidence Rate","Cases per Thousand",2024,58.3009907500574
+"KEN","Kenya","admin0","Infection Prevalence","per 100 Children",2022,4.08809574369709
+"KEN","Kenya","admin0","Infection Prevalence","per 100 Children",2023,3.8749898511325904
+"KEN","Kenya","admin0","Infection Prevalence","per 100 Children",2024,3.77808213224397
+"KEN","Kenya","admin0","Mortality Rate","Deaths per 100 Thousand",2022,7.81063697153804
+"KEN","Kenya","admin0","Mortality Rate","Deaths per 100 Thousand",2023,6.31040732787051
+"KEN","Kenya","admin0","Mortality Rate","Deaths per 100 Thousand",2024,6.295196106269261
+"KGZ","Kyrgyzstan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"KGZ","Kyrgyzstan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"KGZ","Kyrgyzstan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"KGZ","Kyrgyzstan","admin0","Infection Prevalence","per 100 Children",2022,0
+"KGZ","Kyrgyzstan","admin0","Infection Prevalence","per 100 Children",2023,0
+"KGZ","Kyrgyzstan","admin0","Infection Prevalence","per 100 Children",2024,0
+"KGZ","Kyrgyzstan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"KGZ","Kyrgyzstan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"KGZ","Kyrgyzstan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"KHM","Cambodia","admin0","Incidence Rate","Cases per Thousand",2022,0.0852378445981637
+"KHM","Cambodia","admin0","Incidence Rate","Cases per Thousand",2023,0.008093274146011239
+"KHM","Cambodia","admin0","Incidence Rate","Cases per Thousand",2024,0.00832886479326018
+"KHM","Cambodia","admin0","Infection Prevalence","per 100 Children",2022,0.0032612741584421797
+"KHM","Cambodia","admin0","Infection Prevalence","per 100 Children",2023,0.00030940796222058797
+"KHM","Cambodia","admin0","Infection Prevalence","per 100 Children",2024,0.00031844195034975504
+"KHM","Cambodia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0210055023698025
+"KHM","Cambodia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.185306586060774
+"KHM","Cambodia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.17416194214803601
+"KOR","South Korea","admin0","Incidence Rate","Cases per Thousand",2022,0
+"KOR","South Korea","admin0","Incidence Rate","Cases per Thousand",2023,0
+"KOR","South Korea","admin0","Incidence Rate","Cases per Thousand",2024,0
+"KOR","South Korea","admin0","Infection Prevalence","per 100 Children",2022,0
+"KOR","South Korea","admin0","Infection Prevalence","per 100 Children",2023,0
+"KOR","South Korea","admin0","Infection Prevalence","per 100 Children",2024,0
+"KOR","South Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"KOR","South Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"KOR","South Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"LAO","Laos","admin0","Incidence Rate","Cases per Thousand",2022,0.16382497791627001
+"LAO","Laos","admin0","Incidence Rate","Cases per Thousand",2023,0.0318067803739034
+"LAO","Laos","admin0","Incidence Rate","Cases per Thousand",2024,0.030930440248122602
+"LAO","Laos","admin0","Infection Prevalence","per 100 Children",2022,0.00626998483238027
+"LAO","Laos","admin0","Infection Prevalence","per 100 Children",2023,0.0012161373943451
+"LAO","Laos","admin0","Infection Prevalence","per 100 Children",2024,0.00118276681262069
+"LAO","Laos","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.036012964289184504
+"LAO","Laos","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.168773651364553
+"LAO","Laos","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.194187596094103
+"LBR","Liberia","admin0","Incidence Rate","Cases per Thousand",2022,185.74446936445398
+"LBR","Liberia","admin0","Incidence Rate","Cases per Thousand",2023,183.745800919652
+"LBR","Liberia","admin0","Incidence Rate","Cases per Thousand",2024,177.931496796654
+"LBR","Liberia","admin0","Infection Prevalence","per 100 Children",2022,15.3126966629817
+"LBR","Liberia","admin0","Infection Prevalence","per 100 Children",2023,15.1841013729629
+"LBR","Liberia","admin0","Infection Prevalence","per 100 Children",2024,14.5959546784685
+"LBR","Liberia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,97.264880869233
+"LBR","Liberia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,85.3368732169138
+"LBR","Liberia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,82.13078219123959
+"LKA","Sri Lanka","admin0","Incidence Rate","Cases per Thousand",2022,0
+"LKA","Sri Lanka","admin0","Incidence Rate","Cases per Thousand",2023,0
+"LKA","Sri Lanka","admin0","Incidence Rate","Cases per Thousand",2024,0
+"LKA","Sri Lanka","admin0","Infection Prevalence","per 100 Children",2022,0
+"LKA","Sri Lanka","admin0","Infection Prevalence","per 100 Children",2023,0
+"LKA","Sri Lanka","admin0","Infection Prevalence","per 100 Children",2024,0
+"LKA","Sri Lanka","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"LKA","Sri Lanka","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"LKA","Sri Lanka","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"MAR","Morocco","admin0","Incidence Rate","Cases per Thousand",2022,0
+"MAR","Morocco","admin0","Incidence Rate","Cases per Thousand",2023,0
+"MAR","Morocco","admin0","Incidence Rate","Cases per Thousand",2024,0
+"MAR","Morocco","admin0","Infection Prevalence","per 100 Children",2022,0
+"MAR","Morocco","admin0","Infection Prevalence","per 100 Children",2023,0
+"MAR","Morocco","admin0","Infection Prevalence","per 100 Children",2024,0
+"MAR","Morocco","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"MAR","Morocco","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"MAR","Morocco","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"MDG","Madagascar","admin0","Incidence Rate","Cases per Thousand",2022,142.05516589262402
+"MDG","Madagascar","admin0","Incidence Rate","Cases per Thousand",2023,128.81604278422301
+"MDG","Madagascar","admin0","Incidence Rate","Cases per Thousand",2024,129.26518731181898
+"MDG","Madagascar","admin0","Infection Prevalence","per 100 Children",2022,10.0182479756114
+"MDG","Madagascar","admin0","Infection Prevalence","per 100 Children",2023,9.06088467149359
+"MDG","Madagascar","admin0","Infection Prevalence","per 100 Children",2024,9.14990227065015
+"MDG","Madagascar","admin0","Mortality Rate","Deaths per 100 Thousand",2022,31.3662551194053
+"MDG","Madagascar","admin0","Mortality Rate","Deaths per 100 Thousand",2023,31.639072214876798
+"MDG","Madagascar","admin0","Mortality Rate","Deaths per 100 Thousand",2024,31.3807041174578
+"MEX","Mexico","admin0","Incidence Rate","Cases per Thousand",2022,0
+"MEX","Mexico","admin0","Incidence Rate","Cases per Thousand",2023,0
+"MEX","Mexico","admin0","Incidence Rate","Cases per Thousand",2024,0
+"MEX","Mexico","admin0","Infection Prevalence","per 100 Children",2022,0
+"MEX","Mexico","admin0","Infection Prevalence","per 100 Children",2023,0
+"MEX","Mexico","admin0","Infection Prevalence","per 100 Children",2024,0
+"MEX","Mexico","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"MEX","Mexico","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"MEX","Mexico","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"MLI","Mali","admin0","Incidence Rate","Cases per Thousand",2022,218.271222412621
+"MLI","Mali","admin0","Incidence Rate","Cases per Thousand",2023,235.985715237477
+"MLI","Mali","admin0","Incidence Rate","Cases per Thousand",2024,236.162215863718
+"MLI","Mali","admin0","Infection Prevalence","per 100 Children",2022,15.2869887443173
+"MLI","Mali","admin0","Infection Prevalence","per 100 Children",2023,17.169959072952302
+"MLI","Mali","admin0","Infection Prevalence","per 100 Children",2024,17.2208057612884
+"MLI","Mali","admin0","Mortality Rate","Deaths per 100 Thousand",2022,78.6138158670837
+"MLI","Mali","admin0","Mortality Rate","Deaths per 100 Thousand",2023,78.3639622843636
+"MLI","Mali","admin0","Mortality Rate","Deaths per 100 Thousand",2024,78.5138697300273
+"MMR","Myanmar","admin0","Incidence Rate","Cases per Thousand",2022,2.80155998519243
+"MMR","Myanmar","admin0","Incidence Rate","Cases per Thousand",2023,3.63377103899626
+"MMR","Myanmar","admin0","Incidence Rate","Cases per Thousand",2024,4.23061594004705
+"MMR","Myanmar","admin0","Infection Prevalence","per 100 Children",2022,0.11116742720042401
+"MMR","Myanmar","admin0","Infection Prevalence","per 100 Children",2023,0.14596380627386898
+"MMR","Myanmar","admin0","Infection Prevalence","per 100 Children",2024,0.172241064531421
+"MMR","Myanmar","admin0","Mortality Rate","Deaths per 100 Thousand",2022,1.33382804873962
+"MMR","Myanmar","admin0","Mortality Rate","Deaths per 100 Thousand",2023,1.7074292419249202
+"MMR","Myanmar","admin0","Mortality Rate","Deaths per 100 Thousand",2024,1.6695494462066
+"MOZ","Mozambique","admin0","Incidence Rate","Cases per Thousand",2022,272.67168324853
+"MOZ","Mozambique","admin0","Incidence Rate","Cases per Thousand",2023,275.19852278220105
+"MOZ","Mozambique","admin0","Incidence Rate","Cases per Thousand",2024,277.322612433397
+"MOZ","Mozambique","admin0","Infection Prevalence","per 100 Children",2022,22.6280093186557
+"MOZ","Mozambique","admin0","Infection Prevalence","per 100 Children",2023,22.800991552240802
+"MOZ","Mozambique","admin0","Infection Prevalence","per 100 Children",2024,23.1790254382814
+"MOZ","Mozambique","admin0","Mortality Rate","Deaths per 100 Thousand",2022,58.5102444491797
+"MOZ","Mozambique","admin0","Mortality Rate","Deaths per 100 Thousand",2023,49.8694996339433
+"MOZ","Mozambique","admin0","Mortality Rate","Deaths per 100 Thousand",2024,50.2187216586173
+"MRT","Mauritania","admin0","Incidence Rate","Cases per Thousand",2022,55.5180105772187
+"MRT","Mauritania","admin0","Incidence Rate","Cases per Thousand",2023,56.9710993403609
+"MRT","Mauritania","admin0","Incidence Rate","Cases per Thousand",2024,57.0642624456561
+"MRT","Mauritania","admin0","Infection Prevalence","per 100 Children",2022,2.24006924564652
+"MRT","Mauritania","admin0","Infection Prevalence","per 100 Children",2023,2.30604931354211
+"MRT","Mauritania","admin0","Infection Prevalence","per 100 Children",2024,2.38625144018
+"MRT","Mauritania","admin0","Mortality Rate","Deaths per 100 Thousand",2022,17.992850438462302
+"MRT","Mauritania","admin0","Mortality Rate","Deaths per 100 Thousand",2023,18.5252115349683
+"MRT","Mauritania","admin0","Mortality Rate","Deaths per 100 Thousand",2024,19.6509412417531
+"MWI","Malawi","admin0","Incidence Rate","Cases per Thousand",2022,226.980050702822
+"MWI","Malawi","admin0","Incidence Rate","Cases per Thousand",2023,228.512516631973
+"MWI","Malawi","admin0","Incidence Rate","Cases per Thousand",2024,225.96738540291798
+"MWI","Malawi","admin0","Infection Prevalence","per 100 Children",2022,18.974614218145298
+"MWI","Malawi","admin0","Infection Prevalence","per 100 Children",2023,19.3402624473932
+"MWI","Malawi","admin0","Infection Prevalence","per 100 Children",2024,19.20185934426
+"MWI","Malawi","admin0","Mortality Rate","Deaths per 100 Thousand",2022,45.068369090813896
+"MWI","Malawi","admin0","Mortality Rate","Deaths per 100 Thousand",2023,39.8347272921369
+"MWI","Malawi","admin0","Mortality Rate","Deaths per 100 Thousand",2024,40.476891905096196
+"MYS","Malaysia","admin0","Incidence Rate","Cases per Thousand",2022,0
+"MYS","Malaysia","admin0","Incidence Rate","Cases per Thousand",2023,0
+"MYS","Malaysia","admin0","Incidence Rate","Cases per Thousand",2024,0
+"MYS","Malaysia","admin0","Infection Prevalence","per 100 Children",2022,0
+"MYS","Malaysia","admin0","Infection Prevalence","per 100 Children",2023,0
+"MYS","Malaysia","admin0","Infection Prevalence","per 100 Children",2024,0
+"MYS","Malaysia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"MYS","Malaysia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"MYS","Malaysia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"MYT","Mayotte","admin0","Incidence Rate","Cases per Thousand",2022,0
+"MYT","Mayotte","admin0","Incidence Rate","Cases per Thousand",2023,0
+"MYT","Mayotte","admin0","Incidence Rate","Cases per Thousand",2024,0
+"MYT","Mayotte","admin0","Infection Prevalence","per 100 Children",2022,0
+"MYT","Mayotte","admin0","Infection Prevalence","per 100 Children",2023,0
+"MYT","Mayotte","admin0","Infection Prevalence","per 100 Children",2024,0
+"MYT","Mayotte","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"MYT","Mayotte","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"MYT","Mayotte","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"NAM","Namibia","admin0","Incidence Rate","Cases per Thousand",2022,11.841294357490101
+"NAM","Namibia","admin0","Incidence Rate","Cases per Thousand",2023,12.663238250148401
+"NAM","Namibia","admin0","Incidence Rate","Cases per Thousand",2024,12.7936790027266
+"NAM","Namibia","admin0","Infection Prevalence","per 100 Children",2022,0.4609131829425
+"NAM","Namibia","admin0","Infection Prevalence","per 100 Children",2023,0.49298764359427
+"NAM","Namibia","admin0","Infection Prevalence","per 100 Children",2024,0.498463690846084
+"NAM","Namibia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.938665665292174
+"NAM","Namibia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,2.1165126758963297
+"NAM","Namibia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,1.8974712198580501
+"NER","Niger","admin0","Incidence Rate","Cases per Thousand",2022,279.086560430936
+"NER","Niger","admin0","Incidence Rate","Cases per Thousand",2023,246.455732190079
+"NER","Niger","admin0","Incidence Rate","Cases per Thousand",2024,245.41756215941902
+"NER","Niger","admin0","Infection Prevalence","per 100 Children",2022,19.3725414909308
+"NER","Niger","admin0","Infection Prevalence","per 100 Children",2023,16.7656695339709
+"NER","Niger","admin0","Infection Prevalence","per 100 Children",2024,16.6907968161812
+"NER","Niger","admin0","Mortality Rate","Deaths per 100 Thousand",2022,113.224627193187
+"NER","Niger","admin0","Mortality Rate","Deaths per 100 Thousand",2023,116.466714035384
+"NER","Niger","admin0","Mortality Rate","Deaths per 100 Thousand",2024,116.270360906442
+"NGA","Nigeria","admin0","Incidence Rate","Cases per Thousand",2022,283.540085483852
+"NGA","Nigeria","admin0","Incidence Rate","Cases per Thousand",2023,278.180079495182
+"NGA","Nigeria","admin0","Incidence Rate","Cases per Thousand",2024,278.865617192141
+"NGA","Nigeria","admin0","Infection Prevalence","per 100 Children",2022,23.4891647919951
+"NGA","Nigeria","admin0","Infection Prevalence","per 100 Children",2023,23.9316593013735
+"NGA","Nigeria","admin0","Infection Prevalence","per 100 Children",2024,24.138096304205998
+"NGA","Nigeria","admin0","Mortality Rate","Deaths per 100 Thousand",2022,92.21783084153179
+"NGA","Nigeria","admin0","Mortality Rate","Deaths per 100 Thousand",2023,88.4845039410317
+"NGA","Nigeria","admin0","Mortality Rate","Deaths per 100 Thousand",2024,87.73344649603729
+"NIC","Nicaragua","admin0","Incidence Rate","Cases per Thousand",2022,1.4232334535103401
+"NIC","Nicaragua","admin0","Incidence Rate","Cases per Thousand",2023,0.329953083837301
+"NIC","Nicaragua","admin0","Incidence Rate","Cases per Thousand",2024,0.106633726313959
+"NIC","Nicaragua","admin0","Infection Prevalence","per 100 Children",2022,0.055446314762844805
+"NIC","Nicaragua","admin0","Infection Prevalence","per 100 Children",2023,0.0127931531710062
+"NIC","Nicaragua","admin0","Infection Prevalence","per 100 Children",2024,0.00413671278308627
+"NIC","Nicaragua","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.17726188904780799
+"NIC","Nicaragua","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.26540484867172903
+"NIC","Nicaragua","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0992093543619794
+"NPL","Nepal","admin0","Incidence Rate","Cases per Thousand",2022,0.000735323461584252
+"NPL","Nepal","admin0","Incidence Rate","Cases per Thousand",2023,0.000694340162362328
+"NPL","Nepal","admin0","Incidence Rate","Cases per Thousand",2024,0.000658394614975692
+"NPL","Nepal","admin0","Infection Prevalence","per 100 Children",2022,0.0000281665607750861
+"NPL","Nepal","admin0","Infection Prevalence","per 100 Children",2023,0.0000265744741228619
+"NPL","Nepal","admin0","Infection Prevalence","per 100 Children",2024,0.000025258191479153498
+"NPL","Nepal","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.000686651189572673
+"NPL","Nepal","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.000727204143737611
+"NPL","Nepal","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0008158998730862629
+"OMN","Oman","admin0","Incidence Rate","Cases per Thousand",2022,0.000135708630714291
+"OMN","Oman","admin0","Incidence Rate","Cases per Thousand",2023,0.0000981852246228487
+"OMN","Oman","admin0","Incidence Rate","Cases per Thousand",2024,0.00011718972900942301
+"OMN","Oman","admin0","Infection Prevalence","per 100 Children",2022,0.0000051896126376867195
+"OMN","Oman","admin0","Infection Prevalence","per 100 Children",2023,0.00000375393595291417
+"OMN","Oman","admin0","Infection Prevalence","per 100 Children",2024,0.00000448030867817966
+"OMN","Oman","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.00005401636800610049
+"OMN","Oman","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.00006424202376748929
+"OMN","Oman","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0000752550331070869
+"PAK","Pakistan","admin0","Incidence Rate","Cases per Thousand",2022,16.5138374836102
+"PAK","Pakistan","admin0","Incidence Rate","Cases per Thousand",2023,22.0697441949706
+"PAK","Pakistan","admin0","Incidence Rate","Cases per Thousand",2024,16.9106393908026
+"PAK","Pakistan","admin0","Infection Prevalence","per 100 Children",2022,0.739650970547641
+"PAK","Pakistan","admin0","Infection Prevalence","per 100 Children",2023,0.996391773723088
+"PAK","Pakistan","admin0","Infection Prevalence","per 100 Children",2024,0.758779672398124
+"PAK","Pakistan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,7.9114887979725195
+"PAK","Pakistan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,3.41219785446626
+"PAK","Pakistan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,3.91941624222076
+"PAN","Panama","admin0","Incidence Rate","Cases per Thousand",2022,0.044798484892751796
+"PAN","Panama","admin0","Incidence Rate","Cases per Thousand",2023,0.00729785349473691
+"PAN","Panama","admin0","Incidence Rate","Cases per Thousand",2024,0.014356647370125099
+"PAN","Panama","admin0","Infection Prevalence","per 100 Children",2022,0.0017136859201362402
+"PAN","Panama","admin0","Infection Prevalence","per 100 Children",2023,0.00027901198566487997
+"PAN","Panama","admin0","Infection Prevalence","per 100 Children",2024,0.00054903491212721
+"PAN","Panama","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.00669750334013768
+"PAN","Panama","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0102025559258641
+"PAN","Panama","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.00594680831753038
+"PER","Peru","admin0","Incidence Rate","Cases per Thousand",2022,0.223779951695239
+"PER","Peru","admin0","Incidence Rate","Cases per Thousand",2023,0.183617334219167
+"PER","Peru","admin0","Incidence Rate","Cases per Thousand",2024,0.188614503591707
+"PER","Peru","admin0","Infection Prevalence","per 100 Children",2022,0.00891110094506048
+"PER","Peru","admin0","Infection Prevalence","per 100 Children",2023,0.007253087036668799
+"PER","Peru","admin0","Infection Prevalence","per 100 Children",2024,0.00748647590708918
+"PER","Peru","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.026814668256873002
+"PER","Peru","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0286484041166025
+"PER","Peru","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.025610042050729302
+"PHL","Philippines","admin0","Incidence Rate","Cases per Thousand",2022,0.0632615414425139
+"PHL","Philippines","admin0","Incidence Rate","Cases per Thousand",2023,0.10004242056814401
+"PHL","Philippines","admin0","Incidence Rate","Cases per Thousand",2024,0.100117959261511
+"PHL","Philippines","admin0","Infection Prevalence","per 100 Children",2022,0.00245451164128853
+"PHL","Philippines","admin0","Infection Prevalence","per 100 Children",2023,0.0039039117235694495
+"PHL","Philippines","admin0","Infection Prevalence","per 100 Children",2024,0.00391534376665864
+"PHL","Philippines","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.010940043735318001
+"PHL","Philippines","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0103723965636046
+"PHL","Philippines","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.00901263885247424
+"PNG","Papua New Guinea","admin0","Incidence Rate","Cases per Thousand",2022,108.653383420384
+"PNG","Papua New Guinea","admin0","Incidence Rate","Cases per Thousand",2023,100.818126322838
+"PNG","Papua New Guinea","admin0","Incidence Rate","Cases per Thousand",2024,103.837545460283
+"PNG","Papua New Guinea","admin0","Infection Prevalence","per 100 Children",2022,5.88046597627311
+"PNG","Papua New Guinea","admin0","Infection Prevalence","per 100 Children",2023,5.43808144008319
+"PNG","Papua New Guinea","admin0","Infection Prevalence","per 100 Children",2024,5.6109914593983605
+"PNG","Papua New Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,22.6244078509278
+"PNG","Papua New Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,24.486106175926096
+"PNG","Papua New Guinea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,23.7140587649771
+"PRK","North Korea","admin0","Incidence Rate","Cases per Thousand",2022,0
+"PRK","North Korea","admin0","Incidence Rate","Cases per Thousand",2023,0
+"PRK","North Korea","admin0","Incidence Rate","Cases per Thousand",2024,0
+"PRK","North Korea","admin0","Infection Prevalence","per 100 Children",2022,0
+"PRK","North Korea","admin0","Infection Prevalence","per 100 Children",2023,0
+"PRK","North Korea","admin0","Infection Prevalence","per 100 Children",2024,0
+"PRK","North Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"PRK","North Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"PRK","North Korea","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"PRY","Paraguay","admin0","Incidence Rate","Cases per Thousand",2022,0
+"PRY","Paraguay","admin0","Incidence Rate","Cases per Thousand",2023,0
+"PRY","Paraguay","admin0","Incidence Rate","Cases per Thousand",2024,0
+"PRY","Paraguay","admin0","Infection Prevalence","per 100 Children",2022,0
+"PRY","Paraguay","admin0","Infection Prevalence","per 100 Children",2023,0
+"PRY","Paraguay","admin0","Infection Prevalence","per 100 Children",2024,0
+"PRY","Paraguay","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"PRY","Paraguay","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"PRY","Paraguay","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"RWA","Rwanda","admin0","Incidence Rate","Cases per Thousand",2022,41.0179664375954
+"RWA","Rwanda","admin0","Incidence Rate","Cases per Thousand",2023,40.155609529737404
+"RWA","Rwanda","admin0","Incidence Rate","Cases per Thousand",2024,40.5259642251793
+"RWA","Rwanda","admin0","Infection Prevalence","per 100 Children",2022,2.2304083940396398
+"RWA","Rwanda","admin0","Infection Prevalence","per 100 Children",2023,2.220397150636
+"RWA","Rwanda","admin0","Infection Prevalence","per 100 Children",2024,2.25007874890971
+"RWA","Rwanda","admin0","Mortality Rate","Deaths per 100 Thousand",2022,19.9368865278007
+"RWA","Rwanda","admin0","Mortality Rate","Deaths per 100 Thousand",2023,19.4519628167276
+"RWA","Rwanda","admin0","Mortality Rate","Deaths per 100 Thousand",2024,19.4769206698475
+"SAU","Saudi Arabia","admin0","Incidence Rate","Cases per Thousand",2022,0
+"SAU","Saudi Arabia","admin0","Incidence Rate","Cases per Thousand",2023,0
+"SAU","Saudi Arabia","admin0","Incidence Rate","Cases per Thousand",2024,0
+"SAU","Saudi Arabia","admin0","Infection Prevalence","per 100 Children",2022,0
+"SAU","Saudi Arabia","admin0","Infection Prevalence","per 100 Children",2023,0
+"SAU","Saudi Arabia","admin0","Infection Prevalence","per 100 Children",2024,0
+"SAU","Saudi Arabia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"SAU","Saudi Arabia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"SAU","Saudi Arabia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"SDN","Sudan","admin0","Incidence Rate","Cases per Thousand",2022,66.1409197680728
+"SDN","Sudan","admin0","Incidence Rate","Cases per Thousand",2023,65.3217648952786
+"SDN","Sudan","admin0","Incidence Rate","Cases per Thousand",2024,65.17886599534759
+"SDN","Sudan","admin0","Infection Prevalence","per 100 Children",2022,4.39067018483558
+"SDN","Sudan","admin0","Infection Prevalence","per 100 Children",2023,4.232436986352949
+"SDN","Sudan","admin0","Infection Prevalence","per 100 Children",2024,4.232620408891529
+"SDN","Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,8.69154720404711
+"SDN","Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,7.64937163491493
+"SDN","Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,7.64508701416609
+"SEN","Senegal","admin0","Incidence Rate","Cases per Thousand",2022,80.38248859827141
+"SEN","Senegal","admin0","Incidence Rate","Cases per Thousand",2023,132.28138658995002
+"SEN","Senegal","admin0","Incidence Rate","Cases per Thousand",2024,142.367410871664
+"SEN","Senegal","admin0","Infection Prevalence","per 100 Children",2022,3.32409899959786
+"SEN","Senegal","admin0","Infection Prevalence","per 100 Children",2023,5.73731142587914
+"SEN","Senegal","admin0","Infection Prevalence","per 100 Children",2024,6.4816120679154405
+"SEN","Senegal","admin0","Mortality Rate","Deaths per 100 Thousand",2022,16.6354799091077
+"SEN","Senegal","admin0","Mortality Rate","Deaths per 100 Thousand",2023,21.9239574744661
+"SEN","Senegal","admin0","Mortality Rate","Deaths per 100 Thousand",2024,22.446595626755002
+"SLB","Solomon Islands","admin0","Incidence Rate","Cases per Thousand",2022,88.73159208694679
+"SLB","Solomon Islands","admin0","Incidence Rate","Cases per Thousand",2023,103.047078928977
+"SLB","Solomon Islands","admin0","Incidence Rate","Cases per Thousand",2024,95.26452450999021
+"SLB","Solomon Islands","admin0","Infection Prevalence","per 100 Children",2022,4.3479274771526
+"SLB","Solomon Islands","admin0","Infection Prevalence","per 100 Children",2023,5.098432990295191
+"SLB","Solomon Islands","admin0","Infection Prevalence","per 100 Children",2024,4.71726629060417
+"SLB","Solomon Islands","admin0","Mortality Rate","Deaths per 100 Thousand",2022,19.8895601282797
+"SLB","Solomon Islands","admin0","Mortality Rate","Deaths per 100 Thousand",2023,22.721838235676
+"SLB","Solomon Islands","admin0","Mortality Rate","Deaths per 100 Thousand",2024,21.3806188521757
+"SLE","Sierra Leone","admin0","Incidence Rate","Cases per Thousand",2022,301.00174330457105
+"SLE","Sierra Leone","admin0","Incidence Rate","Cases per Thousand",2023,283.972393175734
+"SLE","Sierra Leone","admin0","Incidence Rate","Cases per Thousand",2024,282.505211471478
+"SLE","Sierra Leone","admin0","Infection Prevalence","per 100 Children",2022,32.3610495873256
+"SLE","Sierra Leone","admin0","Infection Prevalence","per 100 Children",2023,30.020084363044102
+"SLE","Sierra Leone","admin0","Infection Prevalence","per 100 Children",2024,29.9180759828533
+"SLE","Sierra Leone","admin0","Mortality Rate","Deaths per 100 Thousand",2022,151.91338548097198
+"SLE","Sierra Leone","admin0","Mortality Rate","Deaths per 100 Thousand",2023,131.43749671852
+"SLE","Sierra Leone","admin0","Mortality Rate","Deaths per 100 Thousand",2024,133.267287939934
+"SLV","El Salvador","admin0","Incidence Rate","Cases per Thousand",2022,0
+"SLV","El Salvador","admin0","Incidence Rate","Cases per Thousand",2023,0
+"SLV","El Salvador","admin0","Incidence Rate","Cases per Thousand",2024,0
+"SLV","El Salvador","admin0","Infection Prevalence","per 100 Children",2022,0
+"SLV","El Salvador","admin0","Infection Prevalence","per 100 Children",2023,0
+"SLV","El Salvador","admin0","Infection Prevalence","per 100 Children",2024,0
+"SLV","El Salvador","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"SLV","El Salvador","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"SLV","El Salvador","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"SOM","Somalia","admin0","Incidence Rate","Cases per Thousand",2022,54.495609462896404
+"SOM","Somalia","admin0","Incidence Rate","Cases per Thousand",2023,55.0697043289005
+"SOM","Somalia","admin0","Incidence Rate","Cases per Thousand",2024,54.019097257766305
+"SOM","Somalia","admin0","Infection Prevalence","per 100 Children",2022,2.92945341992325
+"SOM","Somalia","admin0","Infection Prevalence","per 100 Children",2023,2.93839375119673
+"SOM","Somalia","admin0","Infection Prevalence","per 100 Children",2024,2.87571553496303
+"SOM","Somalia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,8.71347062763025
+"SOM","Somalia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,8.51104333309863
+"SOM","Somalia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,8.56597543498355
+"SSD","South Sudan","admin0","Incidence Rate","Cases per Thousand",2022,257.795354106362
+"SSD","South Sudan","admin0","Incidence Rate","Cases per Thousand",2023,254.43594879169302
+"SSD","South Sudan","admin0","Incidence Rate","Cases per Thousand",2024,255.22276837360602
+"SSD","South Sudan","admin0","Infection Prevalence","per 100 Children",2022,23.7201711404978
+"SSD","South Sudan","admin0","Infection Prevalence","per 100 Children",2023,23.0065528738501
+"SSD","South Sudan","admin0","Infection Prevalence","per 100 Children",2024,23.1297320166709
+"SSD","South Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,51.52778921538209
+"SSD","South Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,47.9757813982381
+"SSD","South Sudan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,46.7822811136077
+"STP","Sao Tome And Principe","admin0","Incidence Rate","Cases per Thousand",2022,31.245476133344898
+"STP","Sao Tome And Principe","admin0","Incidence Rate","Cases per Thousand",2023,17.9124916391227
+"STP","Sao Tome And Principe","admin0","Incidence Rate","Cases per Thousand",2024,19.7598780531342
+"STP","Sao Tome And Principe","admin0","Infection Prevalence","per 100 Children",2022,1.5933147348330599
+"STP","Sao Tome And Principe","admin0","Infection Prevalence","per 100 Children",2023,0.937292637039518
+"STP","Sao Tome And Principe","admin0","Infection Prevalence","per 100 Children",2024,1.02267460217809
+"STP","Sao Tome And Principe","admin0","Mortality Rate","Deaths per 100 Thousand",2022,1.73365098128411
+"STP","Sao Tome And Principe","admin0","Mortality Rate","Deaths per 100 Thousand",2023,1.51085880734984
+"STP","Sao Tome And Principe","admin0","Mortality Rate","Deaths per 100 Thousand",2024,1.4350889807924099
+"SUR","Suriname","admin0","Incidence Rate","Cases per Thousand",2022,0
+"SUR","Suriname","admin0","Incidence Rate","Cases per Thousand",2023,0
+"SUR","Suriname","admin0","Incidence Rate","Cases per Thousand",2024,0
+"SUR","Suriname","admin0","Infection Prevalence","per 100 Children",2022,0
+"SUR","Suriname","admin0","Infection Prevalence","per 100 Children",2023,0
+"SUR","Suriname","admin0","Infection Prevalence","per 100 Children",2024,0
+"SUR","Suriname","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"SUR","Suriname","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"SUR","Suriname","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"SWZ","Eswatini","admin0","Incidence Rate","Cases per Thousand",2022,0.804912794362482
+"SWZ","Eswatini","admin0","Incidence Rate","Cases per Thousand",2023,1.86635459822986
+"SWZ","Eswatini","admin0","Incidence Rate","Cases per Thousand",2024,1.29917248886847
+"SWZ","Eswatini","admin0","Infection Prevalence","per 100 Children",2022,0.031750711881491006
+"SWZ","Eswatini","admin0","Infection Prevalence","per 100 Children",2023,0.076222682108278
+"SWZ","Eswatini","admin0","Infection Prevalence","per 100 Children",2024,0.052855433565792795
+"SWZ","Eswatini","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.12826672590681298
+"SWZ","Eswatini","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.31487148390151704
+"SWZ","Eswatini","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.28899576114474
+"SYR","Syria","admin0","Incidence Rate","Cases per Thousand",2022,0
+"SYR","Syria","admin0","Incidence Rate","Cases per Thousand",2023,0
+"SYR","Syria","admin0","Incidence Rate","Cases per Thousand",2024,0
+"SYR","Syria","admin0","Infection Prevalence","per 100 Children",2022,0
+"SYR","Syria","admin0","Infection Prevalence","per 100 Children",2023,0
+"SYR","Syria","admin0","Infection Prevalence","per 100 Children",2024,0
+"SYR","Syria","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"SYR","Syria","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"SYR","Syria","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"TCD","Chad","admin0","Incidence Rate","Cases per Thousand",2022,207.23347902997799
+"TCD","Chad","admin0","Incidence Rate","Cases per Thousand",2023,204.323651505714
+"TCD","Chad","admin0","Incidence Rate","Cases per Thousand",2024,204.844903590056
+"TCD","Chad","admin0","Infection Prevalence","per 100 Children",2022,14.3056460890633
+"TCD","Chad","admin0","Infection Prevalence","per 100 Children",2023,13.993451257764999
+"TCD","Chad","admin0","Infection Prevalence","per 100 Children",2024,14.060438822345
+"TCD","Chad","admin0","Mortality Rate","Deaths per 100 Thousand",2022,42.807897086709495
+"TCD","Chad","admin0","Mortality Rate","Deaths per 100 Thousand",2023,42.042171484095505
+"TCD","Chad","admin0","Mortality Rate","Deaths per 100 Thousand",2024,41.5796471297876
+"TGO","Togo","admin0","Incidence Rate","Cases per Thousand",2022,237.070798917429
+"TGO","Togo","admin0","Incidence Rate","Cases per Thousand",2023,229.875190065567
+"TGO","Togo","admin0","Incidence Rate","Cases per Thousand",2024,228.102358394424
+"TGO","Togo","admin0","Infection Prevalence","per 100 Children",2022,20.6169523378273
+"TGO","Togo","admin0","Infection Prevalence","per 100 Children",2023,20.33229801798
+"TGO","Togo","admin0","Infection Prevalence","per 100 Children",2024,20.299744987948802
+"TGO","Togo","admin0","Mortality Rate","Deaths per 100 Thousand",2022,59.2399868932455
+"TGO","Togo","admin0","Mortality Rate","Deaths per 100 Thousand",2023,56.832718224166705
+"TGO","Togo","admin0","Mortality Rate","Deaths per 100 Thousand",2024,57.052011040025505
+"THA","Thailand","admin0","Incidence Rate","Cases per Thousand",2022,0.0060988843377814605
+"THA","Thailand","admin0","Incidence Rate","Cases per Thousand",2023,0.006985256626289181
+"THA","Thailand","admin0","Incidence Rate","Cases per Thousand",2024,0.0099497612702323
+"THA","Thailand","admin0","Infection Prevalence","per 100 Children",2022,0.000233759376867787
+"THA","Thailand","admin0","Infection Prevalence","per 100 Children",2023,0.000267754811515577
+"THA","Thailand","admin0","Infection Prevalence","per 100 Children",2024,0.000381977553514888
+"THA","Thailand","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.00145438525586581
+"THA","Thailand","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0015491355584443202
+"THA","Thailand","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.00236682968237731
+"TJK","Tajikistan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"TJK","Tajikistan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"TJK","Tajikistan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"TJK","Tajikistan","admin0","Infection Prevalence","per 100 Children",2022,0
+"TJK","Tajikistan","admin0","Infection Prevalence","per 100 Children",2023,0
+"TJK","Tajikistan","admin0","Infection Prevalence","per 100 Children",2024,0
+"TJK","Tajikistan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"TJK","Tajikistan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"TJK","Tajikistan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"TKM","Turkmenistan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"TKM","Turkmenistan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"TKM","Turkmenistan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"TKM","Turkmenistan","admin0","Infection Prevalence","per 100 Children",2022,0
+"TKM","Turkmenistan","admin0","Infection Prevalence","per 100 Children",2023,0
+"TKM","Turkmenistan","admin0","Infection Prevalence","per 100 Children",2024,0
+"TKM","Turkmenistan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"TKM","Turkmenistan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"TKM","Turkmenistan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"TLS","Timor-Leste","admin0","Incidence Rate","Cases per Thousand",2022,0
+"TLS","Timor-Leste","admin0","Incidence Rate","Cases per Thousand",2023,0.000168945379475726
+"TLS","Timor-Leste","admin0","Incidence Rate","Cases per Thousand",2024,0.00109866966092426
+"TLS","Timor-Leste","admin0","Infection Prevalence","per 100 Children",2022,0
+"TLS","Timor-Leste","admin0","Infection Prevalence","per 100 Children",2023,0.00000645863675541585
+"TLS","Timor-Leste","admin0","Infection Prevalence","per 100 Children",2024,0.000042015754036362
+"TLS","Timor-Leste","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"TLS","Timor-Leste","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.000594120520872146
+"TLS","Timor-Leste","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.00033895502523995
+"TUR","Turkey","admin0","Incidence Rate","Cases per Thousand",2022,0
+"TUR","Turkey","admin0","Incidence Rate","Cases per Thousand",2023,0
+"TUR","Turkey","admin0","Incidence Rate","Cases per Thousand",2024,0
+"TUR","Turkey","admin0","Infection Prevalence","per 100 Children",2022,0
+"TUR","Turkey","admin0","Infection Prevalence","per 100 Children",2023,0
+"TUR","Turkey","admin0","Infection Prevalence","per 100 Children",2024,0
+"TUR","Turkey","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"TUR","Turkey","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"TUR","Turkey","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"TZA","Tanzania","admin0","Incidence Rate","Cases per Thousand",2022,131.964044504945
+"TZA","Tanzania","admin0","Incidence Rate","Cases per Thousand",2023,128.932849626297
+"TZA","Tanzania","admin0","Incidence Rate","Cases per Thousand",2024,128.466444648715
+"TZA","Tanzania","admin0","Infection Prevalence","per 100 Children",2022,8.53326127908698
+"TZA","Tanzania","admin0","Infection Prevalence","per 100 Children",2023,8.5480286488169
+"TZA","Tanzania","admin0","Infection Prevalence","per 100 Children",2024,8.557664771039029
+"TZA","Tanzania","admin0","Mortality Rate","Deaths per 100 Thousand",2022,21.1781179210092
+"TZA","Tanzania","admin0","Mortality Rate","Deaths per 100 Thousand",2023,20.0593581189579
+"TZA","Tanzania","admin0","Mortality Rate","Deaths per 100 Thousand",2024,20.0883538958673
+"UGA","Uganda","admin0","Incidence Rate","Cases per Thousand",2022,244.921865783823
+"UGA","Uganda","admin0","Incidence Rate","Cases per Thousand",2023,236.840125885072
+"UGA","Uganda","admin0","Incidence Rate","Cases per Thousand",2024,240.377197649837
+"UGA","Uganda","admin0","Infection Prevalence","per 100 Children",2022,21.6124840634694
+"UGA","Uganda","admin0","Infection Prevalence","per 100 Children",2023,20.6437947436448
+"UGA","Uganda","admin0","Infection Prevalence","per 100 Children",2024,21.2994986958692
+"UGA","Uganda","admin0","Mortality Rate","Deaths per 100 Thousand",2022,70.5835791469361
+"UGA","Uganda","admin0","Mortality Rate","Deaths per 100 Thousand",2023,57.5429931213451
+"UGA","Uganda","admin0","Mortality Rate","Deaths per 100 Thousand",2024,57.0359433424907
+"UZB","Uzbekistan","admin0","Incidence Rate","Cases per Thousand",2022,0
+"UZB","Uzbekistan","admin0","Incidence Rate","Cases per Thousand",2023,0
+"UZB","Uzbekistan","admin0","Incidence Rate","Cases per Thousand",2024,0
+"UZB","Uzbekistan","admin0","Infection Prevalence","per 100 Children",2022,0
+"UZB","Uzbekistan","admin0","Infection Prevalence","per 100 Children",2023,0
+"UZB","Uzbekistan","admin0","Infection Prevalence","per 100 Children",2024,0
+"UZB","Uzbekistan","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"UZB","Uzbekistan","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0
+"UZB","Uzbekistan","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"VEN","Venezuela","admin0","Incidence Rate","Cases per Thousand",2022,2.61115084933258
+"VEN","Venezuela","admin0","Incidence Rate","Cases per Thousand",2023,2.84196608579705
+"VEN","Venezuela","admin0","Incidence Rate","Cases per Thousand",2024,2.51990997914361
+"VEN","Venezuela","admin0","Infection Prevalence","per 100 Children",2022,0.133413105662503
+"VEN","Venezuela","admin0","Infection Prevalence","per 100 Children",2023,0.14877303322933
+"VEN","Venezuela","admin0","Infection Prevalence","per 100 Children",2024,0.12941723268928398
+"VEN","Venezuela","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.475514476645493
+"VEN","Venezuela","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.833540308109489
+"VEN","Venezuela","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.7345893949580741
+"VNM","Vietnam","admin0","Incidence Rate","Cases per Thousand",2022,0.0068096640181492
+"VNM","Vietnam","admin0","Incidence Rate","Cases per Thousand",2023,0.0027985490806052803
+"VNM","Vietnam","admin0","Incidence Rate","Cases per Thousand",2024,0.00422521797650174
+"VNM","Vietnam","admin0","Infection Prevalence","per 100 Children",2022,0.00026049655101701997
+"VNM","Vietnam","admin0","Infection Prevalence","per 100 Children",2023,0.000107026797410647
+"VNM","Vietnam","admin0","Infection Prevalence","per 100 Children",2024,0.000161607540727455
+"VNM","Vietnam","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.00293577475207849
+"VNM","Vietnam","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0121395020594857
+"VNM","Vietnam","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.013599683496616999
+"VUT","Vanuatu","admin0","Incidence Rate","Cases per Thousand",2022,0
+"VUT","Vanuatu","admin0","Incidence Rate","Cases per Thousand",2023,0.0354514524635342
+"VUT","Vanuatu","admin0","Incidence Rate","Cases per Thousand",2024,0.0153730100354783
+"VUT","Vanuatu","admin0","Infection Prevalence","per 100 Children",2022,0
+"VUT","Vanuatu","admin0","Infection Prevalence","per 100 Children",2023,0.00135636348113316
+"VUT","Vanuatu","admin0","Infection Prevalence","per 100 Children",2024,0.000588459650481128
+"VUT","Vanuatu","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0
+"VUT","Vanuatu","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.00112479281613955
+"VUT","Vanuatu","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0
+"YEM","Yemen","admin0","Incidence Rate","Cases per Thousand",2022,44.0107371335905
+"YEM","Yemen","admin0","Incidence Rate","Cases per Thousand",2023,40.364825208225604
+"YEM","Yemen","admin0","Incidence Rate","Cases per Thousand",2024,39.6540117550925
+"YEM","Yemen","admin0","Infection Prevalence","per 100 Children",2022,2.18679306860877
+"YEM","Yemen","admin0","Infection Prevalence","per 100 Children",2023,2.0005011605059
+"YEM","Yemen","admin0","Infection Prevalence","per 100 Children",2024,1.96766329120007
+"YEM","Yemen","admin0","Mortality Rate","Deaths per 100 Thousand",2022,12.0714199905713
+"YEM","Yemen","admin0","Mortality Rate","Deaths per 100 Thousand",2023,12.260645599560899
+"YEM","Yemen","admin0","Mortality Rate","Deaths per 100 Thousand",2024,12.0118549725929
+"ZAF","South Africa","admin0","Incidence Rate","Cases per Thousand",2022,0.195874892629399
+"ZAF","South Africa","admin0","Incidence Rate","Cases per Thousand",2023,0.467941741824623
+"ZAF","South Africa","admin0","Incidence Rate","Cases per Thousand",2024,0.447911595427767
+"ZAF","South Africa","admin0","Infection Prevalence","per 100 Children",2022,0.0074994242421739495
+"ZAF","South Africa","admin0","Infection Prevalence","per 100 Children",2023,0.0179502898494728
+"ZAF","South Africa","admin0","Infection Prevalence","per 100 Children",2024,0.017204126070504602
+"ZAF","South Africa","admin0","Mortality Rate","Deaths per 100 Thousand",2022,0.0262622285189638
+"ZAF","South Africa","admin0","Mortality Rate","Deaths per 100 Thousand",2023,0.0446812466856825
+"ZAF","South Africa","admin0","Mortality Rate","Deaths per 100 Thousand",2024,0.0363646622615448
+"ZMB","Zambia","admin0","Incidence Rate","Cases per Thousand",2022,182.18600791045301
+"ZMB","Zambia","admin0","Incidence Rate","Cases per Thousand",2023,179.869858503037
+"ZMB","Zambia","admin0","Incidence Rate","Cases per Thousand",2024,176.598002501764
+"ZMB","Zambia","admin0","Infection Prevalence","per 100 Children",2022,14.319599750881101
+"ZMB","Zambia","admin0","Infection Prevalence","per 100 Children",2023,13.919336659505799
+"ZMB","Zambia","admin0","Infection Prevalence","per 100 Children",2024,13.6882843361244
+"ZMB","Zambia","admin0","Mortality Rate","Deaths per 100 Thousand",2022,35.8421968732031
+"ZMB","Zambia","admin0","Mortality Rate","Deaths per 100 Thousand",2023,30.0977145601414
+"ZMB","Zambia","admin0","Mortality Rate","Deaths per 100 Thousand",2024,29.9358875177096
+"ZWE","Zimbabwe","admin0","Incidence Rate","Cases per Thousand",2022,53.7276665069504
+"ZWE","Zimbabwe","admin0","Incidence Rate","Cases per Thousand",2023,80.6110819476004
+"ZWE","Zimbabwe","admin0","Incidence Rate","Cases per Thousand",2024,76.6171887959642
+"ZWE","Zimbabwe","admin0","Infection Prevalence","per 100 Children",2022,2.19039196825032
+"ZWE","Zimbabwe","admin0","Infection Prevalence","per 100 Children",2023,3.3838393954770902
+"ZWE","Zimbabwe","admin0","Infection Prevalence","per 100 Children",2024,3.26786457400072
+"ZWE","Zimbabwe","admin0","Mortality Rate","Deaths per 100 Thousand",2022,2.74905889464837
+"ZWE","Zimbabwe","admin0","Mortality Rate","Deaths per 100 Thousand",2023,2.81635621075582
+"ZWE","Zimbabwe","admin0","Mortality Rate","Deaths per 100 Thousand",2024,2.57124802751372
