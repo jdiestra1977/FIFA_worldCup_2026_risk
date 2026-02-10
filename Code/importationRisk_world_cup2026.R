@@ -1,9 +1,9 @@
 library(tidyverse)
 library(readxl)
 
-setwd("~/Projects/World_Cup_2026/")
+setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 
-dengue_data_world<-read_xlsx("dengue-global-data-2025-12-10.xlsx")
+dengue_data_world<-read_xlsx("Data/dengue-global-data-2025-12-10.xlsx")
 
 dengue_data_world_selected<-dengue_data_world %>% 
   select(date,date_lab,who_region_long,country,cases)
@@ -19,13 +19,11 @@ dengue_data_world_selected %>% select(date,who_region_long,cases) %>%
 Sys.glob("*")
 
 #https://immunizationdata.who.int
-measles_data <- read_xlsx("Measles reported cases and incidence 2025-09-12 14-18 UTC.xlsx")
+measles_data <- read_xlsx("Data/Measles reported cases and incidence 2025-09-12 14-18 UTC.xlsx")
 
-pertusis_data <- read_xlsx("Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx")
+pertusis_data <- read_xlsx("Data/Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx")
 
-#malaria_data<-read_csv("malaria_world_data.csv")
-
-malaria_data_otro<-read_csv("Malaria_National_Unit_data.csv")
+malaria_data_otro<-read_csv("Data/Malaria_National_Unit_data.csv")
 malaria_cases<-malaria_data_otro %>% filter(Year==2024) %>% filter(Metric=="Incidence Rate") %>%
   select(Country=Name,cases_per1K=Value)
 
@@ -37,7 +35,7 @@ malaria_cases<-malaria_data_otro %>% filter(Year==2024) %>% filter(Metric=="Inci
 ### Arrivals using COR
 
 #These are arrivals to the US, regardless of airport or city of destination
-arrivals_COR <- read_csv("Monthly_Arrivals_Country_of_Residence_COR_1.csv")
+arrivals_COR <- read_csv("Data/Monthly_Arrivals_Country_of_Residence_COR_1.csv")
 
 arrivals_long<-arrivals_COR %>%
   mutate(across(-c(Country, World_region), ~ readr::parse_number(as.character(.x)))) %>%
@@ -128,7 +126,7 @@ ggplot(df_plot80, aes(x = Country, y = total)) +
        subtitle = "Countries shown until cumulative share reaches ~80% of regional arrivals") +
   scale_y_continuous(labels = scales::label_scientific(digits = 2),expand = expansion(mult = c(0, 0.15)))
 
-ggsave(last_plot(),file="countries_arriving_summer.png",width = 25,height = 12)
+ggsave(last_plot(),file="Figures/countries_arriving_summer.png",width = 25,height = 12)
 ## Now, we start!!!
 
 ###############################################################
@@ -185,8 +183,8 @@ bad_airport_raw <- c(
 # ----------------------------
 # 1) Read input files
 # ----------------------------
-ranking <- read_csv("Annual_Airport_Ranking_2023.csv", show_col_types = FALSE)
-airports_info <- read_csv("airports_information.csv", show_col_types = FALSE)
+ranking <- read_csv("Data/Annual_Airport_Ranking_2023.csv", show_col_types = FALSE)
+airports_info <- read_csv("Data/airports_information.csv", show_col_types = FALSE)
 
 ranking %>% glimpse()
 airports_info %>% glimpse()
@@ -417,7 +415,7 @@ library(ggplot2)
 library(ggrepel)
 library(grid)   # for unit()
 
-venues_position<-read_csv("world_cup_2026_stadiums_coordinates.csv") %>% filter(country == "USA") %>% 
+venues_position<-read_csv("Data/world_cup_2026_stadiums_coordinates.csv") %>% filter(country == "USA") %>% 
   rename("latitude_deg"="latitude","longitude_deg"="longitude")
 
 counties_contig <- counties_sf2 %>%
@@ -516,7 +514,7 @@ scale_size_continuous(range = c(1.5, 8), guide = "none") +
         legend.text = element_text(size = 12),
         plot.margin = margin(0, 5, 0, 30))  # 🔴 space for outside labels
 
-ggsave(last_plot(),file="map_probs_and_venues.png")
+ggsave(last_plot(),file="Figures/map_probs_and_venues.png")
 
 ###
 
