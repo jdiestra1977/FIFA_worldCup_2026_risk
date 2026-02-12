@@ -518,7 +518,7 @@ ggsave(last_plot(),file="Figures/map_probs_and_venues.png")
 
 ###
 
-population_of_world <-read_csv("~/Projects/ImportationRisk/population2020.csv") %>%
+population_of_world <-read_csv("Data/population2020.csv") %>%
   rename("Country"="COUNTRY","population_country"="POPULATION") %>%
   mutate(Country=ifelse(Country=="DR Congo","Zaire (formerly DRC)",Country))
 
@@ -626,7 +626,7 @@ prob_imp_dengue<-expected_imp_dengue_country_region %>%
 
 plot_grid(exp_imp_dengue,prob_imp_dengue)
 
-ggsave(last_plot(),file="figure_dengue.png",width=20,height = 15)
+ggsave(last_plot(),file="Figures/figure_dengue.png",width=20,height = 15)
 
 # 
 # 
@@ -692,7 +692,7 @@ labs(title = "Expected dengue importations by U.S. airport",
 
 visits_and_population_countries
 
-measles_data <- read_xlsx("Measles reported cases and incidence 2025-09-12 14-18 UTC.xlsx") %>%
+measles_data <- read_xlsx("Data/Measles reported cases and incidence 2025-09-12 14-18 UTC.xlsx") %>%
   select(Country=1,cases_per1M=4) %>% drop_na()
 
 measles_country_import <- visits_and_population_countries %>%
@@ -731,7 +731,7 @@ measles_country_import %>%
 
 plot_grid(exp_imp_measles,prob_imp_measles)
 
-ggsave(last_plot(),file="figure_dengue.png",width=20,height = 15)
+ggsave(last_plot(),file="Figures/figure_dengue.png",width=20,height = 15)
 
 measles_country_import
 
@@ -833,7 +833,7 @@ malaria_country_import %>%
 
 plot_grid(exp_imp_malaria,prob_imp_malaria)
 
-ggsave(last_plot(),file="figure_dengue.png",width=20,height = 15)
+ggsave(last_plot(),file="Figures/figure_malaria.png",width=20,height = 15)
 
 # 2) Allocate across airports using prob_entry
 malaria_country_airport <- malaria_country_import %>%
@@ -891,7 +891,7 @@ labs(title = "Expected malaria importations by U.S. airport",
 
 visits_and_population_countries
 
-pertussis_data <- read_xlsx("Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx") %>%
+pertussis_data <- read_xlsx("Data/Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx") %>%
   select(Country=1,cases_per1M=4) %>% drop_na()
 
 pertussis_country_import <- visits_and_population_countries %>%
@@ -937,7 +937,7 @@ plot_grid(dengue_map,malaria_map,measles_map,ncol=2)
 plot_grid(exp_imp_dengue,exp_imp_measles,exp_imp_malaria,exp_imp_pertussis,ncol=4,
           labels = "AUTO",label_size = 30)
 
-ggsave(last_plot(),file="expected_importations_top30.png",width = 25,height = 7)
+ggsave(last_plot(),file="Figures/expected_importations_top30.png",width = 25,height = 7)
 
 #Data about cities in the US
 
@@ -1044,23 +1044,23 @@ cities_us_contig %>% filter(str_detect(NAME,regex("west chicago", ignore_case = 
 ##-  U.S. Citizen Returning: U.S. citizen passengers arriving back to the United States 
 #    after international travel abroad.
 
-ny_from_world<-read_excel("Selected_cities_and_origins/data_world_to_ny.xlsx") %>% drop_na()
+ny_from_world<-read_excel("Data/Selected_cities_and_origins/data_world_to_ny.xlsx") %>% drop_na()
 
-ny_from_africa<-read_excel("Selected_cities_and_origins/data_africa_to_ny.xlsx") %>% drop_na()
-ny_from_asia<-read_excel("Selected_cities_and_origins/data_asia_to_ny.xlsx") %>% drop_na()
-ny_from_canada<-read_excel("Selected_cities_and_origins/data_canada_to_ny.xlsx") %>% drop_na()
-ny_from_caribbean<-read_excel("Selected_cities_and_origins/data_caribbean_to_ny.xlsx") %>% drop_na()
-ny_from_centAmerica<-read_excel("Selected_cities_and_origins/data_central_america_to_ny.xlsx") %>% drop_na()
-ny_from_europe<-read_excel("Selected_cities_and_origins/data_europe_to_ny.xlsx") %>% drop_na()
-ny_from_mexico<-read_excel("Selected_cities_and_origins/data_mexico_to_ny.xlsx") %>% drop_na()
-ny_from_mideast<-read_excel("Selected_cities_and_origins/data_mideast_to_ny.xlsx") %>% drop_na()
-ny_from_oceania<-read_excel("Selected_cities_and_origins/data_oceania_to_ny.xlsx") %>% drop_na()
-ny_from_southAmerica<-read_excel("Selected_cities_and_origins/data_south_america_to_ny.xlsx") %>% drop_na()
+ny_from_africa<-read_excel("Data/Selected_cities_and_origins/data_africa_to_ny.xlsx") %>% drop_na()
+ny_from_asia<-read_excel("Data/Selected_cities_and_origins/data_asia_to_ny.xlsx") %>% drop_na()
+ny_from_canada<-read_excel("Data/Selected_cities_and_origins/data_canada_to_ny.xlsx") %>% drop_na()
+ny_from_caribbean<-read_excel("Data/Selected_cities_and_origins/data_caribbean_to_ny.xlsx") %>% drop_na()
+ny_from_centAmerica<-read_excel("Data/Selected_cities_and_origins/data_central_america_to_ny.xlsx") %>% drop_na()
+ny_from_europe<-read_excel("Data/Selected_cities_and_origins/data_europe_to_ny.xlsx") %>% drop_na()
+ny_from_mexico<-read_excel("Data/Selected_cities_and_origins/data_mexico_to_ny.xlsx") %>% drop_na()
+ny_from_mideast<-read_excel("Data/Selected_cities_and_origins/data_mideast_to_ny.xlsx") %>% drop_na()
+ny_from_oceania<-read_excel("Data/Selected_cities_and_origins/data_oceania_to_ny.xlsx") %>% drop_na()
+ny_from_southAmerica<-read_excel("Data/Selected_cities_and_origins/data_south_america_to_ny.xlsx") %>% drop_na()
 
-usa_from_world<-read_excel("Selected_cities_and_origins/data_world_to_usa.xlsx") %>% drop_na()
+usa_from_world<-read_excel("Data/Selected_cities_and_origins/data_world_to_usa.xlsx") %>% drop_na()
 
 #For correspondence country - region
-arrivals_COR <- read_csv("Monthly_Arrivals_Country_of_Residence_COR_1.csv")
+arrivals_COR <- read_csv("Data/Monthly_Arrivals_Country_of_Residence_COR_1.csv")
 
 arrivals_COR %>% filter(str_detect(Country,"uerto"))
 
@@ -1156,7 +1156,7 @@ library(readr)
 # ----------------------------
 # file_vec should be your character vector of file paths
 # e.g. 
-file_vec <- list.files("Data_International_arrivals", full.names = TRUE)
+file_vec <- list.files("Data/Data_International_arrivals", full.names = TRUE)
 
 files_df <- tibble(file_path = file_vec) %>%
   mutate(
@@ -1244,7 +1244,7 @@ library(sf)
 # ------------------------------------------------------------
 # 1) Read file paths and extract city name from each file
 # ------------------------------------------------------------
-file_vec <- list.files("Data_International_arrivals", full.names = TRUE)
+file_vec <- list.files("Data/Data_International_arrivals", full.names = TRUE)
 
 files_df <- tibble(file_path = file_vec) %>%
   mutate(
@@ -1299,12 +1299,10 @@ cities_from_files %>% select(-file_path)
 
 airports_info
 ######
-Sys.glob("Data_International_arrivals/*.xlsx")
+Sys.glob("Data/Data_International_arrivals/*.xlsx")
 
 cities_us_contig %>% 
   filter(str_detect(NAME, regex("yuma", ignore_case = TRUE)))
-
-filter(str_detect("yuma",NAME))
 
 ranking %>% filter(str_detect(Airport,regex("yuma", ignore_case = TRUE)))
   
