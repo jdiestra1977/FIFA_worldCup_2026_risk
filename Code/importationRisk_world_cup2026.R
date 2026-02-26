@@ -1044,6 +1044,8 @@ cities_us_contig %>% filter(str_detect(NAME,regex("west chicago", ignore_case = 
 ##-  U.S. Citizen Returning: U.S. citizen passengers arriving back to the United States 
 #    after international travel abroad.
 
+Sys.glob("Data/Selected_cities_and_origins/*")
+
 ny_from_world<-read_excel("Data/Selected_cities_and_origins/data_world_to_ny.xlsx") %>% drop_na()
 
 ny_from_africa<-read_excel("Data/Selected_cities_and_origins/data_africa_to_ny.xlsx") %>% drop_na()
@@ -1329,4 +1331,46 @@ airports_info %>% filter(str_detect(name,regex("international",ignore_case = T))
            str_detect(municipality,regex(name_city, ignore_case = TRUE))) %>%
   select(type,name,municipality,iso_region)
 
-  
+### Games, teams, and venues
+
+teams_dates_venues<-read_excel("Data/WorldCup2026_games_template.xlsx")
+
+teams_dates_venues %>% 
+  mutate(Country = fct_relevel(Country, c("Mexico","Canada","USA")),
+         City    = fct_reorder(City, as.numeric(Country))) %>%
+  ggplot(aes(x = City, fill = Country)) + geom_bar() + theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = c(0.1,0.8))
+
+rbind(teams_dates_venues %>% 
+        filter(City %in% c("East Rutherford","Philadelphia","Foxborough")) %>% select(-`Team 2`) %>%
+        rename("Team"="Team 1"),
+      teams_dates_venues %>% 
+        filter(City %in% c("East Rutherford","Philadelphia","Foxborough")) %>% select(-`Team 1`) %>%
+        rename("Team"="Team 2")) %>%
+  filter(Team != "TBD")
+
+#Source: https://dentonrc.com/sports/fifa-to-start-notifying-winners-of-world-cup-ticket-lottery/article_c9d70ecc-9758-4a05-91df-86009f382033.html
+#More than 500 million ticket requests were submitted for the World Cup, FIFA announced in January
+#Aside from the three host countries — the United States, Mexico and Canada — most 
+#applications came from Germany, England, Brazil, Spain, Portugal, Argentina and Colombia.
+#Germany and Portugal are among the teams that will play group-stage matches in Houston.  
+
+#Also, I have a nice map of previous world cup attendance save in the directory that I 
+#got from here: https://www.reuters.com/sports/soccer/us-tourism-expected-score-big-with-fifa-world-cup-2025-11-19/
+
+countries_most_demand_tickets<-c("Argentina","Germany","England","Colombia",
+                                 "Brazil","Spain","Portugal","Ecuador","Scotland")
+
+rbind(teams_dates_venues %>% select(-`Team 2`) %>% rename("Team"="Team 1"),
+      teams_dates_venues %>% select(-`Team 1`) %>% rename("Team"="Team 2")) %>%
+  filter(Team %in% countries_most_demand_tickets) %>% rename("match_date"="Match Date") %>%
+  arrange(match_date)
+
+#Other piece of information that might be useful. Estimated length of stay by region
+#Latin & South America: 16 nights (highest of any region).
+#Europe: 14 nights.
+#Asia Pacific: 13 nights.
+
+
+
