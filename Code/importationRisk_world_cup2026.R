@@ -1,20 +1,209 @@
 library(tidyverse)
 library(readxl)
+library(stringr)
+library(janitor)
 
 setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 
+## I am trying to organize the process of data collection and cleaning
+## I will start with volume of visits from regions of the world to cities
+## To keep the idea local, I will start with Austin, Dallas, and Houston
+
+#For correspondence country - region
+arrivals_COR <- read_csv("Data/Monthly_Arrivals_Country_of_Residence_COR_1.csv")
+
+arrivals_COR %>% filter(str_detect(Country,"uerto"))
+
+correspondence_country_region<-arrivals_COR %>% select(Country,region=World_region) %>% 
+  drop_na() %>% unique() %>%
+  mutate(Country = if_else(
+    Country == "Zaire ( formerly Congo, Democratic Republic of)",
+    "Zaire (formerly DRC)",Country)) %>%
+  mutate(
+    new_region = case_when(
+      region %in% c("Western Europe", "Eastern Europe") ~ "Europe",
+      TRUE ~ region
+    )) %>% left_join(population_of_world) %>% drop_na() %>%
+  mutate(new_region=case_when(
+    Country=="Mexico" ~ "Mexico",
+    Country=="Canada" ~ "Canada",
+    TRUE ~ new_region
+  ))
+
+population_by_region<-correspondence_country_region %>%
+  select(new_region,population_country) %>%
+  group_by(new_region) %>% summarise(popu_region=sum(population_country))
+
+# I have downloaded this data (from: https://www.trade.gov/us-international-air-travel-statistics-i-92-data)
+#Columns:
+##-  Date – Year: Calendar year in which the international air passenger movements were recorded.
+##-  Month Number: Numeric representation of the calendar month (1 = January, …, 12 = December).
+##-  Date – Month: Calendar month name corresponding to the reported passenger movements.
+##-  Foreign Originating: Non-U.S. citizen passengers whose international trip begins 
+#    outside the United States and who arrive to the United States.
+##-  Foreign Returning: Non-U.S. citizen passengers returning (re-entering) the 
+#    United States after prior travel abroad.
+##-  U.S. Citizen Originating: U.S. citizen passengers departing the United States to 
+#    begin international travel.
+##-  U.S. Citizen Returning: U.S. citizen passengers arriving back to the United States 
+#    after international travel abroad.
+
+files <- Sys.glob("Data/Selected_cities_and_origins/*.xlsx")
+
+data_all <- map_dfr(files, \(f){
+  
+  name <- basename(f)
+  
+  # Extract origin region
+  region <- name |>
+    str_extract("data_(.*)_to_") |>
+    str_remove("^data_") |>
+    str_remove("_to_$") |>
+    str_replace_all("_", " ") |>
+    str_to_title()
+  
+  # Extract destination city
+  destination <- name |>
+    str_extract("to_.*\\.xlsx") |>
+    str_remove("^to_") |>
+    str_remove("\\.xlsx$") |>
+    str_replace_all("_", " ") |>
+    str_to_title()
+  
+  read_excel(f) |>
+    clean_names() |>
+    mutate(
+      region_origin = region,
+      destination_city = destination
+    ) |>
+    filter(str_detect(as.character(date_year), "^(19|20)\\d{2}$"))
+  
+})
+
+library(lubridate)
+
+shade_df <- data_all %>%
+  mutate(year_month = as.Date(paste(date_year, month_number, 1, sep = "-"))) %>%
+  distinct(year_month) %>%
+  filter(month(year_month) %in% c(5,6,7)) %>%
+  mutate(
+    xmin = year_month,
+    xmax = year_month + months(1)
+  )
+
+definite_data_arrivals<-data_all %>% 
+  mutate(all_arrivals = foreign_originating + foreign_returning + u_s_citizen_returning) %>%
+  select(-u_s_citizen_originating, -foreign_originating, -foreign_returning, -u_s_citizen_returning) %>%
+  mutate(year_month = as.Date(paste(date_year, month_number, 1, sep = "-"))) %>% 
+  drop_na() %>%
+  filter(!destination_city %in% c("Austin")) %>% 
+  filter(!region_origin %in% c("Oceania","World")) 
+
+usa_arrivals <- definite_data_arrivals %>%
+  filter(destination_city == "Usa") %>%
+  select(region_origin, year_month, all_arrivals) %>%
+  rename(all_arrivals_usa = all_arrivals)
+
+definite_data_arrivals<-definite_data_arrivals %>%
+  left_join(usa_arrivals, by = c("region_origin", "year_month")) %>%
+  filter(destination_city != "Usa")
+
+definite_data_arrivals %>%
+  ggplot(aes(x = year_month, y = all_arrivals, color = destination_city, group = destination_city)) +
+  theme_bw() +
+  geom_rect(
+    data = shade_df,
+    inherit.aes = FALSE,
+    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+    fill = "gray80",
+    alpha = 0.5
+  ) +
+  
+  geom_line() +
+  facet_wrap(~region_origin, scales = "free_y")
+
+#For the sake of simplification I will get the mean volume of people 
+#across three peak months: May, June, and July.
+
+summer_means <- definite_data_arrivals %>%
+  filter(month_number %in% c(5, 6, 7)) %>%   # keep May, June, July
+  group_by(date_year, region_origin, destination_city,all_arrivals_usa) %>%
+  summarise(
+    mean_arrivals_may_jul = mean(all_arrivals, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+summer_means
+
+mean_arrivals_all_usa_june<-definite_data_arrivals %>%
+  filter(month_number %in% c(6)) %>% filter(date_year>="2023") %>%
+  group_by(region_origin) %>%
+  summarise(mean_all_usa_June=mean(all_arrivals_usa))
+  
+
+#I want to try only for June - mean number of arrivalss in June 2023-2025
+arrivals_only_june <- definite_data_arrivals %>%
+  filter(month_number %in% c(6)) %>%   # keep May, June, July
+  filter(date_year>="2023")  %>%
+  group_by(region_origin, destination_city) %>%
+  summarise(
+    arrivals_June = mean(all_arrivals, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+##
 dengue_data_world<-read_xlsx("Data/dengue-global-data-2025-12-10.xlsx")
 
 dengue_data_world_selected<-dengue_data_world %>% 
-  select(date,date_lab,who_region_long,country,cases)
+  select(date,date_lab,who_region_long,country,cases) %>%
+  mutate(
+    country = recode(
+      country,
+      "Venezuela (Bolivarian Republic of)" = "Venezuela",
+      "Bolivia (Plurinational State of)"   = "Bolivia",
+      "Iran (Islamic Republic of)"         = "Iran",
+      "United Republic of Tanzania"        = "Tanzania")) %>%
+  left_join(correspondence_country_region %>% select(country=Country,new_region))
 
-dengue_data_world_selected %>% select(date,who_region_long,cases) %>%
-  mutate(cases = replace_na(cases, 0)) %>%
-  group_by(date,who_region_long) %>%
-  summarise(total_cases=sum(cases)) %>%
-  filter(date>as.Date("2024-12-31")) %>%
-  ggplot(aes(x=date,y=total_cases)) + geom_col() +
-  facet_wrap(~who_region_long)#,scales="free_y")
+dengue_data_world_selected %>% select(date,new_region,cases) %>%
+  mutate(cases = replace_na(cases, 0)) %>% drop_na() %>%
+  group_by(date,new_region) %>% summarise(total_cases=sum(cases)) %>%
+  filter(date>as.Date("2018-12-31")) %>%
+  filter(!new_region %in% c("Canada","Europe")) %>%
+  ggplot(aes(x=date,y=total_cases)) + geom_col() + theme_bw() +
+  geom_rect(
+    data = shade_df,
+    inherit.aes = FALSE,
+    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+    fill = "gray80",
+    alpha = 0.5
+  ) +
+  facet_wrap(~new_region,scales="free_y")
+
+#Dengue only in June as well
+
+mean_dengue_cases_regions_june<-dengue_data_world_selected %>%
+  filter(month(date) %in% c(6)) %>%filter(year(date)>2023) %>%
+  drop_na() %>% select(date,new_region,cases) %>%
+  group_by(date,new_region) %>% summarise(cases_region=sum(cases)) %>%
+  ungroup() %>% select(-date) %>% group_by(new_region) %>%
+  summarise(mean_cases_june=mean(cases_region)) %>% 
+  mutate(new_region=ifelse(new_region=="Middle East","Mideast",new_region))
+
+
+exp_inf_arrivals_origin_dest<-arrivals_only_june %>% left_join(mean_arrivals_all_usa_june) %>%
+  left_join(mean_dengue_cases_regions_june %>% rename("region_origin"="new_region")) %>%
+  left_join(population_by_region %>% mutate(new_region=ifelse(new_region=="Middle East","Mideast",new_region)) %>%
+              rename("region_origin"="new_region")) %>%
+  mutate(pro_arrival_to_airport=arrivals_June/mean_all_usa_June) %>%
+  mutate(exp_inf_arrivals=arrivals_June*mean_cases_june/popu_region)
+
+importation_intensity_june<-exp_inf_arrivals_origin_dest %>%
+  select(destination_city,exp_inf_arrivals) %>%
+  group_by(destination_city) %>% summarise(imp_intensity=sum(exp_inf_arrivals)) %>%
+  mutate(prob_at_least_one=1-exp(-imp_intensity))
+
+importation_intensity_june
 
 Sys.glob("*")
 
