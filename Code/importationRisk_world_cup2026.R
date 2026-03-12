@@ -190,13 +190,34 @@ mean_dengue_cases_regions_june<-dengue_data_world_selected %>%
   summarise(mean_cases_june=mean(cases_region)) %>% 
   mutate(new_region=ifelse(new_region=="Middle East","Mideast",new_region))
 
-
 exp_inf_arrivals_origin_dest<-arrivals_only_june %>% left_join(mean_arrivals_all_usa_june) %>%
   left_join(mean_dengue_cases_regions_june %>% rename("region_origin"="new_region")) %>%
   left_join(population_by_region %>% mutate(new_region=ifelse(new_region=="Middle East","Mideast",new_region)) %>%
               rename("region_origin"="new_region")) %>%
   mutate(pro_arrival_to_airport=arrivals_June/mean_all_usa_June) %>%
   mutate(exp_inf_arrivals=arrivals_June*mean_cases_june/popu_region)
+
+importation_intensity_june<-exp_inf_arrivals_origin_dest %>%
+  mutate(cases_to_city=mean_cases_june*pro_arrival_to_airport) %>%
+  mutate(ver_esto=arrivals_June*cases_to_city/popu_region) %>%
+  select(destination_city,ver_esto) %>% group_by(destination_city) %>%
+  summarise(imp_intensity=sum(ver_esto)) %>%
+  mutate(prob_at_least_one=1-exp(-imp_intensity))
+
+ggplot(importation_intensity_june,
+         aes(x = reorder(destination_city, -imp_intensity),y = imp_intensity)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = round(prob_at_least_one, 2)),
+            vjust = -0.5,
+            size = 4) +
+  labs(
+    x = "",
+    #x = "Destination city",
+    y = "Importation intensity",
+    title = "Estimated dengue importation intensity by destination city"
+  ) + theme_bw() + theme(text=element_text(size=20))
+
+ggsave(last_plot(),file="import_dengue.png")
 
 importation_intensity_june<-exp_inf_arrivals_origin_dest %>%
   select(destination_city,exp_inf_arrivals) %>%
