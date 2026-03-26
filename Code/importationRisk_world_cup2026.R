@@ -10,6 +10,10 @@ setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 ## To keep the idea local, I will start with Austin, Dallas, and Houston
 
 #For correspondence country - region
+population_of_world <-read_csv("Data/population2020.csv") %>%
+  rename("Country"="COUNTRY","population_country"="POPULATION") %>%
+  mutate(Country=ifelse(Country=="DR Congo","Zaire (formerly DRC)",Country))
+
 arrivals_COR <- read_csv("Data/Monthly_Arrivals_Country_of_Residence_COR_1.csv")
 
 arrivals_COR %>% filter(str_detect(Country,"uerto"))
@@ -122,6 +126,8 @@ definite_data_arrivals %>%
   geom_line() +
   facet_wrap(~region_origin, scales = "free_y")
 
+ggsave(last_plot(),file="Figures/temporal_arrivals_from_regions.png",height = 6,width = 10)
+
 #For the sake of simplification I will get the mean volume of people 
 #across three peak months: May, June, and July.
 
@@ -150,6 +156,13 @@ arrivals_only_june <- definite_data_arrivals %>%
     arrivals_June = mean(all_arrivals, na.rm = TRUE),
     .groups = "drop"
   )
+
+arrivals_only_june %>% filter(arrivals_June>0) %>%
+  ggplot(aes(x=destination_city,y=arrivals_June,fill=region_origin))+
+  geom_col(position = position_dodge()) +
+  scale_y_log10()
+
+
 
 ##
 dengue_data_world<-read_xlsx("Data/dengue-global-data-2025-12-10.xlsx")
@@ -727,10 +740,6 @@ scale_size_continuous(range = c(1.5, 8), guide = "none") +
 ggsave(last_plot(),file="Figures/map_probs_and_venues.png")
 
 ###
-
-population_of_world <-read_csv("Data/population2020.csv") %>%
-  rename("Country"="COUNTRY","population_country"="POPULATION") %>%
-  mutate(Country=ifelse(Country=="DR Congo","Zaire (formerly DRC)",Country))
 
 visits_and_population_countries<-total_arrivals_July_August_by_country %>% 
   filter(year=="2025") %>% mutate(Country=ifelse(Country=="Bahamas, the","Bahamas",Country)) %>%
