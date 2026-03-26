@@ -5,6 +5,10 @@ library(janitor)
 
 setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 
+population_of_world <-read_csv("Data/population2020.csv") %>%
+  rename("Country"="COUNTRY","population_country"="POPULATION") %>%
+  mutate(Country=ifelse(Country=="DR Congo","Zaire (formerly DRC)",Country))
+
 ## I am trying to organize the process of data collection and cleaning
 ## I will start with volume of visits from regions of the world to cities
 ## To keep the idea local, I will start with Austin, Dallas, and Houston
@@ -146,8 +150,8 @@ mean_arrivals_all_usa_june<-definite_data_arrivals %>%
   group_by(region_origin) %>%
   summarise(mean_all_usa_June=mean(all_arrivals_usa))
   
-
 #I want to try only for June - mean number of arrivalss in June 2023-2025
+#This is the volume in my formula
 arrivals_only_june <- definite_data_arrivals %>%
   filter(month_number %in% c(6)) %>%   # keep May, June, July
   filter(date_year>="2023")  %>%
@@ -194,7 +198,6 @@ dengue_data_world_selected %>% select(date,new_region,cases) %>%
   facet_wrap(~new_region,scales="free_y")
 
 #Dengue only in June as well
-
 mean_dengue_cases_regions_june<-dengue_data_world_selected %>%
   filter(month(date) %in% c(6)) %>%filter(year(date)>2023) %>%
   drop_na() %>% select(date,new_region,cases) %>%
@@ -232,12 +235,26 @@ ggplot(importation_intensity_june,
 
 ggsave(last_plot(),file="import_dengue.png")
 
-importation_intensity_june<-exp_inf_arrivals_origin_dest %>%
-  select(destination_city,exp_inf_arrivals) %>%
-  group_by(destination_city) %>% summarise(imp_intensity=sum(exp_inf_arrivals)) %>%
+#I am building here formula in document for importation intensity
+#and probability of at least one introduction.
+under_rho=1
+p_travel_inf=1
+expected_imports_from_c_to_h<-exp_inf_arrivals_origin_dest %>%
+  mutate(current_inf=under_rho*(mean_cases_june/popu_region)) %>%
+  select(region_origin,destination_city,arrivals_June,current_inf) %>%
+  mutate(expected_c_to_h=arrivals_June*current_inf*p_travel_inf)
+
+importation_intensity_june_formula<-expected_imports_from_c_to_h %>%
+  group_by(destination_city) %>% summarise(imp_intensity=sum(expected_c_to_h)) %>%
   mutate(prob_at_least_one=1-exp(-imp_intensity))
 
-importation_intensity_june
+ggplot(importation_intensity_june_formula,
+       aes(x = reorder(destination_city, -imp_intensity),y = imp_intensity)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = round(prob_at_least_one, 2)),vjust = -0.5,size = 4) +
+  labs(x = "",y = "Importation intensity",
+       title = "Estimated dengue importation intensity by destination city") + 
+  theme_bw() + theme(text=element_text(size=20))
 
 Sys.glob("*")
 
@@ -246,9 +263,79 @@ measles_data <- read_xlsx("Data/Measles reported cases and incidence 2025-09-12 
 
 pertusis_data <- read_xlsx("Data/Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx")
 
+#I changed this : #Democratic Republic of the Congo - Zaire (formerly DRC)
+#Since I only have yearly malaria data, I am dividing the incidence by 12 to
+#get the expected mean incidence in each country.
+
 malaria_data_otro<-read_csv("Data/Malaria_National_Unit_data.csv")
 malaria_cases<-malaria_data_otro %>% filter(Year==2024) %>% filter(Metric=="Incidence Rate") %>%
   select(Country=Name,cases_per1K=Value)
+
+p_travel_inf_malaria=0.3
+under_rho_malaria=0.6
+exp_inf_arrivals_origin_dest_malaria <- malaria_cases %>%
+  mutate(Country = recode(
+    Country,
+    "Democratic Republic of the Congo"="Zaire (formerly DRC)")) %>%
+  left_join(correspondence_country_region %>% select(Country,region_origin=new_region)) %>%
+  drop_na() %>% mutate(Incidence=under_rho_malaria*cases_per1K/(12*1000)) %>%
+  group_by(region_origin) %>% summarise(total_inc=sum(Incidence)) %>%
+  left_join(arrivals_only_june) %>% drop_na() %>%
+  mutate(expected_c_to_h=arrivals_June*total_inc*p_travel_inf_malaria)
+
+importation_intensity_june_formula_malaria<-exp_inf_arrivals_origin_dest_malaria %>%
+  group_by(destination_city) %>% summarise(imp_intensity=sum(expected_c_to_h)) %>%
+  mutate(prob_at_least_one=1-exp(-imp_intensity))
+
+importation_intensity_june_formula_malaria
+
+## Measles
+
+measles_data <- read_xlsx("Data/Measles reported cases and incidence 2025-09-12 14-18 UTC.xlsx")
+measles_incidence<-measles_data %>% select(Country=1,incidence_per1M=4) %>% drop_na() %>%
+  mutate(incidence_per1M=as.numeric(incidence_per1M))
+
+p_travel_inf_measles=0.3
+under_rho_measles=0.6
+exp_inf_arrivals_origin_dest_measles <- measles_incidence %>%
+  mutate(Country = recode(
+    Country,
+    "Democratic Republic of the Congo"="Zaire (formerly DRC)")) %>%
+  left_join(correspondence_country_region %>% select(Country,region_origin=new_region)) %>%
+  drop_na() %>% mutate(Incidence=under_rho_measles*incidence_per1M/(12*1000000)) %>%
+  group_by(region_origin) %>% summarise(total_inc=sum(Incidence)) %>%
+  left_join(arrivals_only_june) %>% drop_na() %>%
+  mutate(expected_c_to_h=arrivals_June*total_inc*p_travel_inf_measles)
+
+importation_intensity_june_formula_measles<-exp_inf_arrivals_origin_dest_measles %>%
+  group_by(destination_city) %>% summarise(imp_intensity=sum(expected_c_to_h)) %>%
+  mutate(prob_at_least_one=1-exp(-imp_intensity))
+
+importation_intensity_june_formula_measles
+
+## Pertussis
+
+pertussis_data <- read_xlsx("Data/Pertussis reported cases and incidence 2025-22-12 14-46 UTC.xlsx")
+pertussis_incidence<-pertussis_data %>% select(Country=1,incidence_per1M=4) %>% drop_na() %>%
+  mutate(incidence_per1M=as.numeric(incidence_per1M))
+
+p_travel_inf_pertussis=1
+under_rho_pertussis=1
+exp_inf_arrivals_origin_dest_pertussis <- pertussis_incidence %>%
+  mutate(Country = recode(
+    Country,
+    "Democratic Republic of the Congo"="Zaire (formerly DRC)")) %>%
+  left_join(correspondence_country_region %>% select(Country,region_origin=new_region)) %>%
+  drop_na() %>% mutate(Incidence=under_rho_pertussis*incidence_per1M/(12*1000000)) %>%
+  group_by(region_origin) %>% summarise(total_inc=sum(Incidence)) %>%
+  left_join(arrivals_only_june) %>% drop_na() %>%
+  mutate(expected_c_to_h=arrivals_June*total_inc*p_travel_inf_pertussis)
+
+importation_intensity_june_formula_pertussis<-exp_inf_arrivals_origin_dest_pertussis %>%
+  group_by(destination_city) %>% summarise(imp_intensity=sum(expected_c_to_h)) %>%
+  mutate(prob_at_least_one=1-exp(-imp_intensity))
+
+importation_intensity_june_formula_pertussis
 
 #The FIFA world cup 2026 will be hosted by three countries: USA, Mexico and Canada
 #Most games will happen in USA. Dates: June 11 - July 16. I want to see what is the
@@ -1569,7 +1656,8 @@ rbind(teams_dates_venues %>%
         rename("Team"="Team 2")) %>%
   filter(Team != "TBD")
 
-#Source: https://dentonrc.com/sports/fifa-to-start-notifying-winners-of-world-cup-ticket-lottery/article_c9d70ecc-9758-4a05-91df-86009f382033.html
+#Source: 
+#https://dentonrc.com/sports/fifa-to-start-notifying-winners-of-world-cup-ticket-lottery/article_c9d70ecc-9758-4a05-91df-86009f382033.html
 #More than 500 million ticket requests were submitted for the World Cup, FIFA announced in January
 #Aside from the three host countries — the United States, Mexico and Canada — most 
 #applications came from Germany, England, Brazil, Spain, Portugal, Argentina and Colombia.
