@@ -166,8 +166,6 @@ arrivals_only_june %>% filter(arrivals_June>0) %>%
   geom_col(position = position_dodge()) +
   scale_y_log10()
 
-
-
 ##
 dengue_data_world<-read_xlsx("Data/dengue-global-data-2025-12-10.xlsx")
 
@@ -251,7 +249,7 @@ importation_intensity_june_formula<-expected_imports_from_c_to_h %>%
 ggplot(importation_intensity_june_formula,
        aes(x = reorder(destination_city, -imp_intensity),y = imp_intensity)) +
   geom_col(fill = "steelblue") +
-  geom_text(aes(label = round(prob_at_least_one, 2)),vjust = -0.5,size = 4) +
+  geom_text(aes(label = round(prob_at_least_one, 2)),vjust = -0.5,size = 5) +
   labs(x = "",y = "Importation intensity",
        title = "Estimated dengue importation intensity by destination city") + 
   theme_bw() + theme(text=element_text(size=20))
