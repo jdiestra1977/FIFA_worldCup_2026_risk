@@ -477,7 +477,7 @@
 
 \begin{frame}{Model 1 — Baseline results}
   \begin{center}
-    \includegraphics[width=0.60\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/estimated_importations.png}
   \end{center}
   \vspace{-0.3em}
@@ -488,7 +488,7 @@
 % ------------------------------------------------------------
 \begin{frame}{Model 2 — WC-adjusted results}
   \begin{center}
-    \includegraphics[width=0.60\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/estimated_importations_wc_adjusted.png}
   \end{center}
   \vspace{-0.3em}
@@ -499,7 +499,7 @@
 % ------------------------------------------------------------
 \begin{frame}{Model 3 — Schedule-driven results}
   \begin{center}
-    \includegraphics[width=0.60\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/estimated_importations_schedule_driven.png}
   \end{center}
   \vspace{-0.3em}
@@ -510,7 +510,7 @@
 % ------------------------------------------------------------
 \begin{frame}{Three-model comparison — importation probability}
   \begin{center}
-    \includegraphics[width=0.60\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/model_comparison_probability.png}
   \end{center}
   \vspace{-0.3em}
@@ -524,7 +524,7 @@
 % ------------------------------------------------------------
 \begin{frame}{Three-model comparison — importation intensity ($\lambda$)}
   \begin{center}
-    \includegraphics[width=0.70\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/model_comparison_intensity.png}
   \end{center}
   \vspace{-0.3em}
@@ -538,7 +538,7 @@
 
 \begin{frame}{Which countries drive importation risk?}
   \begin{center}
-    \includegraphics[width=0.6\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/country_importation_ranking.png}
   \end{center}
   \vspace{-0.3em}
@@ -549,7 +549,7 @@
 % ------------------------------------------------------------
 \begin{frame}{WC fans vs.\ background tourists — dengue}
   \begin{center}
-    \includegraphics[width=0.70\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/stream_breakdown_dengue.png}
   \end{center}
   \vspace{-0.3em}
@@ -563,7 +563,7 @@
 % ------------------------------------------------------------
 \begin{frame}{Country $\times$ city importation matrix — dengue}
   \begin{center}
-    \includegraphics[width=0.70\textwidth]%
+    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
       {../Figures/heatmap_dengue.png}
   \end{center}
   \vspace{-0.3em}
@@ -633,6 +633,54 @@
               situations may differ
         \item NTTO projections pre-date the event; actual
               arrival volumes will vary
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Data that would most improve the model}
+  \begin{columns}[T]
+    \begin{column}{0.33\textwidth}
+      \textbf{Travel volume}
+      \begin{itemize}\small
+        \item \textbf{Flight bookings} (OAG, Amadeus, IATA PaxIS) —
+              direct country-to-city routing for the WC window;
+              covers the 11 venues not in I-92
+        \item \textbf{FIFA ticket sales} by country — most direct
+              measure of WC fan travel; replaces the NTTO
+              decomposition entirely
+        \item \textbf{Previous WC entry records} (Brazil 2014,
+              Russia 2018, Qatar 2022) — empirical validation
+              of schedule-based fan routing
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{Disease burden}
+      \begin{itemize}\small
+        \item \textbf{Real-time surveillance} (ProMED, WHO DON,
+              ECDC CDTR) — catch outbreaks that emerge after the
+              2025 data freeze
+        \item \textbf{Age-stratified incidence} — travelers skew
+              working-age; age-specific burden would refine
+              $I_{c,d}$
+        \item \textbf{Vaccination coverage} (WHO/UNICEF) — adjust
+              effective measles/pertussis incidence for
+              immunity in travelers
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.33\textwidth}
+      \textbf{Local transmission}
+      \begin{itemize}\small
+        \item \textbf{\textit{Ae.~aegypti} surveillance} (CDC
+              ArboNET) — extend model from importation to
+              local dengue outbreak probability
+        \item \textbf{Hospital capacity} (AHA survey) —
+              contextualise risk for health system
+              resource pre-positioning
+        \item \textbf{Mobility data} (Meta Movement, Google) —
+              validate the schedule-based fan routing
+              assumption empirically
       \end{itemize}
     \end{column}
   \end{columns}

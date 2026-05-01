@@ -319,7 +319,9 @@ WC-fan arrivals at each venue city are then:
 \end{equation}
 
 Background arrivals continue to use I-92 regional routing fractions
-applied to all six gateway cities:
+applied to the gateway city routing fractions (Equation~\ref{eq:routing});
+Newark and New York are subsequently merged into a single New York
+entry, yielding five canonical gateway cities:
 \begin{equation}
   N_{c,h}^{\text{bg}} = N_c^{\text{bg}} \cdot f_{r(c),h}
   \label{eq:bg_arrivals}
@@ -598,6 +600,100 @@ where $E_a$ denotes annual enplanements at airport $a$ among the top
 ranked US airports (excluding Alaska, Hawaii, and US territories).
 Country-level expected importations were then allocated to airports
 as $\lambda_{c,a,d} = \lambda_{c,d} \cdot \pi_a$.
+
+% ============================================================
+\subsection*{Model limitations and data opportunities}
+
+The analyses presented here represent a first-pass estimation framework
+constrained by the publicly available data sources described above.
+Several classes of additional data would substantially improve the
+precision and scope of the model.
+
+\subsubsection*{Travel volume}
+
+\begin{itemize}
+
+  \item \textbf{Flight booking data.}
+  Airline booking databases (e.g., OAG Traffic Analyser, Amadeus Travel
+  Intelligence, IATA PaxIS) provide origin-destination passenger volumes
+  by city pair and travel date. These would replace the I-92 regional
+  routing fractions and COR monthly aggregates with direct
+  country-to-city routing specific to the WC travel window, including
+  routing to the eleven venue cities not currently covered by I-92 data.
+
+  \item \textbf{FIFA ticket sales by country.}
+  FIFA ticket allocation and sales records by country of purchase would
+  provide a direct, event-specific measure of WC fan travel intentions,
+  entirely replacing the need to decompose general tourism growth into
+  WC-fan and background streams. This is the highest-value single dataset
+  for the schedule-driven model.
+
+  \item \textbf{Fan travel records from previous World Cups.}
+  Entry and hotel registration records from Brazil 2014, Russia 2018, and
+  Qatar 2022 — obtained through host country immigration authorities or
+  public health agencies — would allow empirical validation of the
+  schedule-based routing fractions used in Model 3 and calibration of
+  the WC-specific growth factors.
+
+\end{itemize}
+
+\subsubsection*{Disease burden}
+
+\begin{itemize}
+
+  \item \textbf{Near-real-time outbreak surveillance.}
+  The model uses WHO datasets accessed through late 2025. Integration
+  with near-real-time data streams (ProMED-mail, WHO Disease Outbreak
+  News, ECDC Communicable Disease Threats Reports) updated through
+  June 2026 would capture outbreaks in source countries that emerge
+  after the data freeze, particularly for dengue which is highly
+  seasonal.
+
+  \item \textbf{Age-stratified national incidence.}
+  International leisure travelers are disproportionately working-age
+  adults (18--50 years). Age-specific incidence data, available from
+  WHO and national surveillance systems for several diseases, would
+  allow weighting country-level burden by the age distribution of the
+  traveling population, improving the per-traveller infection
+  probability $I_{c,d}$.
+
+  \item \textbf{National vaccination coverage.}
+  For measles and pertussis, WHO/UNICEF national immunization coverage
+  estimates (Immunization Data portal) would allow adjustment of
+  effective incidence to account for immunity in the traveling
+  population, replacing the implicit assumption that travelers have
+  the same vaccination status as the general population.
+
+\end{itemize}
+
+\subsubsection*{Local transmission risk}
+
+\begin{itemize}
+
+  \item \textbf{\textit{Aedes aegypti} surveillance.}
+  The current model quantifies importation risk only; it does not
+  model secondary transmission at destination cities. Local vector
+  density and competence data for \textit{Ae.~aegypti} in US host
+  cities, available through CDC ArboNET and state health department
+  surveillance programmes, would allow extension of the framework
+  to estimate the probability of a local dengue outbreak following
+  an importation event.
+
+  \item \textbf{Healthcare system capacity.}
+  Hospital capacity, infectious disease bed availability, and public
+  health rapid-response capacity data by host city (American Hospital
+  Association annual survey, state health departments) would
+  contextualise the importation risk estimates for local health
+  system planning and resource pre-positioning.
+
+  \item \textbf{Mobile device and mobility data.}
+  Aggregated mobility datasets (e.g., Meta Movement Data, Google
+  Community Mobility Reports) around previous major sporting events
+  could be used to validate the schedule-based fan routing assumption
+  that fans distribute across venue cities in proportion to the number
+  of their team's matches played there.
+
+\end{itemize}
 
 % ============================================================
 \subsection*{Sensitivity analysis}
