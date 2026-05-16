@@ -12,10 +12,11 @@
 \usepackage{caption}
 \usepackage{lscape}
 \usepackage{longtable}
+\usepackage{subcaption}
 
 \onehalfspacing
 
-\title{\textbf{Methods: Estimating Infectious Disease Importation Risk\\
+\title{\textbf{Estimating Infectious Disease Importation Risk\\
 during the 2026 FIFA World Cup}}
 \author{Jose Herrera-Diestra}
 \date{\today}
@@ -49,12 +50,25 @@ model} using historical regional air travel patterns (2023--2025);
 to country-level 2026 projections; and (3) a \emph{schedule-driven
 model} that separates World Cup fan travel from background tourism and
 routes fans to the specific venue cities where their national team plays.
+The four diseases were selected because each is endemic in countries
+with strong football traditions, each has a plausible pathway for
+travel-associated importation into the United States, and each
+represents a distinct surveillance and public health response
+challenge.
 
 % ============================================================
 \subsection*{Importation risk framework}
 
-We modelled disease importation as a Poisson process. If
-$\lambda_{h,d}$ is the expected number of imported cases of disease
+We modelled disease importation as a Poisson process. This choice
+is standard for rare-event counting problems: when individual import
+events are independent and the per-traveller probability of infection
+is small, the number of imported cases in a fixed time window
+converges to a Poisson random variable. The Poisson framework is also
+analytically tractable and additive over source units, allowing
+country-level and stream-level contributions to be computed and
+summed independently.
+
+If $\Lambda_{h,d}$ is the expected number of imported cases of disease
 $d$ arriving in city $h$ during June 2026, the probability of
 observing at least one importation is:
 
@@ -69,18 +83,36 @@ WC-adjusted model). This framework is consistent with previously
 published importation risk analyses for large international sporting
 events~\citep{Herrera2024}.
 
+Each source-unit contribution takes the same multiplicative form
+across all three models:
+\begin{equation}
+  \lambda_{s,h,d} = N_{s,h} \cdot I_{s,d} \cdot p_d
+  \label{eq:general_lambda}
+\end{equation}
+where $N_{s,h}$ is the number of travellers from source $s$ arriving
+in city $h$, $I_{s,d}$ is the per-traveller probability that an
+arriving person carries disease $d$, and $p_d$ is the probability
+that such a person travels internationally while infectious. The three
+models differ in how $N_{s,h}$ and $I_{s,d}$ are constructed.
+
 % ============================================================
-\subsection*{Baseline model: regional travel volume (2023--2025)}
+\subsection*{Baseline model: regional travel volume (I-92, 2023--2025)}
 
 \subsubsection*{Travel data}
 
-Origin-to-city air arrival volumes were obtained from the
-US International Air Travel Statistics (I-92 programme, Bureau of
-Transportation Statistics / US Department of
+Origin-to-city air arrival volumes for the baseline model were
+obtained from the US International Air Travel Statistics (I-92
+programme, Bureau of Transportation Statistics / US Department of
 Commerce).\footnote{\url{https://www.trade.gov/us-international-air-travel-statistics-i-92-data}}
-These data record monthly passenger movements between broad
-world-origin regions and specific US gateway cities (Boston, Dallas,
-Houston, Newark, New York, Philadelphia). Origin regions were used as
+The I-92 programme records monthly passenger movements between broad
+world-origin regions and specific US gateway cities. It was chosen for
+the baseline model because its regional aggregation matches the
+regional disease incidence calculations used at this stage: both
+travel and disease burden are treated at the same geographic level
+(region), keeping the model internally consistent.
+
+The I-92 data cover six US gateway cities: Boston, Dallas, Houston,
+Newark, New York, and Philadelphia. Origin regions were used as
 provided by the I-92 programme, with two modifications applied to
 align with the country-region correspondence table derived from I-94
 data: (1) Western Europe and Eastern Europe were merged into a single
@@ -101,18 +133,21 @@ Total monthly arrivals were defined as:
 
 The mean June arrivals over 2023--2025 were used as the baseline
 travel volume $N_{r,h}$ for region $r$ to city $h$, chosen to
-capture the most recent pre-tournament summer travel patterns.
+capture the most recent pre-tournament summer travel patterns
+while avoiding the COVID-recovery period (2020--2022), during which
+international travel was atypical.
 
-\subsubsection*{City routing fractions}
+\subsubsection*{City routing fractions (baseline)}
 
-For the WC-adjusted model (described below), city routing fractions
-were estimated from the I-92 data as:
+For the baseline model, the share of regional arrivals directed to
+each gateway city is estimated as:
 \begin{equation}
   f_{r,h} = \frac{N_{r,h}}{N_{r,\text{US total}}}
+  \label{eq:i92_routing}
 \end{equation}
 where $N_{r,\text{US total}}$ is the mean June arrivals from region
 $r$ to the entire United States. These fractions represent the
-share of arrivals from a given origin region that are routed to each
+share of arrivals from a given origin region that enter through each
 specific US gateway city.
 
 \subsubsection*{Regional disease incidence}
@@ -152,6 +187,109 @@ importation intensity for city $h$ is then:
 \end{equation}
 
 % ============================================================
+\subsection*{BTS T-100 International Segment data: country-level
+city routing fractions}
+
+\subsubsection*{Motivation and data source}
+
+The I-92 routing fractions (Equation~\ref{eq:i92_routing}) are
+adequate for the baseline model, where incidence is also at the
+regional level. However, the WC-adjusted and schedule-driven models
+require country-level routing fractions for two reasons: (1) disease
+incidence is disaggregated to the country level in those models; and
+(2) the WC-adjusted model expands coverage to all 11 US venue cities,
+six of which (Los Angeles, Atlanta, Kansas City, Miami, San Francisco,
+and Seattle) are not covered by the I-92 gateway city data.
+
+To fill this gap, we use the Bureau of Transportation Statistics
+(BTS) T-100 International Segment (All Carriers) dataset, which
+records nonstop international flight segments landing at US airports
+at the individual airport level.\footnote{Data downloaded from
+\url{https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FJE\&QO_fu146_anzr=Nv4\%20Pn44vr45}.
+Table ID: T\_T100I\_SEGMENT\_ALL\_CARRIER.} Unlike I-92, T-100 covers
+all US commercial airports and reports passengers by country of origin
+(via the departure country code), making it possible to compute
+country-specific routing fractions for every US airport. The T-100
+data do not include an origin city field, only the originating country
+code for the international segment.
+
+\subsubsection*{Data processing and routing fraction construction}
+
+Three full years of T-100 data were downloaded for 2023, 2024, and
+2025, covering all months. Only June records (month = 6) were
+retained for each year, yielding three June cross-sections. This
+window was chosen to: (1) match the June travel period of the WC
+group stage; (2) use the three most recent complete pre-tournament
+June months; and (3) avoid the COVID-recovery period (2020--2022)
+during which route networks and traffic volumes were atypical.
+
+Records were filtered to scheduled passenger service only
+(\texttt{CLASS = "F"}), excluding charter (\texttt{N}),
+all-cargo (\texttt{L}), and mixed cargo (\texttt{P}) service
+classes. Only segments with at least one passenger (\texttt{PASSENGERS > 0})
+and landing in the United States (\texttt{DEST\_COUNTRY = "US"}) were
+retained. Destination airports were then mapped to the eleven US
+WC venue city groups using a predefined airport-to-city table (e.g.,
+JFK, EWR, and LGA $\to$ New York; MIA and FLL $\to$ Miami;
+SFO, OAK, and SJC $\to$ San Francisco). Any airport not associated
+with a WC venue city was excluded.
+
+For each source country $c$, venue city $h$, and year $y$, the
+routing fraction is first computed within each June cross-section
+as:
+\begin{equation}
+  f_{c,h,y}^{\text{T100}} =
+    \frac{N_{c,h,y}^{\text{June}}}
+         {N_{c,\text{US},y}^{\text{June}}}
+\end{equation}
+where $N_{c,h,y}^{\text{June}}$ is the total T-100 passengers from
+country $c$ to the airport group serving venue city $h$ in June of
+year $y$, and $N_{c,\text{US},y}^{\text{June}}$ is the total T-100
+passengers from country $c$ to \emph{all} US airports in June of
+year $y$ (the denominator). Using the full US total---not just WC
+venue airports---ensures that fractions are true proportions,
+interpretable as the share of US-bound travel from country $c$ that
+enters through each city.
+
+The mean routing fraction is then averaged across the three years:
+\begin{equation}
+  f_{c,h}^{\text{T100}} = \frac{1}{|Y|}
+    \sum_{y \in Y} f_{c,h,y}^{\text{T100}}
+  \label{eq:t100_routing}
+\end{equation}
+where $Y = \{2023, 2024, 2025\}$. Averaging within years before
+averaging across years (rather than pooling all passenger counts)
+prevents high-volume years from dominating the estimate and keeps
+each annual fraction a valid proportion.
+
+\subsubsection*{Important limitations of T-100 routing fractions}
+
+T-100 records the \emph{nonstop international segment} only. A
+passenger travelling on a connecting itinerary (e.g., São Paulo
+$\to$ Miami $\to$ Kansas City) appears only in the Miami row, because
+Miami is the airport where the international segment terminates and US
+Customs is cleared. Kansas City, as a domestic connecting leg, is not
+recorded in T-100 for that passenger. This is the correct
+interpretation for importation risk modelling: from a public health
+perspective, the traveller enters the US in Miami, where surveillance
+and border health screening occurs. Kansas City correctly shows
+near-zero T-100 routing fractions for most countries, reflecting
+minimal direct international service; its WC-specific traffic is
+captured entirely by the schedule-driven WC-fan stream.
+
+The T-100 data cover US airports only. Routing fractions for the five
+non-US host cities (Toronto, Vancouver, Guadalajara, Mexico City,
+Monterrey) cannot be derived from T-100 and are not estimated here;
+those cities receive importation risk estimates solely from the
+WC-fan travel stream.
+
+Country names in T-100 use ISO/ICAO conventions (e.g.,
+``Korea, Republic of'', ``Viet Nam'') while the CBP COR arrival data
+use informal short names (e.g., ``South Korea'', ``Vietnam''). A
+standardised recode table covering 26 known mismatches was applied
+before joining the two datasets.
+
+% ============================================================
 \subsection*{World Cup--adjusted model: country-level travel
 volume (2026 projections)}
 
@@ -162,12 +300,22 @@ reflects normal summer travel patterns and does not account for the
 additional influx of visitors attending the World Cup. Furthermore, I-92
 data aggregate countries into broad regions, masking the
 heterogeneity in disease burden between countries within the same
-region. The WC-adjusted model addresses both limitations.
+region. For example, Brazil and Argentina belong to the same
+CONMEBOL/South America region in I-92, but have substantially
+different dengue incidence levels and different travel volumes to the
+United States. The WC-adjusted model addresses both limitations by
+(1) projecting June 2026 arrival volumes at the country level using
+NTTO forecasts and COR data, and (2) replacing regional disease
+incidence with country-specific estimates.
 
 \subsubsection*{Construction of 2026 travel volume}
 
 Country-level June 2026 visitor volumes to the United States were
-constructed from two complementary sources using a tiered approach:
+constructed from two complementary sources using a tiered approach.
+The tiered design is necessary because not all countries have
+official NTTO projections; for the majority of the world, the only
+available country-level arrival data are the CBP COR monthly figures,
+which are then scaled by an appropriate growth factor.
 
 \paragraph{Tier 1 --- NTTO projections (top 12 source markets).}
 Official 2026 international visitor projections for twelve major
@@ -181,23 +329,35 @@ should \emph{not} have additional WC visitors added on top. The
 2024-to-2026 growth factor for each country was derived as
 $\phi_c = V_{c,2026} / V_{c,2024}$, where $V_{c,y}$ is the
 projected annual visitor volume in year $y$ (Table~\ref{tab:ntto}).
+Using the NTTO projections for these twelve countries is important
+because they reflect expert forecasts that account for the specific
+WC effect, bilateral travel trends, and macroeconomic factors, making
+them more reliable than a simple scaling of 2024 COR arrivals.
 
-\paragraph{Tier 2 --- COR data scaled by global growth factors (remaining countries).}
+\paragraph{Tier 2 --- COR data scaled by global growth factors
+(remaining countries).}
 For all other countries, country-level June 2024 arrivals were
 extracted from the US Customs and Border Protection (CBP) I-94
 Monthly Arrivals by Country of Residence
-dataset.\footnote{\url{https://travel.trade.gov}} A growth factor was
-then assigned based on World Cup qualification status:
+dataset.\footnote{\url{https://travel.trade.gov}} The COR data
+provide monthly arrival counts by country of residence and are the
+most granular publicly available source of international arrival
+data for the United States. A growth factor was then assigned based
+on World Cup qualification status:
 
 \begin{itemize}
   \item \emph{WC-qualified countries not in Tier 1}: scaled by the
     overall NTTO 2024$\to$2026 growth factor ($\phi_{\text{WC}} =
-    85{,}017/72{,}390 = 1.174$), which incorporates the WC tourism
-    uplift at the aggregate level.
+    85{,}017/72{,}390 = 1.174$). This factor was derived from the
+    aggregate NTTO total and incorporates the WC tourism uplift at
+    the global level, providing a reasonable approximation for
+    WC-qualified countries not individually projected by NTTO.
   \item \emph{Non-qualified countries}: scaled by the estimated
     baseline growth factor without the WC effect
     ($\phi_{\text{base}} = 1.134$, corresponding to approximately
-    $6.5\%$ annual growth over two years).
+    $6.5\%$ annual growth over two years). This background rate
+    reflects historical trends in US inbound travel independent of
+    the tournament.
 \end{itemize}
 
 The projected June 2026 arrivals for country $c$ are thus:
@@ -207,21 +367,28 @@ The projected June 2026 arrivals for country $c$ are thus:
   \label{eq:travel_wc}
 \end{equation}
 
-\paragraph{Country-to-city allocation.}
-City-level arrival volumes for country $c$ and city $h$ were
-estimated by applying the I-92 routing fractions from the baseline
-model:
+\paragraph{Country-to-city allocation via T-100 routing fractions.}
+City-level arrival volumes for country $c$ and venue city $h$ were
+estimated by applying the T-100 country-level routing fractions
+(Equation~\ref{eq:t100_routing}):
 \begin{equation}
-  N_{c,h}^{2026} = N_{c,\text{June 2026}} \cdot f_{r(c),h}
-  \label{eq:routing}
+  N_{c,h}^{2026} = N_{c,\text{June 2026}} \cdot f_{c,h}^{\text{T100}}
+  \label{eq:routing_wc}
 \end{equation}
-where $r(c)$ denotes the broad world region to which country $c$
-belongs.
+This replaces the I-92 regional routing fractions used in the
+baseline model with country-specific fractions that cover all 11 US
+WC venue cities. Countries with no T-100 routing data (typically
+nations with no scheduled nonstop international service to the United
+States) are excluded from the city-level allocation; their volumes
+are negligible in the context of total arrivals.
 
 \subsubsection*{Country-level disease incidence}
 
 In the WC-adjusted model, disease burden is computed at the country
-level rather than the regional level, providing greater precision:
+level rather than the regional level, providing greater precision.
+This is the appropriate level of disaggregation because the travel
+data are now country-specific, and within-region variation in disease
+incidence (especially for dengue and malaria) is substantial:
 
 \begin{equation}
   I_{c,d} = \rho_d \cdot \frac{C_{c,d}}{P_c}
@@ -252,15 +419,16 @@ Equation~\ref{eq:poisson}.
 \subsubsection*{Motivation}
 
 Both the baseline and WC-adjusted models allocate international arrivals
-to US gateway cities using I-92 routing fractions, which reflect
-historical tourist flow patterns. However, World Cup fans travel to the
-specific cities where their national team plays --- a fundamentally
-different spatial logic. A supporter from Brazil attending a group-stage
-match in Houston is unlikely to distribute their travel to Boston or
-Philadelphia in the same proportions as a regular tourist. The
-schedule-driven model captures this distinction by decomposing total
-travel into a WC-specific fan stream and a background tourist stream,
-routing each according to a different spatial rule.
+to US cities using historical travel routing fractions, which reflect
+normal tourist flow patterns. However, World Cup fans travel to the
+specific cities where their national team plays---a fundamentally
+different spatial logic than general tourism. A supporter from Brazil
+attending a group-stage match in Houston is unlikely to distribute
+their travel to Boston, Philadelphia, or Seattle in the same
+proportions as a regular tourist. The schedule-driven model captures
+this distinction by decomposing total travel into a WC-specific fan
+stream and a background tourist stream, routing each according to a
+different spatial rule.
 
 \subsubsection*{Travel decomposition}
 
@@ -270,12 +438,16 @@ into two components:
 
 \begin{itemize}
   \item \textit{WC-fan stream}: the marginal arrivals attributable to the
-    World Cup, defined as the increment above the no-WC counterfactual:
+    World Cup, defined as the increment above the no-WC counterfactual
+    (the volume that would have arrived with only baseline growth):
     \begin{equation}
       N_c^{\text{WC}} = N_{c,\text{June 2024}}^{\text{COR}} \cdot
         \max\!\bigl(0,\; \phi_c - \phi_{\text{base}}\bigr)
       \label{eq:wc_fan_stream}
     \end{equation}
+    This formulation isolates the WC-specific increment: any growth
+    above the baseline rate ($\phi_{\text{base}} = 1.134$) is attributed
+    to the tournament.
 
   \item \textit{Background stream}: arrivals that would have occurred
     regardless of the World Cup:
@@ -288,12 +460,12 @@ into two components:
 For countries with NTTO growth factors below the baseline
 ($\phi_c < \phi_{\text{base}} = 1.134$, e.g., the United Kingdom at
 $\phi = 1.107$), the WC increment is set to zero and all travel is
-treated as background. For a WC-qualified country with the global
+treated as background. For a WC-qualified country assigned the global
 WC growth factor ($\phi_{\text{WC}} = 1.174$), the WC fan fraction
 is approximately $3.4\%$ of projected arrivals:
 $(1.174 - 1.134)/1.174 \approx 0.034$.
 
-\subsubsection*{Schedule-based fan routing}
+\subsubsection*{Schedule-based WC fan routing}
 
 The 2026 FIFA World Cup match schedule was extracted from event records
 for all 48 qualifying nations. Matches with at least one undetermined opponent
@@ -308,27 +480,35 @@ schedule routing fraction is defined as:
 \end{equation}
 
 where $g_{c,v}$ is the number of matches played by team $t_c$ at venue
-city $v$ and $G_c = \sum_v g_{c,v}$ is the total number of (known)
-group-stage matches. This fraction represents the share of WC fans from
-country $c$ expected to attend games in venue city $v$.
-
-WC-fan arrivals at each venue city are then:
+city $v$ and $G_c = \sum_v g_{c,v}$ is the total number of known
+matches for that team. This fraction represents the share of WC fans
+from country $c$ expected to be present in venue city $v$, under the
+assumption that fan travel is proportional to the number of matches
+played there. WC-fan arrivals at each venue city are then:
 \begin{equation}
   N_{c,v}^{\text{WC}} = N_c^{\text{WC}} \cdot \omega_{c,v}
   \label{eq:wc_arrivals_venue}
 \end{equation}
 
-Background arrivals continue to use I-92 regional routing fractions
-applied to the gateway city routing fractions (Equation~\ref{eq:routing});
-Newark and New York are subsequently merged into a single New York
-entry, yielding five canonical gateway cities:
+\subsubsection*{Background stream routing via T-100 fractions}
+
+Background travellers (Equation~\ref{eq:bg_stream}) are assumed to
+follow normal routing patterns, independent of the match schedule.
+We use the T-100 country-level routing fractions
+(Equation~\ref{eq:t100_routing}) to distribute background arrivals
+across venue cities:
 \begin{equation}
-  N_{c,h}^{\text{bg}} = N_c^{\text{bg}} \cdot f_{r(c),h}
+  N_{c,h}^{\text{bg}} = N_c^{\text{bg}} \cdot f_{c,h}^{\text{T100}}
   \label{eq:bg_arrivals}
 \end{equation}
-
-where $r(c)$ is the world region of country $c$ and $f_{r,h}$ is the
-routing fraction from Equation~\ref{eq:routing}.
+This is a key improvement over prior approaches that used I-92
+regional routing fractions for the background stream. Because T-100
+covers all 11 US venue cities, background travelers from countries
+with service to Los Angeles, Atlanta, Miami, San Francisco, and
+Seattle now contribute importation risk at those cities---cities that
+were entirely invisible in the background stream under an I-92-only
+approach. Countries with no direct T-100 service to a given city
+simply have a zero routing fraction for that city, not a missing entry.
 
 \paragraph{Note on multi-team countries.}
 England and Scotland are distinct World Cup participants but share a
@@ -340,43 +520,47 @@ double-counting of UK arrivals occurs.
 
 \paragraph{Venue cities.}
 The schedule-driven model covers all sixteen host venues across the
-three co-host nations (Table~\ref{tab:venues}). For cities that also
-appear as I-92 gateway cities (Boston, Dallas, Houston, New York,
-Philadelphia), the WC-fan and background streams are summed before
-computing the importation intensity. For the remaining venue cities
-(Atlanta, Kansas City, Los Angeles, Miami, San Francisco, Seattle in
-the US; Toronto and Vancouver in Canada; Guadalajara, Mexico City, and
-Monterrey in Mexico), only the WC-fan stream contributes --- background
-tourist flows to those cities are not captured in the I-92 gateway data.
+three co-host nations (Table~\ref{tab:venues}). For all eleven US
+venue cities, both the WC-fan and background streams contribute to
+importation risk: the WC-fan stream routes fans via the match
+schedule ($\omega_{c,v}$) and the background stream routes tourists
+via T-100 fractions ($f_{c,h}^{\text{T100}}$). For the five
+non-US host cities (Toronto and Vancouver in Canada; Guadalajara,
+Mexico City, and Monterrey in Mexico), T-100 fractions are not
+available and only the WC-fan stream contributes; background tourist
+flows to those cities are not estimated.
 
 \begin{table}[h!]
 \centering
 \caption{WC 2026 host venues and their canonical city names used in the
-  schedule-driven model. Cities also covered by I-92 gateway data are
+  schedule-driven model. Cities with T-100 background routing are
   marked with $\dagger$.}
 \label{tab:venues}
 \begin{tabular}{llll}
 \toprule
 \textbf{Stadium} & \textbf{City (canonical)} & \textbf{Country} &
-\textbf{I-92?} \\
+\textbf{T-100 bg?} \\
 \midrule
-MetLife Stadium        & New York$^\dagger$    & USA    & Yes \\
-SoFi Stadium           & Los Angeles           & USA    & No  \\
-AT\&T Stadium          & Dallas$^\dagger$      & USA    & Yes \\
-Mercedes-Benz Stadium  & Atlanta               & USA    & No  \\
-NRG Stadium            & Houston$^\dagger$     & USA    & Yes \\
-Arrowhead Stadium      & Kansas City           & USA    & No  \\
-Lincoln Financial Field& Philadelphia$^\dagger$& USA    & Yes \\
-Hard Rock Stadium      & Miami                 & USA    & No  \\
-Levi's Stadium         & San Francisco         & USA    & No  \\
-Lumen Field            & Seattle               & USA    & No  \\
-Gillette Stadium       & Boston$^\dagger$      & USA    & Yes \\
-BC Place               & Vancouver             & Canada & No  \\
-BMO Field              & Toronto               & Canada & No  \\
-Estadio Banorte        & Mexico City           & Mexico & No  \\
-Estadio BBVA           & Monterrey             & Mexico & No  \\
-Estadio Akron          & Guadalajara           & Mexico & No  \\
+MetLife Stadium        & New York$^\dagger$     & USA    & Yes \\
+SoFi Stadium           & Los Angeles$^\dagger$  & USA    & Yes \\
+AT\&T Stadium          & Dallas$^\dagger$       & USA    & Yes \\
+Mercedes-Benz Stadium  & Atlanta$^\dagger$      & USA    & Yes \\
+NRG Stadium            & Houston$^\dagger$      & USA    & Yes \\
+Arrowhead Stadium      & Kansas City$^\dagger$  & USA    & Yes* \\
+Lincoln Financial Field& Philadelphia$^\dagger$ & USA    & Yes \\
+Hard Rock Stadium      & Miami$^\dagger$        & USA    & Yes \\
+Levi's Stadium         & San Francisco$^\dagger$& USA    & Yes \\
+Lumen Field            & Seattle$^\dagger$      & USA    & Yes \\
+Gillette Stadium       & Boston$^\dagger$       & USA    & Yes \\
+BC Place               & Vancouver              & Canada & No  \\
+BMO Field              & Toronto                & Canada & No  \\
+Estadio Banorte        & Mexico City            & Mexico & No  \\
+Estadio BBVA           & Monterrey              & Mexico & No  \\
+Estadio Akron          & Guadalajara            & Mexico & No  \\
 \bottomrule
+\multicolumn{4}{l}{\footnotesize * Kansas City shows near-zero T-100 fractions for most countries,} \\
+\multicolumn{4}{l}{\footnotesize reflecting its minimal direct international air service; its} \\
+\multicolumn{4}{l}{\footnotesize WC-specific traffic is captured by the WC-fan stream.} \\
 \end{tabular}
 \end{table}
 
@@ -394,15 +578,14 @@ of contributions from both travel streams across all source countries:
     \;+\;
     \underbrace{%
       \sum_{c}
-        N_{c,h(v)}^{\text{bg}} \cdot I_{c,d} \cdot p_d
+        N_{c,v}^{\text{bg}} \cdot I_{c,d} \cdot p_d
     }_{\text{background stream}}
   \label{eq:lambda_schedule}
 \end{equation}
 
 where $\mathcal{Q}$ denotes the set of WC-qualified countries with a
-known group-stage schedule, and $h(v)$ maps venue city $v$ to its
-corresponding I-92 gateway city (if one exists). The probability of at
-least one importation is computed via Equation~\ref{eq:poisson}.
+known group-stage schedule. The probability of at least one
+importation is computed via Equation~\ref{eq:poisson}.
 
 % ============================================================
 \subsection*{Three-model comparison}
@@ -412,23 +595,22 @@ three models are compared side by side for each disease and destination
 city. The three models form a nested hierarchy:
 
 \begin{enumerate}
-  \item \textbf{Baseline} (Sections above): I-92 regional travel
-    (2023--2025 mean), regional disease incidence, five US I-92 gateway
-    cities.
+  \item \textbf{Baseline}: I-92 regional travel (2023--2025 mean),
+    regional disease incidence, five US I-92 gateway cities.
   \item \textbf{WC-adjusted}: Country-level 2026 travel projections
-    (NTTO + COR scaling), country-level disease incidence, five US
-    I-92 gateway cities (routing unchanged).
+    (NTTO + COR scaling), country-level disease incidence, all eleven
+    US venue cities via T-100 routing.
   \item \textbf{Schedule-driven}: Same 2026 projections decomposed into
     WC-fan and background streams; WC fans routed to all sixteen venue
-    cities via the match schedule; background travelers use I-92 routing.
+    cities via the match schedule; background travelers routed via
+    T-100 country-level fractions to all eleven US cities.
 \end{enumerate}
 
 The step from Model~1 to Model~2 isolates the combined effect of the
-WC travel surge and country-level disease incidence resolution. The step
-from Model~2 to Model~3 isolates the effect of schedule-based venue
-routing: new cities (Atlanta, Miami, Kansas City, Los Angeles, San
-Francisco, Seattle, and the three Mexican cities) appear in the
-importation risk landscape only in Model~3.
+WC travel surge and country-level disease incidence resolution.
+The step from Model~2 to Model~3 isolates the effect of schedule-based
+venue routing: the spatial redistribution of WC fans to the cities
+where their team actually plays.
 
 Two summary metrics are compared (Figures~\ref{fig:comp_prob} and
 \ref{fig:comp_lambda}):
@@ -436,7 +618,7 @@ Two summary metrics are compared (Figures~\ref{fig:comp_prob} and
   \item $P(\geq 1)$: probability of at least one importation
     (Equation~\ref{eq:poisson}). Useful as a communication metric but
     saturates quickly toward~1 for high-risk cities.
-  \item $\lambda$: expected number of imported cases (the raw Poisson
+  \item $\Lambda$: expected number of imported cases (the raw Poisson
     intensity). Remains on a linear scale even when $P(\geq 1) \to 1$
     and allows direct quantitative comparison across cities and models.
 \end{itemize}
@@ -465,12 +647,13 @@ and background streams), three summaries are produced:
     (Figure~\ref{fig:country_rank}).
 
   \item \textbf{Travel-stream decomposition}: for the top 20
-    countries by dengue importation burden, the fraction of
-    $\lambda_{c,v,\text{dengue}}$ attributable to the WC-fan stream
-    versus the background stream is shown
-    (Figure~\ref{fig:stream_breakdown}). Countries with WC teams are
-    expected to show a non-zero WC-fan component; non-qualified
-    countries will show only background travel contributions.
+    countries by importation burden, the fraction of
+    $\lambda_{c,v,d}$ attributable to the WC-fan stream
+    versus the background stream is shown separately for each disease
+    (Figure~\ref{fig:stream_panel}).
+    Countries with WC teams are expected to show a non-zero WC-fan
+    component; non-qualified countries will show only background travel
+    contributions.
 
   \item \textbf{Country $\times$ city importation heatmap}: a matrix
     visualisation of $\lambda_{c,v,d}$ summed over both streams,
@@ -479,7 +662,7 @@ and background streams), three summaries are produced:
     This reveals the spatial concentration of risk: WC-qualified
     countries show importation concentrated in their specific match
     venues, while non-qualified countries show diffuse contributions
-    spread across the five I-92 gateway cities.
+    spread via T-100 routing fractions.
 \end{enumerate}
 
 % ============================================================
@@ -488,7 +671,13 @@ and background streams), three summaries are produced:
 \subsubsection*{Dengue}
 
 Monthly country-level dengue case counts were obtained from the WHO
-Global Dengue Surveillance dataset (accessed December 2025). For the
+Global Dengue Surveillance dataset (accessed December 2025). Dengue
+is the primary focus of the WC-adjusted and schedule-driven models
+because it is highly seasonal (peaking in June in the Southern
+Hemisphere, where several WC-qualified nations are located), is
+endemic across much of Latin America, the Caribbean, and Southeast
+Asia, and has a substantial fraction of infections that are
+asymptomatic or mild enough to allow continued travel. For the
 baseline model, cases were aggregated to broad world regions and the
 mean June case count over 2024--2025 was used. For the WC-adjusted
 model, the mean June 2024--2025 case count per country was used
@@ -500,8 +689,13 @@ incidence. Countries with no data were excluded.
 Country-level malaria incidence rates for 2024 (cases per 1,000
 population) were obtained from the WHO Global Malaria Programme
 National Unit Data. Annual incidence was divided by 12 to obtain an
-approximate monthly rate. Countries were recoded to match naming
-conventions in the travel datasets where necessary (e.g.,
+approximate monthly rate. Malaria was included because several
+WC-qualified countries (particularly in sub-Saharan Africa and parts
+of Asia) have high endemic transmission, and even low traveller
+infection probabilities translate into meaningful importation risk
+given the large travel volumes from Latin America and Africa.
+Countries were recoded to match naming conventions in the travel
+datasets where necessary (e.g.,
 ``Democratic Republic of the Congo'' $\to$ ``Zaire (formerly DRC)'').
 
 \subsubsection*{Measles and pertussis}
@@ -510,6 +704,14 @@ Annual country-level incidence rates (cases per 1,000,000 population)
 for measles and pertussis were obtained from the WHO Immunization Data
 portal (accessed September and December 2025, respectively). Annual
 incidence was divided by 12 to obtain an approximate monthly rate.
+Measles was included because of its resurgence in multiple regions due
+to declining vaccination coverage, and because it has a high
+infectiousness ($R_0 \approx 12$--18) that makes even a single
+importation event meaningful. Pertussis was included because its
+catarrhal phase closely resembles a common cold, making it likely that
+infected individuals continue to travel internationally; its $p_d$
+value (Table~\ref{tab:params}) is accordingly the highest of the four
+diseases.
 
 % ============================================================
 \subsection*{Model parameters}
@@ -518,10 +720,15 @@ Table~\ref{tab:params} summarises the disease-specific parameters
 used in all three models. The adjustment factor $\rho_d$ captures the
 combined effect of under-reporting in routine surveillance and the
 fraction of reported cases that represent actively infectious
-individuals. The travel infectiousness probability $p_d$ reflects the
-likelihood that a person with the disease continues to travel
-internationally while infectious, accounting for the typical severity
-and duration of symptoms relative to the incubation period.
+individuals at a given time. Under-reporting is well-documented for
+all four diseases: dengue and malaria are frequently misdiagnosed or
+asymptomatic; measles cases may not be reported in countries with
+weakened surveillance infrastructure; and pertussis is often
+misidentified as a non-specific respiratory illness in adults. The
+travel infectiousness probability $p_d$ reflects the likelihood that
+a person with the disease continues to travel internationally while
+infectious, accounting for the typical severity and duration of
+symptoms relative to the incubation period and infectious window.
 
 \begin{table}[h!]
 \centering
@@ -616,10 +823,10 @@ precision and scope of the model.
   \item \textbf{Flight booking data.}
   Airline booking databases (e.g., OAG Traffic Analyser, Amadeus Travel
   Intelligence, IATA PaxIS) provide origin-destination passenger volumes
-  by city pair and travel date. These would replace the I-92 regional
-  routing fractions and COR monthly aggregates with direct
-  country-to-city routing specific to the WC travel window, including
-  routing to the eleven venue cities not currently covered by I-92 data.
+  by city pair and travel date. These would replace the T-100 routing
+  fractions with direct country-to-city routing specific to the WC travel
+  window, including routing to the five non-US host cities not covered
+  by T-100.
 
   \item \textbf{FIFA ticket sales by country.}
   FIFA ticket allocation and sales records by country of purchase would
@@ -630,10 +837,9 @@ precision and scope of the model.
 
   \item \textbf{Fan travel records from previous World Cups.}
   Entry and hotel registration records from Brazil 2014, Russia 2018, and
-  Qatar 2022 — obtained through host country immigration authorities or
-  public health agencies — would allow empirical validation of the
-  schedule-based routing fractions used in Model 3 and calibration of
-  the WC-specific growth factors.
+  Qatar 2022 would allow empirical validation of the schedule-based
+  routing fractions used in Model 3 and calibration of the WC-specific
+  growth factors.
 
 \end{itemize}
 
@@ -651,18 +857,17 @@ precision and scope of the model.
 
   \item \textbf{Age-stratified national incidence.}
   International leisure travelers are disproportionately working-age
-  adults (18--50 years). Age-specific incidence data, available from
-  WHO and national surveillance systems for several diseases, would
-  allow weighting country-level burden by the age distribution of the
+  adults (18--50 years). Age-specific incidence data would allow
+  weighting country-level burden by the age distribution of the
   traveling population, improving the per-traveller infection
   probability $I_{c,d}$.
 
   \item \textbf{National vaccination coverage.}
   For measles and pertussis, WHO/UNICEF national immunization coverage
-  estimates (Immunization Data portal) would allow adjustment of
-  effective incidence to account for immunity in the traveling
-  population, replacing the implicit assumption that travelers have
-  the same vaccination status as the general population.
+  estimates would allow adjustment of effective incidence to account
+  for immunity in the traveling population, replacing the implicit
+  assumption that travelers have the same vaccination status as the
+  general population.
 
 \end{itemize}
 
@@ -674,17 +879,14 @@ precision and scope of the model.
   The current model quantifies importation risk only; it does not
   model secondary transmission at destination cities. Local vector
   density and competence data for \textit{Ae.~aegypti} in US host
-  cities, available through CDC ArboNET and state health department
-  surveillance programmes, would allow extension of the framework
-  to estimate the probability of a local dengue outbreak following
-  an importation event.
+  cities would allow extension of the framework to estimate the
+  probability of a local dengue outbreak following an importation event.
 
   \item \textbf{Healthcare system capacity.}
   Hospital capacity, infectious disease bed availability, and public
-  health rapid-response capacity data by host city (American Hospital
-  Association annual survey, state health departments) would
-  contextualise the importation risk estimates for local health
-  system planning and resource pre-positioning.
+  health rapid-response capacity data by host city would contextualise
+  the importation risk estimates for local health system planning and
+  resource pre-positioning.
 
   \item \textbf{Mobile device and mobility data.}
   Aggregated mobility datasets (e.g., Meta Movement Data, Google
@@ -698,23 +900,381 @@ precision and scope of the model.
 % ============================================================
 \subsection*{Sensitivity analysis}
 
-All parameter values for $\rho_d$ and $p_d$ represent central
-estimates subject to uncertainty. Given the lack of strong empirical
-constraints on these values for large sporting events, a structured
-sensitivity analysis varying $\rho_d$ and $p_d$ independently over a
-plausible range (e.g., $\pm 50\%$ of central values) is recommended
-before finalising results for policy communication.
+Because $\rho_d$ and $p_d$ lack strong empirical constraints for
+mass sporting-event contexts, we conducted a structured one-at-a-time
+sensitivity analysis using the schedule-driven model (Model~3) as the
+reference. Each parameter was varied independently across five
+multipliers---$\times 0.50$, $0.75$, $1.00$, $1.25$, and
+$1.50$---relative to the central values in Table~\ref{tab:params},
+while holding the other parameter fixed at its central value.
+
+For each combination of disease, parameter, and multiplier, the
+full schedule-driven pipeline was re-executed and city-level
+importation intensities $\Lambda_{v,d}$ were recorded. Because
+$\Lambda_{v,d}$ is linear in both $\rho_d$ and $p_d$
+(Equation~\ref{eq:lambda_schedule}), the relative change in $\Lambda$
+equals the parameter multiplier exactly; deviations from this
+proportionality arise only through differences in which country--city
+pairs have non-zero contributions after joining the incidence and
+arrival matrices.
+
+Results are summarised as absolute and relative $\Lambda$ values
+across multiplier levels
+(Figures~\ref{fig:sens_abs} and~\ref{fig:sens_rel}). The relative
+sensitivity metric $\Lambda_{\text{perturbed}} / \Lambda_{\text{central}}$
+is used to identify the diseases and cities most sensitive to
+parameter uncertainty.
 
 % ============================================================
 \subsection*{Software}
 
-All analyses were performed in R (version 4.5.2). Key packages used
-include \texttt{tidyverse} for data wrangling, \texttt{sf} and
-\texttt{tigris} for spatial operations, \texttt{stringdist} for
-fuzzy airport name matching, \texttt{readxl} for ingestion of Excel
-data sources, and \texttt{cowplot} for figure composition. Code and
-data are available at
+All analyses were performed in R (version 4.5.2). The main
+importation pipeline (\texttt{importationRisk\_main.R}) uses
+\texttt{tidyverse} for data wrangling and visualisation,
+\texttt{readxl} for ingestion of Excel data sources,
+\texttt{janitor} for column-name standardisation,
+\texttt{lubridate} for date operations, and \texttt{cowplot} for
+multi-panel figure composition. A dedicated data preparation script
+(\texttt{t100\_routing\_prep.R}) processes the BTS T-100 data using
+\texttt{tidyverse} and \texttt{janitor}. A supplementary script
+(\texttt{importationRisk\_world\_cup2026.R}) handles airport-level
+spatial operations using \texttt{sf}, \texttt{tigris}, and
+\texttt{stringdist} (fuzzy airport name matching). Code and data are
+available at
 \url{https://github.com/jdiestra1977/FIFA_worldCup_2026_risk}.
+
+% ============================================================
+\section*{Results}
+% ============================================================
+
+\subsection*{Baseline importation risk (Model 1)}
+
+Figure~\ref{fig:baseline} shows the estimated importation intensity
+($\Lambda$) and probability of at least one importation $[P(\geq 1)]$
+for all four diseases across the five I-92 US gateway cities under
+the baseline model. Dengue fever exhibited the highest importation
+intensity across all cities, driven by its high endemic burden across
+Latin America, the Caribbean, and Southeast Asia---all regions with
+substantial visitor volumes to the United States in June. Pertussis
+showed the second-highest estimated probability of importation,
+reflecting its high $p_d$ value (0.70): the catarrhal phase of
+pertussis is clinically indistinguishable from a common cold, making
+infected travellers unlikely to self-recognise and self-isolate before
+or during international travel.
+
+Malaria importation intensity was concentrated in the cities receiving
+the largest visitor flows from sub-Saharan Africa, where transmission
+is highest. Measles, despite having the highest reporting adjustment
+factor ($\rho = 0.60$), showed the lowest travel-related importation
+risk, owing to its low travel-while-infectious probability ($p = 0.05$);
+measles produces severe enough symptoms that most infected individuals
+do not travel internationally during the infectious window. Among
+gateway cities, New York and Houston consistently showed the highest
+absolute importation intensities, reflecting their role as the primary
+entry points for Latin American and Caribbean travellers.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/estimated_importations.png}
+  \caption{Baseline model (Model 1): estimated importation intensity
+    ($\Lambda$, bar height) and probability of at least one importation
+    $[P(\geq 1)]$ for dengue, malaria, measles, and pertussis across
+    five US gateway cities. Based on mean June 2023--2025 I-92 regional
+    arrivals and WHO disease data.}
+  \label{fig:baseline}
+\end{figure}
+
+\subsection*{World Cup--adjusted importation risk (Model 2)}
+
+The WC-adjusted model incorporates June 2026 country-level travel
+projections and country-level disease incidence, while expanding
+coverage to all 11 US venue cities through T-100 routing fractions
+(Figure~\ref{fig:wc_adjusted}). Compared to the baseline, importation
+intensities increase for most cities, reflecting the expected growth
+in international arrivals driven by the WC travel surge. The increase
+is largest for countries with high WC growth factors (particularly
+WC-qualified nations and those with NTTO Tier~1 projections above the
+baseline growth rate) and for cities that are primary entry points for
+those source countries.
+
+The expansion from five to eleven venue cities reveals a substantial
+importation risk footprint that was invisible under the baseline model.
+Los Angeles, Miami, and Atlanta emerged with notable dengue importation
+intensity, reflecting their large catchments of Latin American and
+Caribbean travellers identified through T-100 routing fractions. San
+Francisco showed meaningful contributions from Southeast Asian source
+countries. Seattle and Kansas City, which have limited direct
+international air service for most source countries, showed lower
+background-stream estimates, consistent with their T-100 routing
+fractions.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/estimated_importations_wc_adjusted.png}
+  \caption{WC-adjusted model (Model 2): estimated importation intensity
+    and $P(\geq 1)$ for all four diseases across all 11 US venue cities.
+    Travel volumes reflect June 2026 NTTO/COR projections; city routing
+    uses T-100 country-level fractions (mean June 2023--2025).}
+  \label{fig:wc_adjusted}
+\end{figure}
+
+\subsection*{Schedule-driven importation risk (Model 3)}
+
+The schedule-driven model further decomposes travel into a WC-fan
+stream (routed via the match schedule) and a background stream
+(routed via T-100 fractions), producing the most spatially
+disaggregated risk estimates (Figure~\ref{fig:schedule_driven}).
+Venue cities hosting matches for high-burden WC teams showed
+substantially elevated importation intensity relative to their
+background-stream baseline. Cities receiving matches for dengue-endemic
+teams from Latin America (Brazil, Colombia, Argentina, Mexico) or
+Southeast Asia (Japan, Australia) showed the largest WC-fan
+contributions for dengue. Kansas City, which hosts several group-stage
+matches despite limited direct international service, receives
+meaningful WC-fan stream risk that is not visible in the background
+stream---illustrating the critical added value of the schedule-driven
+model over historical routing approaches.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/estimated_importations_schedule_driven.png}
+  \caption{Schedule-driven model (Model 3): estimated importation
+    intensity and $P(\geq 1)$ for all four diseases across all US
+    venue cities, decomposed into WC-fan and background travel streams.
+    WC fan routing follows the match schedule; background routing uses
+    T-100 fractions.}
+  \label{fig:schedule_driven}
+\end{figure}
+
+\subsection*{Three-model comparison}
+
+Figures~\ref{fig:comp_prob} and~\ref{fig:comp_lambda} compare all
+three models side by side across diseases and venue cities. The step
+from Model~1 to Model~2 (WC surge + country-level incidence) generally
+increased importation intensity at the five original gateway cities,
+but the magnitude of increase varies considerably by disease and
+source-country composition. The step from Model~2 to Model~3
+(schedule-based fan routing) redistributes risk across cities rather
+than simply amplifying it: cities that happen to host matches for
+high-incidence countries see disproportionate increases, while cities
+not hosting matches for those countries may show a relative decrease
+compared to a uniform routing assumption.
+
+The probability metric $P(\geq 1)$ (Figure~\ref{fig:comp_prob})
+saturates toward 1 for high-risk cities under all three models for
+dengue and pertussis, making it difficult to distinguish between
+models at high-risk venues. The importation intensity $\Lambda$
+(Figure~\ref{fig:comp_lambda}) remains on a linear scale throughout
+and is the preferred metric for communicating relative risk differences
+between cities and models; a city with $\Lambda = 10$ has ten times
+the expected imported cases of a city with $\Lambda = 1$, regardless
+of whether both have $P(\geq 1) \approx 1$.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/model_comparison_probability.png}
+  \caption{Three-model comparison: probability of at least one
+    importation $[P(\geq 1)]$ by venue city and disease.
+    \textcolor{blue}{Blue} = Baseline; \textcolor{red}{Red} =
+    WC-adjusted; \textcolor{green!60!black}{Green} = Schedule-driven.
+    Cities absent from a model show $P = 0$ for that model by construction.}
+  \label{fig:comp_prob}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/model_comparison_intensity.png}
+  \caption{Three-model comparison: expected importation intensity
+    ($\Lambda$) by venue city and disease. The linear scale reveals
+    relative risk differences that are masked by the saturation of
+    $P(\geq 1)$ in Figure~\ref{fig:comp_prob}.}
+  \label{fig:comp_lambda}
+\end{figure}
+
+\subsection*{Country-level importation contributions}
+
+\subsubsection*{Country importation ranking}
+
+Figure~\ref{fig:country_rank} ranks the top 15 source countries by
+total expected importations (summed across all destination cities)
+separately for each disease, under the schedule-driven model. For
+dengue, Brazil, Colombia, and Mexico consistently ranked at the top,
+reflecting their combination of high dengue incidence, large travel
+volumes to the United States, and WC fan travel to multiple venue
+cities. For malaria, the ranking shifted markedly toward sub-Saharan
+African nations (particularly those in West and Central Africa with
+high transmission), which have lower absolute travel volumes but
+substantially higher malaria incidence rates.
+
+Measles importation contributions were more diffuse, spread across
+countries with documented vaccination gaps in Europe, Africa, and Asia.
+For pertussis, the high $p_d$ value (0.70) meant that even countries
+with moderate incidence produced non-negligible importation estimates;
+the ranking included both high-incidence low-volume countries and
+moderate-incidence high-volume countries (notably Mexico, Brazil, and
+several European nations experiencing pertussis resurgence).
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/country_importation_ranking.png}
+  \caption{Top 15 source countries by total expected importations
+    (schedule-driven model, summed across all destination cities),
+    shown separately for each disease. Bar length $= \sum_v \lambda_{c,v,d}$.}
+  \label{fig:country_rank}
+\end{figure}
+
+\subsubsection*{WC-fan vs.\ background travel stream decomposition}
+
+Figure~\ref{fig:stream_panel} decomposes the top 20 contributing
+countries by travel stream (WC fans vs.\ background) for each of
+the four diseases. For WC-qualified countries, the WC-fan stream
+contributes a meaningful but typically minority share of the total
+importation intensity, consistent with the $\approx 3.4\%$ fan
+fraction derived from the growth factor decomposition. Countries with
+the largest WC fan contributions are those that (1) have a qualified
+team, (2) have high disease incidence, and (3) have their team's
+matches concentrated at a small number of venue cities, increasing
+the local fan density at those venues.
+
+Non-qualified countries, regardless of their disease burden,
+contribute exclusively through the background stream; their presence
+in the top 20 reflects high June travel volumes to the United States
+rather than any WC-specific effect. This decomposition highlights
+that the background stream dominates total importation risk for most
+source countries: the WC tournament amplifies risk at specific cities
+and for specific diseases, but baseline travel patterns set the
+underlying risk floor across all cities and diseases.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/stream_breakdown_panel.png}
+  \caption{WC-fan vs.\ background travel stream decomposition for the
+    top 20 source countries by total importation intensity, for each
+    of the four diseases. \textcolor{orange!80!black}{Orange} = WC fans;
+    \textcolor{blue!70!black}{Blue} = background. Countries with WC
+    teams show a non-zero WC-fan component; non-qualified countries
+    contribute only through background travel.}
+  \label{fig:stream_panel}
+\end{figure}
+
+\subsubsection*{Country $\times$ city importation heatmaps}
+
+Figures~\ref{fig:heatmap_dengue}--\ref{fig:heatmap_pertussis} present
+the country $\times$ city importation matrix ($\lambda_{c,v,d}$)
+for each disease. The heatmaps reveal a consistent spatial pattern:
+WC-qualified countries from high-incidence regions show importation
+concentrated at the venue cities where their team plays, producing a
+block-diagonal structure aligned with the match schedule. Non-qualified
+countries show importation spread more diffusely across cities in
+proportion to T-100 routing fractions, reflecting their reliance on
+normal tourist routing patterns.
+
+For dengue (Figure~\ref{fig:heatmap_dengue}), the highest
+country--city cells correspond to Latin American WC teams (Brazil,
+Colombia, Ecuador, Paraguay, Uruguay, Argentina) at their respective
+match venues. Miami, Houston, and Los Angeles receive notable dengue
+contributions from multiple Latin American and Caribbean source
+countries through both the WC-fan and background streams. For malaria
+(Figure~\ref{fig:heatmap_malaria}), the risk matrix is sparser, with
+high values concentrated in West African nations at their match venues
+and lower diffuse contributions elsewhere.
+
+Measles (Figure~\ref{fig:heatmap_measles}) shows a distinct pattern
+from dengue and malaria: despite having the highest $\rho$ value,
+the low $p_d$ suppresses absolute importation intensities across all
+country--city pairs, resulting in a more uniformly low-intensity
+matrix with a few notable peaks at cities hosting matches for countries
+with documented measles outbreaks. Pertussis
+(Figure~\ref{fig:heatmap_pertussis}) shows the broadest geographic
+spread, consistent with its global endemicity and high $p_d$; the
+matrix includes non-trivial values from European and East Asian
+countries in addition to Latin American ones.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/heatmap_dengue.png}
+  \caption{Dengue importation matrix: expected importations
+    $\lambda_{c,v}$ by source country (rows, ordered by total burden)
+    and destination city (columns). Colour scale is the Plasma palette;
+    darker = higher expected importations. Schedule-driven model.}
+  \label{fig:heatmap_dengue}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/heatmap_malaria.png}
+  \caption{Malaria importation matrix. Same structure as
+    Figure~\ref{fig:heatmap_dengue}. Risk is concentrated in West
+    and Central African source countries.}
+  \label{fig:heatmap_malaria}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/heatmap_measles.png}
+  \caption{Measles importation matrix. Low absolute intensities
+    across all cells reflect the low travel-while-infectious
+    probability ($p = 0.05$).}
+  \label{fig:heatmap_measles}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/heatmap_pertussis.png}
+  \caption{Pertussis importation matrix. The broad geographic spread
+    reflects pertussis's global endemicity and high
+    travel-while-infectious probability ($p = 0.70$).}
+  \label{fig:heatmap_pertussis}
+\end{figure}
+
+\subsection*{Sensitivity analysis}
+
+Figure~\ref{fig:sens_abs} shows the absolute importation intensity
+$\Lambda_{v,d}$ as each parameter ($\rho_d$, $p_d$) is varied
+$\pm$50\% around its central value. Because $\Lambda_{v,d}$ is
+strictly linear in both $\rho_d$ and $p_d$
+(Equation~\ref{eq:lambda_schedule}), perturbing either parameter by
+a factor of $k$ rescales all city-level $\Lambda$ estimates by
+exactly $k$. The sensitivity curves are therefore parallel lines,
+and the relative ranking of cities and diseases is invariant to
+parameter choice.
+
+Figure~\ref{fig:sens_rel} expresses results as the ratio
+$\Lambda_{\text{perturbed}} / \Lambda_{\text{central}}$, confirming
+that the relative sensitivity is uniform across all cities and
+diseases: a $\pm$50\% change in $\rho_d$ or $p_d$ produces a
+$\pm$50\% change in $\Lambda$, regardless of disease or venue city.
+This proportionality means that, while absolute estimates carry
+substantial uncertainty, the \emph{relative ranking} of cities and
+the \emph{relative contribution} of source countries to importation
+risk are robust to uncertainty in $\rho_d$ and $p_d$.
+
+These results have an important implication for public health
+communication: the specific $\Lambda$ values should be interpreted
+as order-of-magnitude estimates with wide uncertainty bounds, while
+the qualitative conclusions (which cities and source countries face
+the highest risk, which diseases dominate) are stable across the
+plausible parameter range.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/sensitivity_analysis_lambda.png}
+  \caption{Sensitivity analysis: absolute importation intensity
+    $\Lambda_{v,d}$ under $\times$0.50, $\times$0.75, $\times$1.00,
+    $\times$1.25, and $\times$1.50 perturbations of $\rho_d$ and $p_d$
+    independently. Schedule-driven model (Model 3).}
+  \label{fig:sens_abs}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/sensitivity_analysis_relative.png}
+  \caption{Relative sensitivity: $\Lambda_{\text{perturbed}} /
+    \Lambda_{\text{central}}$ for each parameter multiplier. The
+    uniform proportionality across all cities and diseases confirms
+    that city and disease rankings are robust to parameter uncertainty.}
+  \label{fig:sens_rel}
+\end{figure}
 
 % ============================================================
 \bibliographystyle{apalike}
