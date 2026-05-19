@@ -1,0 +1,47 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Tarleton//NONSGML v1.0//EN
+BEGIN:VEVENT
+DTSTART:20260527T140000Z
+DTEND:20260527T220000Z
+LOCATION:Health Professions Building\, Room 113
+SUMMARY:Private Foundation Grant Seeking Workshop
+DESCRIPTION:Take your research to the next level with this hands-on works
+ hop\, where you will identify potential funders\, develop your project co
+ ncepts and learn proven approaches for private foundation grant success a
+ longside fellow faculty.In-person only (limited seating)  Free registrati
+ on  Lunch and snacks provided  Workshop materials provided    This worksh
+ op has limited seating\, so we kindly ask that you only register if you a
+ re certain you will attend. Research faculty will be given priority durin
+ g registration. To take advantage of this workshop's benefits\, we ask th
+ at everyone stay through the entire workshop.&#160\;
+X-ALT-DESC;FMTTYPE=text/html:<p>  Take your research to the next level wi
+ th this hands-on workshop\, where you will identify potential funders\, d
+ evelop your project concepts and learn proven approaches for private foun
+ dation grant success alongside fellow faculty.</p><ul><li>In-person only 
+ (limited seating)  </li><li>Free registration  </li><li>Lunch and snacks 
+ provided  </li><li>Workshop materials provided  </li></ul><p>  This works
+ hop has limited seating\, so we kindly ask that you only register if you 
+ are certain you will attend. Research faculty will be given priority duri
+ ng registration. To take advantage of this workshop's benefits\, we ask t
+ hat everyone stay through the entire workshop.&#160\;</p>
+UID:20260527T140000Z-103422@calendar.tarleton.edu
+DTSTAMP:20260428T150306Z
+URL:https://calendar.tarleton.edu/research/event/103422-private-foundatio
+ n-grant-seeking-workshop
+CATEGORIES:Training and Conferences
+LAST-MODIFIED:20260506T160929Z
+ATTACH:https://calendar.tarleton.edu/live/image/gid/81/width/80/height/80
+ /crop/1/src_region/0,0,1322,1652/2531_RIED_Vert_Purple_2.rev.1736877568.p
+ ng
+X-LIVEWHALE-TYPE:events
+X-LIVEWHALE-ID:103422
+X-LIVEWHALE-TIMEZONE:America/Chicago
+X-LIVEWHALE-IMAGE:https://calendar.tarleton.edu/live/image/gid/81/width/8
+ 0/height/80/crop/1/src_region/0\,0\,1322\,1652/2531_RIED_Vert_Purple_2.re
+ v.1736877568.png
+X-LIVEWHALE-COST:Free
+X-LIVEWHALE-CONTACT-INFO:<p>Dr. Andy Wolfe<br />\nawolfe@tarleton.edu</p>
+X-LIVEWHALE-RSVP:1
+END:VEVENT
+END:VCALENDAR

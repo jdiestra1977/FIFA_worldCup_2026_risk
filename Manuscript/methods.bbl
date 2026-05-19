@@ -1,0 +1,90 @@
+\begin{thebibliography}{}
+
+\bibitem[Bhatt et~al., 2013]{bhatt2013}
+Bhatt, S., Gething, P.~W., Brady, O.~J., et~al. (2013).
+\newblock The global distribution and burden of dengue.
+\newblock {\em Nature}, 496:504--507.
+
+\bibitem[{Bureau of Transportation Statistics}, 2026]{BTS_T100}
+{Bureau of Transportation Statistics} (2026).
+\newblock {T-100} international segment (all carriers) --- form 41 traffic
+  data.
+\newblock
+  \url{https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FJE}.
+\newblock Table ID: T\_T100I\_SEGMENT\_ALL\_CARRIER. June data for 2023--2025
+  accessed 2025--2026.
+
+\bibitem[{Fédération Internationale de Football Association},
+  2026]{FIFA2026_schedule}
+{Fédération Internationale de Football Association} (2026).
+\newblock {FIFA} world cup 2026 match schedule and qualified teams.
+\newblock
+  \url{https://www.fifa.com/fifaplus/en/tournaments/mens/worldcup/canadamexicousa2026}.
+\newblock Accessed April--May 2026.
+
+\bibitem[Herrera-Diestra et~al., 2026]{Herrera2024}
+Herrera-Diestra, J.~L. et~al. (2026).
+\newblock Importation risk of infectious diseases during the {FIFA} {World Cup}
+  2026.
+\newblock {\em [Journal TBD]}.
+\newblock Manuscript in preparation.
+
+\bibitem[McLaughlin et~al., 2016]{mclaughlin2016}
+McLaughlin, J.~M., Swerdlow, D.~L., Isdale, S., et~al. (2016).
+\newblock Estimated incidence of pertussis in people aged $<$50 years in the
+  {United States}.
+\newblock {\em Epidemiology \& Infection}, 144(13):2676--2684.
+
+\bibitem[{National Travel and Tourism Office}, 2025]{NTTO2025}
+{National Travel and Tourism Office} (2025).
+\newblock International visitor forecast: 2025--2029.
+\newblock \url{https://www.trade.gov/travel-and-tourism-forecasts}.
+\newblock Accessed April 2026.
+
+\bibitem[Simons et~al., 2012]{simons2012}
+Simons, E., Ferrari, M., Fricks, J., et~al. (2012).
+\newblock Assessment of the 2010 global measles mortality reduction goal:
+  results from a model of surveillance data.
+\newblock {\em The Lancet}, 379(9832):2173--2178.
+
+\bibitem[Undurraga et~al., 2013]{undurraga2013}
+Undurraga, E.~A., Halasa, Y.~A., and Shepard, D.~S. (2013).
+\newblock Use of expansion factors to estimate the burden of dengue in
+  {Southeast Asia}: a systematic analysis.
+\newblock {\em PLOS Neglected Tropical Diseases}, 7(2):e2056.
+
+\bibitem[{United Nations, Department of Economic and Social Affairs, Population
+  Division}, 2022]{PopUN2020}
+{United Nations, Department of Economic and Social Affairs, Population
+  Division} (2022).
+\newblock World population prospects 2022 --- country population estimates.
+\newblock \url{https://population.un.org/wpp/}.
+\newblock 2020 estimates used as national population denominators. Accessed
+  2025.
+
+\bibitem[{US Customs and Border Protection}, 2026]{CBP_I94}
+{US Customs and Border Protection} (2026).
+\newblock Monthly arrivals by country of residence ({I-94} data).
+\newblock \url{https://travel.trade.gov}.
+\newblock Accessed April 2026.
+
+\bibitem[{World Health Organization}, 2024]{whoWMR2024}
+{World Health Organization} (2024).
+\newblock World malaria report 2024.
+\newblock
+  \url{https://www.who.int/teams/global-malaria-programme/reports/world-malaria-report-2024}.
+\newblock Accessed 2025.
+
+\bibitem[{World Health Organization}, 2025a]{WHO_dengue}
+{World Health Organization} (2025a).
+\newblock Global dengue surveillance dataset.
+\newblock \url{https://www.who.int/data/gho}.
+\newblock Accessed December 2025.
+
+\bibitem[{World Health Organization}, 2025b]{WHO_immunization}
+{World Health Organization} (2025b).
+\newblock Immunization data: Reported cases and incidence.
+\newblock \url{https://immunizationdata.who.int}.
+\newblock Accessed September--December 2025.
+
+\end{thebibliography}

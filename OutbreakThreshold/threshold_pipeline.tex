@@ -1,0 +1,560 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{parskip}
+
+\definecolor{taskblue}{RGB}{31, 97, 141}
+\definecolor{notegreen}{RGB}{30, 130, 76}
+\definecolor{warnred}{RGB}{176, 58, 46}
+
+\hypersetup{colorlinks=true, linkcolor=taskblue, urlcolor=taskblue}
+
+\title{\textbf{Critical Outbreak Size for Disease Importation into the
+United States: A Threshold Analysis Framework}\\[0.5em]
+\large Research Pipeline and Student Brief}
+
+\author{Principal Investigator: Jose Herrera-Diestra\\
+\small Tarleton State University \quad
+\texttt{jherreradiestra@tarleton.edu}}
+
+\date{May 2026}
+
+% ============================================================
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+
+% ============================================================
+\section*{Overview and Motivation}
+% ============================================================
+
+\textbf{Context.} The FIFA World Cup 2026 importation risk analysis
+(Herrera-Diestra, in preparation) estimates the probability of at least
+one imported infectious disease case reaching each US host city, given
+observed outbreak sizes in source countries. That model answers the
+question: \textit{``Given today's incidence, what is the risk?''}
+
+\textbf{This project asks the inverse question:}
+
+\begin{center}
+\fbox{\parbox{0.85\textwidth}{
+  \centering\vspace{0.3em}
+  \textit{For a given source country and disease, how large does an
+  outbreak need to be before at least one imported case is expected
+  to arrive in the United States? And, given the current outbreak
+  trajectory, \textbf{when} does that threshold get crossed?}
+  \vspace{0.3em}
+}}
+\end{center}
+
+This reframing converts the importation model into an
+\textbf{early-warning tool}: instead of retrospectively estimating
+risk from observed data, it provides a \emph{critical threshold}
+$C_c^*$ that public health authorities can monitor in real time.
+When surveillance reports that a country's case count has crossed
+$C_c^*$, the probability of at least one US importation has become
+non-negligible.
+
+\textbf{Why this matters.} A single imported case of a high-severity
+pathogen (e.g., Ebola, Marburg, novel influenza) can trigger enormous
+public health responses. Knowing in advance \emph{how large} an
+outbreak in country $c$ must be to generate even a 5\% importation
+probability allows:
+
+\begin{itemize}
+  \item Proportionate pre-positioning of hospital resources at
+        high-volume entry airports.
+  \item Evidence-based decisions on enhanced traveller screening.
+  \item Communication to public health officials about when to escalate
+        monitoring vs.\ when risk remains negligible.
+\end{itemize}
+
+\textbf{Relationship to the WC paper.} The mathematical framework
+here is identical to the WC importation model. All base data
+(travel volumes, population, disease incidence) and all code are
+inherited from that project. This analysis extends it in a new
+direction and is intended as a standalone follow-up paper.
+
+% ============================================================
+\section{Mathematical Framework}
+% ============================================================
+
+\subsection{The Poisson Importation Model (Inherited)}
+
+The WC analysis models disease importation as a Poisson process.
+If $\Lambda_{c,d}$ is the expected number of imported cases of
+disease $d$ from country $c$ arriving in the US per month, the
+probability of observing at least one importation is:
+
+\begin{equation}
+  P(X_{c,d} \geq 1) = 1 - e^{-\Lambda_{c,d}}
+  \label{eq:poisson}
+\end{equation}
+
+The importation intensity is:
+
+\begin{equation}
+  \Lambda_{c,d} = N_c \cdot I_{c,d} \cdot p_d
+  = N_c \cdot \frac{\rho_d \cdot C_{c,d}}{P_c} \cdot p_d
+  \label{eq:lambda}
+\end{equation}
+
+where:
+\begin{itemize}
+  \item $N_c$ --- monthly travelers from country $c$ to the US
+        (COR/I-94 data, June average).
+  \item $C_{c,d}$ --- reported cases of disease $d$ in country $c$
+        per month.
+  \item $P_c$ --- population of country $c$.
+  \item $\rho_d$ --- reporting adjustment factor for disease $d$
+        (corrects for under-reporting).
+  \item $p_d$ --- probability that an infected individual travels
+        internationally while infectious.
+\end{itemize}
+
+\subsection{Inverting the Model: Critical Outbreak Size}
+
+Setting Equation~\ref{eq:poisson} equal to a threshold
+$\theta \in (0,1)$ and solving for $C_{c,d}$:
+
+\begin{equation}
+  1 - e^{-\Lambda_{c,d}} = \theta
+  \implies
+  \Lambda_{c,d} = -\ln(1 - \theta)
+\end{equation}
+
+Substituting Equation~\ref{eq:lambda} and solving for the
+\textbf{critical case count} $C_{c,d}^*$:
+
+\begin{equation}
+  \boxed{
+    C_{c,d}^* =
+    \frac{-\ln(1 - \theta) \cdot P_c}{N_c \cdot \rho_d \cdot p_d}
+  }
+  \label{eq:critical}
+\end{equation}
+
+\textbf{Interpretation.} $C_{c,d}^*$ is the number of active
+monthly cases in country $c$ at which the probability of exporting
+at least one case of disease $d$ to the US reaches $\theta$.
+It should be computed for multiple threshold levels, e.g.:
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Threshold $\theta$} & \textbf{$-\ln(1-\theta)$} &
+\textbf{Interpretation} \\
+\midrule
+0.05  & 0.051 & ``Emerging concern'' \\
+0.10  & 0.105 & ``Low risk'' \\
+0.50  & 0.693 & ``Even odds'' \\
+0.95  & 2.996 & ``Near-certain importation'' \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Note that $C_{c,d}^*$ varies dramatically across countries and
+diseases. A country with large travel volume to the US (e.g.,
+Brazil, Mexico) has a much lower threshold than a country with
+minimal travel (e.g., DRC).
+
+\subsection{Temporal Component: Time to Threshold}
+
+If an outbreak is growing, the number of cases at time $t$ (in days)
+follows an exponential growth model in the early phase:
+
+\begin{equation}
+  C(t) = C_0 \cdot e^{r \cdot t}
+  \label{eq:growth}
+\end{equation}
+
+where $C_0$ is the observed case count at time $t = 0$ (today) and
+$r$ is the epidemic growth rate. The growth rate is related to the
+basic reproduction number $R_0$ and the mean serial interval $T_s$:
+
+\begin{equation}
+  r \approx \frac{\ln R_0}{T_s}
+  \label{eq:growth_rate}
+\end{equation}
+
+Setting Equation~\ref{eq:growth} equal to $C_{c,d}^*$ and solving
+for $t$:
+
+\begin{equation}
+  \boxed{
+    t^* = \frac{1}{r} \ln\!\left(\frac{C_{c,d}^*}{C_0}\right)
+  }
+  \label{eq:time_to_threshold}
+\end{equation}
+
+\textbf{Interpretation.} $t^*$ is the number of days from today
+until the outbreak is expected to cross the importation risk
+threshold, given the current trajectory. If $C_0 > C_{c,d}^*$,
+the threshold has already been crossed ($t^* < 0$).
+
+\textbf{Important caveat.} The exponential model is a simplification
+valid only for the early epidemic phase (before control measures,
+depletion of susceptibles, etc.). For more realism, this can be
+replaced by a SEIR model, but the exponential approximation is
+sufficient for a first-pass early-warning tool.
+
+\subsection{Aggregate US Importation Risk}
+
+The framework above can be applied to individual US entry airports
+by replacing $N_c$ with $N_{c,v}$ (arrivals from country $c$ to
+city $v$) using T-100 routing fractions. This allows city-level
+threshold curves analogous to the WC analysis.
+
+% ============================================================
+\section{Diseases to Include}
+% ============================================================
+
+The analysis should cover at minimum the four diseases from the
+WC paper, plus Ebola as a high-severity case study that motivates
+the project. Parameters are listed below; see
+Table~\ref{tab:params} for sources.
+
+\begin{table}[h!]
+\centering
+\caption{Disease parameters for the threshold analysis.
+$\rho_d$ = reporting adjustment; $p_d$ = travel-while-infectious
+probability; $R_0$ and $T_s$ are used in the temporal model.
+Ebola parameters are for the Bundibugyo strain (May 2026 DRC outbreak).}
+\label{tab:params}
+\begin{tabular}{lccccl}
+\toprule
+\textbf{Disease} & $\boldsymbol{\rho_d}$ & $\boldsymbol{p_d}$
+  & $\boldsymbol{R_0}$ & $\boldsymbol{T_s}$ (days)
+  & \textbf{Incidence source} \\
+\midrule
+Dengue    & 0.3 & 0.50 & 2.0--6.0 & 20 & WHO monthly \\
+Malaria   & 0.2 & 0.30 & 1.1--3.0 & 30 & WHO annual \\
+Measles   & 0.6 & 0.05 & 12--18   & 12 & WHO annual \\
+Pertussis & 0.3 & 0.70 & 5.5--17  & 14 & WHO annual \\
+Ebola     & 0.8 & 0.01 & 1.5--2.5 & 15 & WHO situation reports \\
+\midrule
+\multicolumn{6}{l}{\textit{Optional extensions (Phase 2):}} \\
+Mpox      & 0.5 & 0.30 & 1.5--3.0 & 9  & WHO/CDC \\
+Cholera   & 0.3 & 0.20 & 1.5--4.0 & 5  & WHO \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Note on $R_0$ uncertainty.} The $R_0$ estimates above are
+literature ranges. The temporal analysis should include a sensitivity
+analysis varying $R_0$ within its plausible range.
+
+% ============================================================
+\section{Data Requirements}
+% ============================================================
+
+Most data are already available from the WC project. New data
+needed are marked with $\star$.
+
+\subsection{Already Available (WC Project)}
+
+\begin{itemize}
+  \item \textbf{Country populations:} \texttt{Data/population2020.csv}
+        (2020 baseline; acceptable for threshold calculations).
+  \item \textbf{Monthly COR arrivals by country:}
+        \texttt{Data/Monthly\_Arrivals\_Country\_of\_Residence\_COR\_1.csv}
+        — use mean June arrivals as $N_c$.
+  \item \textbf{T-100 routing fractions:}
+        \texttt{Data/t100\_routing\_fractions.csv}
+        — for city-level extension.
+  \item \textbf{Dengue incidence (monthly, country-level):}
+        \texttt{Data/dengue-global-data-2025-12-10.xlsx}
+  \item \textbf{Malaria incidence (annual, per 1,000):}
+        \texttt{Data/Malaria\_National\_Unit\_data.csv}
+  \item \textbf{Measles incidence (annual, per 1,000,000):}
+        \texttt{Data/Measles reported cases and incidence *.xlsx}
+  \item \textbf{Pertussis incidence (annual, per 1,000,000):}
+        \texttt{Data/Pertussis reported cases and incidence *.xlsx}
+  \item \textbf{Country--region mapping:}
+        derived from COR data in \texttt{importationRisk\_main.R}.
+\end{itemize}
+
+\subsection{New Data to Obtain ($\star$)}
+
+\begin{enumerate}
+  \item[$\star$] \textbf{Ebola incidence data.}
+        Download WHO Disease Outbreak News (DON) and situation
+        reports for all Ebola outbreaks since 2000.\\
+        URL: \url{https://www.who.int/emergencies/disease-outbreak-news}\\
+        Format needed: country, date, confirmed cases, deaths.
+        For ongoing outbreaks, use the CDC situation summary:\\
+        \url{https://www.cdc.gov/ebola/situation-summary/index.html}
+
+  \item[$\star$] \textbf{$R_0$ and serial interval estimates (literature).}
+        Compile a table of $R_0$ and $T_s$ estimates from the
+        published literature for each disease. Suggested sources:
+        \begin{itemize}
+          \item Biggerstaff et al.\ (2014) for influenza.
+          \item Althaus (2014) for Ebola ($R_0$ West Africa).
+          \item WHO Technical Reports for other diseases.
+        \end{itemize}
+
+  \item[$\star$] \textbf{Air passenger volumes by country (most recent COR).}
+        The existing COR file covers through mid-2025. If a more
+        recent extract is available from CBP
+        (\url{https://www.cbp.gov/newsroom/stats/cbp-travel-stats}),
+        download and add to \texttt{Data/}.
+
+  \item[$\star$] \textbf{Optional: historical importation events.}
+        Compile a validation dataset of documented disease
+        importations into the US from 2010--2025 (source country,
+        disease, date). Use ProMED
+        (\url{https://promedmail.org}) and CDC importation
+        reports. This will be used in Section~\ref{sec:validation}.
+\end{enumerate}
+
+% ============================================================
+\section{Task List}
+% ============================================================
+
+Tasks are numbered and grouped by phase. Each task has a suggested
+time estimate for a graduate student working part-time.
+
+\subsection{Phase 1 --- Analytical Framework (Weeks 1--2)}
+
+\begin{enumerate}[label=\textbf{T\arabic*.}]
+
+  \item \textbf{Set up the project structure.}
+    Fork or clone the WC repository
+    (\url{https://github.com/jdiestra1977/FIFA_worldCup_2026_risk}).
+    Create a new folder \texttt{OutbreakThreshold/} with a
+    dedicated R script \texttt{threshold\_analysis.R}.
+    Load all shared data files from \texttt{Data/} --- do not
+    duplicate them.
+    \textit{[1--2 hours]}
+
+  \item \textbf{Implement the critical threshold formula.}
+    Code Equation~\ref{eq:critical} as a function in R:
+    \begin{verbatim}
+    compute_threshold <- function(N_c, P_c, rho_d, p_d,
+                                  theta = c(0.05, 0.10, 0.50, 0.95)) {
+      -log(1 - theta) * P_c / (N_c * rho_d * p_d)
+    }
+    \end{verbatim}
+    Apply this to all combinations of countries (from COR data)
+    and diseases (from Table~\ref{tab:params}).
+    Output: a tidy data frame with columns
+    \texttt{Country, disease, theta, C\_star}.
+    \textit{[3--4 hours]}
+
+  \item \textbf{Compute thresholds for all country $\times$ disease pairs.}
+    Run \textbf{T2} for all countries in the COR dataset and all
+    five diseases. Use the mean annual COR arrivals (not June-only)
+    for $N_c$ here, since this analysis is not WC-specific.
+    Identify the top 20 countries per disease with the \emph{lowest}
+    $C^*$ (i.e., most at-risk source countries).
+    \textit{[2--3 hours]}
+
+  \item \textbf{Sanity check and validation against known events.}
+    \label{sec:validation}
+    For three well-documented US importation events (e.g.,
+    2014 Ebola in Dallas from Liberia; 2019 measles from Israel;
+    2022 Ebola from DRC/Uganda), check whether the observed outbreak
+    size at time of travel exceeded $C^*$ for $\theta = 0.05$.
+    If the model is well-calibrated, the answer should be ``yes''
+    for most cases.
+    \textit{[4--6 hours; requires historical data from T$\star$4]}
+
+\end{enumerate}
+
+\subsection{Phase 2 --- Temporal Model (Weeks 3--4)}
+
+\begin{enumerate}[label=\textbf{T\arabic*.}, resume]
+
+  \item \textbf{Implement the epidemic growth model.}
+    Code Equations~\ref{eq:growth}--\ref{eq:time_to_threshold}.
+    For each disease, use the central $R_0$ estimate from
+    Table~\ref{tab:params} to compute $r$. Implement a sensitivity
+    wrapper that reruns the calculation for the low and high $R_0$
+    bounds.
+    \textit{[3--4 hours]}
+
+  \item \textbf{Apply to the current DRC/Ebola outbreak (case study).}
+    Use the May 2026 CDC situation summary as $C_0$:
+    DRC has 347 total suspected/confirmed cases at the time of
+    writing. Compute $t^*$ for $\theta \in \{0.05, 0.50\}$.
+    Compare to dengue in Brazil as a contrast.
+    \textit{[2 hours]}
+
+  \item \textbf{Generate threshold curves over time.}
+    For the top 10 highest-risk country $\times$ disease pairs
+    (identified in \textbf{T3}), plot $P(\geq 1)$ as a function of
+    outbreak size $C$ (x-axis) for a range of 0 to $2 \times C^*$.
+    This produces ``risk ramp'' curves that visualise how quickly
+    importation probability grows with outbreak size.
+    \textit{[3 hours]}
+
+\end{enumerate}
+
+\subsection{Phase 3 --- Figures and Outputs (Weeks 5--6)}
+
+\begin{enumerate}[label=\textbf{T\arabic*.}, resume]
+
+  \item \textbf{Figure 1: Global threshold map.}
+    Choropleth world map where the fill colour for each country is
+    $\log_{10}(C^*/\text{current incidence})$ for dengue at
+    $\theta = 0.50$.
+    Ratio $< 1$ (country already above threshold) shown in red;
+    ratio $1$--$10$ in orange; $> 10$ in green.
+    Use \texttt{ggplot2} + \texttt{sf} + country polygons from
+    \texttt{rnaturalearth}.
+    \textit{[4--6 hours]}
+
+  \item \textbf{Figure 2: Threshold ranking table (top 20 per disease).}
+    Faceted bar chart: x-axis = country, y-axis = $C^*$ (log scale),
+    faceted by disease. Annotate current reported incidence as a
+    point on each bar to show how close each country is to the
+    threshold.
+    \textit{[3--4 hours]}
+
+  \item \textbf{Figure 3: Time-to-threshold curves.}
+    For the DRC/Ebola and Brazil/Dengue case studies, plot
+    outbreak size $C(t)$ vs.\ time (x-axis), with a horizontal
+    dashed line at $C^*$ for each $\theta$ level. Shade the
+    region where $C(t) > C^*$ in red.
+    \textit{[2--3 hours]}
+
+  \item \textbf{Figure 4: Sensitivity analysis.}
+    For a representative country $\times$ disease pair, show how
+    $C^*$ changes when $\rho_d$, $p_d$, and $N_c$ are each varied
+    $\pm 50\%$ independently (tornado plot or similar).
+    \textit{[2--3 hours]}
+
+  \item \textbf{Figure 5: City-level extension (optional).}
+    Using T-100 routing fractions, compute city-specific thresholds
+    $C_{c,v}^*$ for the top 5 US entry cities and the top 5 source
+    countries per disease. Display as a heatmap analogous to the
+    WC paper.
+    \textit{[4--5 hours]}
+
+\end{enumerate}
+
+\subsection{Phase 4 --- Write-up (Weeks 7--8)}
+
+\begin{enumerate}[label=\textbf{T\arabic*.}, resume]
+
+  \item \textbf{Draft manuscript.}
+    Target journal: \textit{PLOS Neglected Tropical Diseases} or
+    \textit{Emerging Infectious Diseases}. Suggested structure:
+    Introduction, Methods (model + data), Results (Figures 1--4),
+    Discussion, Supplementary tables (full $C^*$ table for all
+    countries $\times$ diseases). Target length: 3,500--4,500 words.
+    \textit{[15--20 hours]}
+
+  \item \textbf{Produce supplementary $C^*$ table.}
+    A CSV/Excel file with columns:
+    \texttt{Country, disease, theta\_05, theta\_10, theta\_50, theta\_95,
+    current\_incidence, ratio\_to\_threshold}.
+    This is a practical deliverable that can be shared with
+    public health departments independently of the paper.
+    \textit{[2 hours]}
+
+\end{enumerate}
+
+% ============================================================
+\section{Suggested R Script Structure}
+% ============================================================
+
+The student should create a single self-contained R script
+\texttt{OutbreakThreshold/threshold\_analysis.R} with the following
+sections. This mirrors the structure of \texttt{importationRisk\_main.R}
+in the parent project.
+
+\begin{verbatim}
+# 0. Packages
+# 1. Working directory and shared data loading
+#    (population, COR arrivals, T-100 routing, disease incidence)
+# 2. Disease parameters table
+#    (rho, p, R0, T_s for each disease)
+# 3. compute_threshold() function  [Eq. 3]
+# 4. compute_time_to_threshold() function  [Eq. 5]
+# 5. Critical thresholds: all country x disease combinations
+# 6. Temporal model: DRC/Ebola and Brazil/Dengue case studies
+# 7. Figure 1: Global threshold map
+# 8. Figure 2: Threshold ranking (top 20 per disease)
+# 9. Figure 3: Time-to-threshold curves
+# 10. Figure 4: Sensitivity analysis
+# 11. Figure 5: City-level extension (optional)
+# 12. Export supplementary table
+\end{verbatim}
+
+% ============================================================
+\section{Connections to the WC Paper}
+% ============================================================
+
+The student should be aware of and refer to the parent analysis
+throughout. Key shared components:
+
+\begin{itemize}
+  \item The Poisson framework (Eq.~\ref{eq:poisson}--\ref{eq:lambda})
+        is identical.
+  \item The parameter values in Table~\ref{tab:params} must match
+        Table~1 of the WC paper to ensure consistency.
+  \item The T-100 routing fractions and COR data are used as-is.
+  \item The country name harmonisation table in
+        \texttt{t100\_routing\_prep.R} should be reused to avoid
+        join failures.
+  \item The WC paper should be cited as the methodological origin
+        of the importation model.
+\end{itemize}
+
+The threshold analysis is \textbf{not} limited to WC-qualified
+countries or to June travel. It uses full annual travel volumes and
+covers all 180+ countries in the COR dataset, making it a more
+general tool.
+
+% ============================================================
+\section{Expected Timeline Summary}
+% ============================================================
+
+\begin{center}
+\begin{tabular}{clc}
+\toprule
+\textbf{Week(s)} & \textbf{Milestone} & \textbf{Deliverable} \\
+\midrule
+1--2 & Analytical framework coded and validated & R script §0--4 \\
+3--4 & Temporal model + case studies            & R script §5--6 \\
+5--6 & All figures generated                    & Figures 1--5 \\
+7    & Supplementary table complete             & \texttt{.csv} file \\
+8    & First draft manuscript                   & \texttt{.tex} draft \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Total estimated effort:} 60--80 hours for a graduate student
+with intermediate R skills and basic epidemiology background.
+
+% ============================================================
+\section{Questions to Discuss with the PI}
+% ============================================================
+
+Before starting, the student should clarify the following with
+Prof.\ Herrera-Diestra:
+
+\begin{enumerate}
+  \item Which diseases to prioritise in Phase~1 (all five, or start
+        with dengue and Ebola as contrasting examples)?
+  \item Whether to use mean annual COR arrivals or June-specific
+        arrivals for $N_c$ (the former is more general; the latter
+        is more conservative for WC-period applications).
+  \item Whether the optional city-level extension (Figure~5,
+        Task~T12) is in scope for the first submission.
+  \item Target journal and co-authorship expectations.
+  \item Access to the parent GitHub repository.
+\end{enumerate}
+
+% ============================================================
+\end{document}
