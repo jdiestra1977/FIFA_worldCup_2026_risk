@@ -6,9 +6,9 @@
 # OVERVIEW
 # --------
 # This script estimates the probability of at least one imported case
-# of dengue, malaria, measles, and pertussis reaching each US host city
-# during June 2026. Three nested models of increasing spatial resolution
-# are built and compared:
+# of dengue, malaria, measles, pertussis, and influenza reaching each
+# US host city during June 2026. Three nested models of increasing
+# spatial resolution are built and compared:
 #
 #   Model 1 — Baseline
 #     Travel:    COR June 2024 × BTS T-100 routing fractions (no WC adjustment)
@@ -24,7 +24,7 @@
 #     Travel:    2026 projections decomposed into WC-fan and background
 #                streams; WC fans routed by match schedule
 #     Incidence: Country-level (same as Models 1–2)
-#     Cities:    All 16 WC venue cities (3 host nations)
+#     Cities:    11 US WC venue cities (results restricted to US)
 #
 # The importation framework is a Poisson model (Eq. 1 in manuscript):
 #   P(X >= 1) = 1 - exp(-Lambda)
@@ -38,7 +38,7 @@
 #   1.  Working directory
 #   2.  Reference data (population, COR arrivals, region mapping)
 #   3.  Travel volume — T-100 routing fractions + COR June 2024 baseline
-#   4.  Disease data (dengue, malaria, measles, pertussis)
+#   4.  Disease data (dengue, malaria, measles, pertussis, influenza)
 #   5.  Model functions (Poisson core + plot helper)
 #   6.  Baseline importation estimates (Model 1)
 #   7.  Combined baseline panel figure
@@ -483,6 +483,59 @@ pertussis_incidence <- pertussis_data %>%
   drop_na() %>%
   mutate(incidence_per1M = as.numeric(incidence_per1M))
 
+# ---- 4e. Influenza (weekly positive specimens, FluNet) ------
+# Source: WHO FluNet / GISRS global surveillance (accessed May 2026).
+# API: https://xmart-api-public.who.int/FLUMART/VIW_FNT?$format=csv
+#
+# FluNet reports weekly specimen counts (not true case counts), so
+# INF_ALL (all influenza A+B positive specimens) is used as a proxy
+# for reported cases, consistent with how measles/pertussis data are
+# used. The under-reporting correction rho accounts for the gap
+# between laboratory-confirmed specimens and true incidence.
+#
+# June corresponds to ISO weeks 22-26. We average over 2023-2025
+# to match the temporal window used for other diseases.
+flunet_cache <- "Data/flunet_viwfnt.csv"
+
+if (!file.exists(flunet_cache)) {
+  flunet_url <- "https://xmart-api-public.who.int/FLUMART/VIW_FNT?$format=csv"
+  download.file(flunet_url, destfile = flunet_cache, mode = "wb")
+  message("FluNet data downloaded and cached at ", flunet_cache)
+} else {
+  message("Loading FluNet data from local cache: ", flunet_cache)
+}
+
+flunet_raw <- read_csv(flunet_cache, show_col_types = FALSE)
+
+# Keep only the columns we need and filter to June ISO weeks 2023-2025
+flunet_june <- flunet_raw %>%
+  select(Country = COUNTRY_AREA_TERRITORY, YEAR = ISO_YEAR, WEEK = ISO_WEEK,
+         inf_all = INF_ALL, spec_processed = SPEC_PROCESSED_NB) %>%
+  filter(YEAR %in% 2023:2025, WEEK %in% 22:26) %>%
+  mutate(inf_all = as.numeric(inf_all)) %>%
+  drop_na(inf_all) %>%
+  # Harmonise FluNet country names → COR naming conventions
+  mutate(Country = recode(Country,
+    "United Kingdom of Great Britain and Northern Ireland" = "United Kingdom",
+    "Republic of Korea"               = "South Korea",
+    "Bolivia (Plurinational State of)"= "Bolivia",
+    "Venezuela (Bolivarian Republic of)" = "Venezuela",
+    "Iran (Islamic Republic of)"      = "Iran",
+    "United Republic of Tanzania"     = "Tanzania",
+    "Democratic Republic of the Congo"= "Zaire (formerly DRC)",
+    "Viet Nam"                        = "Vietnam",
+    "The former Yugoslav Republic of Macedonia" = "North Macedonia",
+    "Republic of Moldova"             = "Moldova",
+    "Czechia"                         = "Czech Republic"
+  ))
+
+# Mean June positive specimens per country across 2023-2025
+influenza_june_specimens <- flunet_june %>%
+  group_by(Country, YEAR) %>%
+  summarise(year_june_inf = sum(inf_all, na.rm = TRUE), .groups = "drop") %>%
+  group_by(Country) %>%
+  summarise(mean_june_inf = mean(year_june_inf, na.rm = TRUE), .groups = "drop")
+
 # ============================================================
 # 5. MODEL FUNCTIONS
 # ============================================================
@@ -495,9 +548,10 @@ pertussis_incidence <- pertussis_data %>%
 plot_importation <- function(df, title_text) {
   ggplot(df, aes(x = reorder(destination_city, -imp_intensity), y = imp_intensity)) +
     geom_col(fill = "steelblue") +
-    geom_text(aes(label = round(prob_at_least_one, 2)), vjust = -0.5, size = 5) +
+    geom_text(aes(label = round(prob_at_least_one, 2)), vjust = -0.5, size = 8) +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
     labs(x = "", y = "Importation intensity", title = title_text) +
-    theme_bw() + theme(text = element_text(size = 20),axis.text.x = element_text(angle=45,hjust = 1))
+    theme_bw() + theme(text = element_text(size = 26),axis.text.x = element_text(angle=45,hjust = 1))
 }
 
 # ---- 5b. Core Poisson importation model (region-level) -----
@@ -657,6 +711,20 @@ p_travel_inf_measles <- 0.05
 under_rho_pertussis    <- 0.10
 p_travel_inf_pertussis <- 0.7
 
+# Influenza:
+# rho = 0.10: FluNet reports laboratory-confirmed specimens; large
+#             fraction of community influenza goes untested. ILI-based
+#             studies (WHO GISRS, Iuliano et al. 2018 Lancet) estimate
+#             true incidence ~10-30x confirmed counts; we use 0.10 as a
+#             conservative upper bound for the positive-specimen proxy.
+# p   = 0.50: influenza illness is moderate; many travellers continue
+#             journeys during early illness (2-3 day incubation + 1-2 day
+#             prodrome). GeoSentinel and sentinel surveillance data support
+#             ~0.4-0.6 for seasonal influenza. June = Southern Hemisphere
+#             peak season (Brazil, Argentina, Australia) amplifying risk.
+under_rho_influenza    <- 0.10
+p_travel_inf_influenza <- 0.50
+
 # ---- 6b. Country-level disease incidence tables ---------------
 # These tables are computed once here and used in §6, §8, and §9.
 # total_inc[c] = rho_d * (disease metric for country c)
@@ -700,6 +768,15 @@ pertussis_country_inc <- pertussis_incidence %>%
   mutate(total_inc = under_rho_pertussis * incidence_per1M / (12 * 1e6)) %>%
   select(Country, total_inc)
 
+# Influenza: mean June positive specimens (2023–2025) / national population
+# Specimens serve as a proxy for reported cases; rho corrects for under-detection.
+influenza_june_country <- influenza_june_specimens %>%
+  left_join(population_of_world, by = "Country") %>%
+  drop_na(population_country) %>%
+  filter(mean_june_inf > 0) %>%
+  mutate(total_inc = under_rho_influenza * mean_june_inf / population_country) %>%
+  select(Country, total_inc)
+
 # ---- 6c. Baseline arrivals: COR June 2024 × T-100 routing ----
 # N_{c,v}^{baseline} = COR_{c,June2024} × f_{c,v}^{T100}
 # No growth factor — this is the no-WC counterfactual.
@@ -714,12 +791,12 @@ arrivals_baseline <- cor_june_2024 %>%
   ) %>%
   select(Country, destination_city, arrivals_june_2026)
 
-# ---- 6d. Baseline estimates for all four diseases ------------
+# ---- 6d. Baseline estimates for all five diseases ------------
 dengue_results <- compute_importation_country_level(
   arrivals_df    = arrivals_baseline,
   country_inc_df = dengue_june_country,
   p_travel_inf   = p_travel_inf_dengue,
-  title_text     = "Dengue importation intensity — T-100 Baseline (COR June 2024, no WC)"
+  title_text     = "Dengue importation intensity — Baseline"
 )
 print(dengue_results$importation)
 print(dengue_results$plot)
@@ -728,7 +805,7 @@ malaria_results <- compute_importation_country_level(
   arrivals_df    = arrivals_baseline,
   country_inc_df = malaria_country_inc,
   p_travel_inf   = p_travel_inf_malaria,
-  title_text     = "Malaria importation intensity — T-100 Baseline (COR June 2024, no WC)"
+  title_text     = "Malaria importation intensity — Baseline"
 )
 print(malaria_results$importation)
 print(malaria_results$plot)
@@ -737,7 +814,7 @@ measles_results <- compute_importation_country_level(
   arrivals_df    = arrivals_baseline,
   country_inc_df = measles_country_inc,
   p_travel_inf   = p_travel_inf_measles,
-  title_text     = "Measles importation intensity — T-100 Baseline (COR June 2024, no WC)"
+  title_text     = "Measles importation intensity — Baseline"
 )
 print(measles_results$importation)
 print(measles_results$plot)
@@ -746,10 +823,19 @@ pertussis_results <- compute_importation_country_level(
   arrivals_df    = arrivals_baseline,
   country_inc_df = pertussis_country_inc,
   p_travel_inf   = p_travel_inf_pertussis,
-  title_text     = "Pertussis importation intensity — T-100 Baseline (COR June 2024, no WC)"
+  title_text     = "Pertussis importation intensity — Baseline"
 )
 print(pertussis_results$importation)
 print(pertussis_results$plot)
+
+influenza_results <- compute_importation_country_level(
+  arrivals_df    = arrivals_baseline,
+  country_inc_df = influenza_june_country,
+  p_travel_inf   = p_travel_inf_influenza,
+  title_text     = "Influenza importation intensity — Baseline"
+)
+print(influenza_results$importation)
+print(influenza_results$plot)
 
 # ============================================================
 # ===== BEGIN: ORIGINAL I-92 BASELINE (MODEL 1) — PRESERVED FOR REFERENCE =====
@@ -851,12 +937,14 @@ panel_results_plots <- plot_grid(
   dengue_results$plot,
   malaria_results$plot,
   measles_results$plot,
-  pertussis_results$plot
+  pertussis_results$plot,
+  influenza_results$plot,
+  ncol = 2
 )
 
 ggsave(panel_results_plots,
        file   = "Figures/estimated_importations.png",
-       height = 13, width = 20)
+       height = 21, width = 20)
 
 # ============================================================
 # 8. WC-ADJUSTED IMPORTATION MODEL (MODEL 2)
@@ -1049,7 +1137,7 @@ arrivals_country_city_2026 <- travel_volume_june_2026 %>%
 # available to all three model tiers (§6, §8, §9). See §5c for the
 # full function definition and documentation.
 
-# ---- 8g. WC-adjusted estimates for all four diseases --------
+# ---- 8g. WC-adjusted estimates for all five diseases --------
 # Parameters are identical to Section 6 to allow direct comparison.
 
 dengue_wc_results <- compute_importation_country_level(
@@ -1088,18 +1176,29 @@ pertussis_wc_results <- compute_importation_country_level(
 print(pertussis_wc_results$importation)
 print(pertussis_wc_results$plot)
 
+influenza_wc_results <- compute_importation_country_level(
+  arrivals_df    = arrivals_country_city_2026,
+  country_inc_df = influenza_june_country,
+  p_travel_inf   = p_travel_inf_influenza,
+  title_text     = "Influenza importation intensity — WC-adjusted (June 2026)"
+)
+print(influenza_wc_results$importation)
+print(influenza_wc_results$plot)
+
 # ---- 8h. Combined WC-adjusted panel -------------------------
 panel_wc_adjusted <- plot_grid(
   dengue_wc_results$plot,
   malaria_wc_results$plot,
   measles_wc_results$plot,
   pertussis_wc_results$plot,
+  influenza_wc_results$plot,
+  ncol = 2,
   labels = "AUTO", label_size = 20
 )
 
 ggsave(panel_wc_adjusted,
        file   = "Figures/estimated_importations_wc_adjusted.png",
-       height = 13, width = 20)
+       height = 21, width = 20)
 
 # ============================================================
 # 9. SCHEDULE-DRIVEN VENUE ROUTING MODEL (MODEL 3)
@@ -1226,12 +1325,18 @@ travel_decomposed <- travel_volume_june_2026 %>%
 # N_{c,v}^WC = june_wc[c] * omega_{c,v}
 # Non-qualified countries have no row in schedule_routing, so the
 # left_join produces NA → filtered out (correct: no WC fans).
+# Results are restricted to the 11 US venue cities; non-US venues
+# (Toronto, Vancouver, Mexico City, Monterrey, Guadalajara) are excluded.
+us_venue_cities <- c("New York", "Dallas", "Houston", "Philadelphia",
+                     "Boston", "Los Angeles", "Atlanta", "Kansas City",
+                     "Miami", "San Francisco", "Seattle")
+
 arrivals_wc_venue <- travel_decomposed %>%
   left_join(
     schedule_routing %>% rename(Country = team),
     by = "Country"
   ) %>%
-  filter(!is.na(venue_city)) %>%
+  filter(!is.na(venue_city), venue_city %in% us_venue_cities) %>%
   mutate(arrivals_wc_city = june_wc * wc_routing) %>%
   select(Country, venue_city, arrivals_wc_city)
 
@@ -1314,7 +1419,7 @@ compute_importation_schedule <- function(arrivals_wc_df,
   )
 }
 
-# ---- 9f. Schedule-driven estimates for all four diseases -----
+# ---- 9f. Schedule-driven estimates for all five diseases -----
 # Parameters identical to Sections 6 and 8 for direct comparability.
 
 dengue_sched_results <- compute_importation_schedule(
@@ -1349,6 +1454,14 @@ pertussis_sched_results <- compute_importation_schedule(
   title_text      = "Pertussis importation intensity — schedule-driven (June 2026)"
 )
 
+influenza_sched_results <- compute_importation_schedule(
+  arrivals_wc_df  = arrivals_wc_venue,
+  arrivals_bg_df  = arrivals_bg_city,
+  country_inc_df  = influenza_june_country,
+  p_travel_inf    = p_travel_inf_influenza,
+  title_text      = "Influenza importation intensity — schedule-driven (June 2026)"
+)
+
 print(dengue_sched_results$importation)
 print(dengue_sched_results$plot)
 
@@ -1358,12 +1471,14 @@ panel_schedule_driven <- plot_grid(
   malaria_sched_results$plot,
   measles_sched_results$plot,
   pertussis_sched_results$plot,
+  influenza_sched_results$plot,
+  ncol = 2,
   labels = "AUTO", label_size = 20
 )
 
 ggsave(panel_schedule_driven,
        file   = "Figures/estimated_importations_schedule_driven.png",
-       height = 13, width = 20)
+       height = 21, width = 20)
 
 # ============================================================
 # 10. THREE-MODEL COMPARISON
@@ -1441,7 +1556,8 @@ comparison_all <- bind_rows(
   build_comparison(dengue_results,    dengue_wc_results,    dengue_sched_results,    "Dengue"),
   build_comparison(malaria_results,   malaria_wc_results,   malaria_sched_results,   "Malaria"),
   build_comparison(measles_results,   measles_wc_results,   measles_sched_results,   "Measles"),
-  build_comparison(pertussis_results, pertussis_wc_results, pertussis_sched_results, "Pertussis")
+  build_comparison(pertussis_results, pertussis_wc_results, pertussis_sched_results, "Pertussis"),
+  build_comparison(influenza_results, influenza_wc_results, influenza_sched_results, "Influenza")
 )
 
 # Consistent colour palette across all comparison plots
@@ -1481,8 +1597,8 @@ prob_comparison_plot <- comparison_all %>%
   ) +
   theme_bw() +
   theme(
-    axis.text.x  = element_text(angle = 45, hjust = 1, size = 12),
-    text         = element_text(size = 15),
+    axis.text.x  = element_text(angle = 45, hjust = 1, size = 18),
+    text         = element_text(size = 20),
     legend.position = "bottom"
   )
 
@@ -1511,8 +1627,8 @@ intensity_comparison_plot <- comparison_all %>%
   ) +
   theme_bw() +
   theme(
-    axis.text.x  = element_text(angle = 45, hjust = 1, size = 12),
-    text         = element_text(size = 15),
+    axis.text.x  = element_text(angle = 45, hjust = 1, size = 18),
+    text         = element_text(size = 20),
     legend.position = "bottom"
   )
 
@@ -1532,16 +1648,17 @@ ggsave(intensity_comparison_plot,
 # uses those to produce three summaries (Figs 5–8 in manuscript):
 #
 #   (a) Country importation ranking — top 15 by total lambda
-#   (b) WC-fan vs. background stream breakdown — all four diseases
-#   (c) Country × city heatmaps — all four diseases
+#   (b) WC-fan vs. background stream breakdown — all five diseases
+#   (c) Country × city heatmaps — all five diseases
 # ============================================================
 
-# ---- 11a. Aggregate contributions across all four diseases ---
+# ---- 11a. Aggregate contributions across all five diseases ---
 all_contributions <- bind_rows(
   dengue_sched_results$country_contributions    %>% mutate(disease = "Dengue"),
   malaria_sched_results$country_contributions   %>% mutate(disease = "Malaria"),
   measles_sched_results$country_contributions   %>% mutate(disease = "Measles"),
-  pertussis_sched_results$country_contributions %>% mutate(disease = "Pertussis")
+  pertussis_sched_results$country_contributions %>% mutate(disease = "Pertussis"),
+  influenza_sched_results$country_contributions %>% mutate(disease = "Influenza")
 )
 
 # ---- 11b. Country importation ranking ------------------------
@@ -1555,7 +1672,7 @@ top_countries <- all_contributions %>%
   ungroup()
 
 country_ranking_plot <- top_countries %>%
-  mutate(disease = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis"))) %>%
+  mutate(disease = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza"))) %>%
   ggplot(aes(x = reorder(Country, total_imports),
              y = total_imports,
              fill = disease)) +
@@ -1568,7 +1685,7 @@ country_ranking_plot <- top_countries %>%
     title = "Top 15 source countries by expected importation — schedule-driven model"
   ) +
   theme_bw() +
-  theme(text = element_text(size = 15))
+  theme(text = element_text(size = 20))
 
 ggsave(country_ranking_plot,
        file   = "Figures/country_importation_ranking.png",
@@ -1582,7 +1699,7 @@ ggsave(country_ranking_plot,
 # countries show background travel only.
 #
 # NOTE: Previously this section covered dengue only. Extended here to
-# all four diseases to provide a complete picture of stream attribution.
+# all five diseases to provide a complete picture of stream attribution.
 
 make_stream_plot <- function(disease_name, n_top = 20) {
 
@@ -1624,6 +1741,7 @@ stream_plot_dengue    <- make_stream_plot("Dengue")
 stream_plot_malaria   <- make_stream_plot("Malaria")
 stream_plot_measles   <- make_stream_plot("Measles")
 stream_plot_pertussis <- make_stream_plot("Pertussis")
+stream_plot_influenza <- make_stream_plot("Influenza")
 
 ggsave(stream_plot_dengue,
        file = "Figures/stream_breakdown_dengue.png",    height = 9, width = 13)
@@ -1633,16 +1751,20 @@ ggsave(stream_plot_measles,
        file = "Figures/stream_breakdown_measles.png",   height = 9, width = 13)
 ggsave(stream_plot_pertussis,
        file = "Figures/stream_breakdown_pertussis.png", height = 9, width = 13)
+ggsave(stream_plot_influenza,
+       file = "Figures/stream_breakdown_influenza.png", height = 9, width = 13)
 
 # Combined stream panel for the supplement
 panel_stream <- plot_grid(
   stream_plot_dengue, stream_plot_malaria,
   stream_plot_measles, stream_plot_pertussis,
+  stream_plot_influenza,
+  ncol = 2,
   labels = "AUTO", label_size = 16
 )
 ggsave(panel_stream,
        file   = "Figures/stream_breakdown_panel.png",
-       height = 16, width = 22)
+       height = 20, width = 22)
 
 # ---- 11d. Country × city importation heatmaps ---------------
 # A matrix of expected importations by source country (rows, ordered
@@ -1685,11 +1807,13 @@ heatmap_dengue    <- make_heatmap("Dengue")
 heatmap_malaria   <- make_heatmap("Malaria")
 heatmap_measles   <- make_heatmap("Measles")
 heatmap_pertussis <- make_heatmap("Pertussis")
+heatmap_influenza <- make_heatmap("Influenza")
 
 ggsave(heatmap_dengue,    file = "Figures/heatmap_dengue.png",    height = 9, width = 13)
 ggsave(heatmap_malaria,   file = "Figures/heatmap_malaria.png",   height = 9, width = 13)
 ggsave(heatmap_measles,   file = "Figures/heatmap_measles.png",   height = 9, width = 13)
 ggsave(heatmap_pertussis, file = "Figures/heatmap_pertussis.png", height = 9, width = 13)
+ggsave(heatmap_influenza, file = "Figures/heatmap_influenza.png", height = 9, width = 13)
 
 # ============================================================
 # 12. SENSITIVITY ANALYSIS
@@ -1717,10 +1841,10 @@ sensitivity_multipliers <- c(0.50, 0.75, 1.00, 1.25, 1.50)
 
 # Central parameters (must match Sections 6 and 9)
 central_params <- tibble(
-  disease       = c("Dengue",            "Malaria",            "Measles",            "Pertussis"),
-  under_rho     = c(under_rho_dengue,    under_rho_malaria,    under_rho_measles,    under_rho_pertussis),
-  p_travel      = c(p_travel_inf_dengue, p_travel_inf_malaria, p_travel_inf_measles, p_travel_inf_pertussis),
-  country_inc   = list(dengue_june_country, malaria_country_inc, measles_country_inc, pertussis_country_inc)
+  disease       = c("Dengue",            "Malaria",            "Measles",            "Pertussis",            "Influenza"),
+  under_rho     = c(under_rho_dengue,    under_rho_malaria,    under_rho_measles,    under_rho_pertussis,    under_rho_influenza),
+  p_travel      = c(p_travel_inf_dengue, p_travel_inf_malaria, p_travel_inf_measles, p_travel_inf_pertussis, p_travel_inf_influenza),
+  country_inc   = list(dengue_june_country, malaria_country_inc, measles_country_inc, pertussis_country_inc, influenza_june_country)
 )
 
 # Helper: run schedule-driven model with a scaled rho or p
@@ -1754,7 +1878,7 @@ run_sensitivity <- function(disease_name, base_inc_df, base_rho, base_p,
     )
 }
 
-# Run all combinations: 4 diseases × 2 parameters × 5 multipliers = 40 runs
+# Run all combinations: 5 diseases × 2 parameters × 5 multipliers = 50 runs
 sensitivity_results <- pmap_dfr(
   crossing(
     central_params %>% select(disease, under_rho, p_travel, country_inc),
@@ -1797,7 +1921,7 @@ sensitivity_relative <- sensitivity_results %>%
 # ---- Sensitivity plot: absolute Lambda ----------------------
 sensitivity_plot_abs <- sensitivity_results %>%
   mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis")),
+    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
     param_lab  = if_else(param == "rho",
                           "Varying ρ (under-reporting factor)",
                           "Varying p (travel-while-infectious probability)"),
@@ -1822,7 +1946,7 @@ sensitivity_plot_abs <- sensitivity_results %>%
 
 ggsave(sensitivity_plot_abs,
        file   = "Figures/sensitivity_analysis_lambda.png",
-       height = 14, width = 18)
+       height = 17, width = 18)
 
 # ---- Sensitivity plot: relative P(>=1) ----------------------
 # Plotting relative Lambda is uninformative here because both rho
@@ -1838,7 +1962,7 @@ ggsave(sensitivity_plot_abs,
 sensitivity_plot_rel <- sensitivity_relative %>%
   filter(multiplier != 1.00) %>%
   mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis")),
+    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
     param_lab  = if_else(param == "rho", "Varying ρ", "Varying p"),
     multiplier = factor(multiplier)
   ) %>%
@@ -1862,13 +1986,13 @@ sensitivity_plot_rel <- sensitivity_relative %>%
 
 ggsave(sensitivity_plot_rel,
        file   = "Figures/sensitivity_analysis_relative.png",
-       height = 14, width = 18)
+       height = 17, width = 18)
 
 # --- Panel B: absolute shift delta_P = P_perturbed - P_central ---
 sensitivity_plot_delta <- sensitivity_relative %>%
   filter(multiplier != 1.00) %>%
   mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis")),
+    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
     param_lab  = if_else(param == "rho", "Varying ρ", "Varying p"),
     multiplier = factor(multiplier)
   ) %>%
@@ -1892,7 +2016,7 @@ sensitivity_plot_delta <- sensitivity_relative %>%
 
 ggsave(sensitivity_plot_delta,
        file   = "Figures/sensitivity_analysis_delta_prob.png",
-       height = 14, width = 18)
+       height = 17, width = 18)
 
 # Summary table: range of P(>=1) and delta_P across multipliers
 sensitivity_summary <- sensitivity_relative %>%

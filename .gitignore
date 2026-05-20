@@ -1,4 +1,53 @@
+# ── macOS metadata ─────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ── R session files ─────────────────────────────────────────
+.Rhistory
+.RData
+.Rproj.user/
+
+# ── LaTeX build artifacts ───────────────────────────────────
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+
+# ── Large / auto-downloaded data ────────────────────────────
+# FluNet full dataset (~30 MB); auto-downloaded by importationRisk_main.R
+# if the file is missing — no need to commit it
+Data/flunet_viwfnt.csv
+
+# Raw BTS T-100 international segment files (~7 MB each)
+# Download from: https://www.transtats.bts.gov (Table T_T100I_SEGMENT_ALL_CARRIER)
 Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2023.csv
 Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2024.csv
 Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2025.csv
-Data/t100_routing_fractions.csv
+
+# ── Superseded / exploratory data ───────────────────────────
+Data/Not_currently_used/
+
+# ── Superseded figures ──────────────────────────────────────
+Figures/Not_currently_used/
+
+# ── Stray root-level output figures ────────────────────────
+estimated_importations.png
+import_dengue.png
+temporal_arrivals_from_regions.png
+
+# ── Generated HTML from Rmd ─────────────────────────────────
+Importation_of_Influenza_WC2026/*.html
+
+# ── Copyrighted reference PDFs ──────────────────────────────
+# Do not commit copyrighted journal articles to a public repo
+References/
+
+# ── Claude Code project settings ───────────────────────────
+.claude/

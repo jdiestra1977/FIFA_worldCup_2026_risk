@@ -170,6 +170,18 @@
 
 % ------------------------------------------------------------
 \begin{frame}{Disease-specific parameters}
+  \[
+    I_{c,d} = \rho_d \cdot \frac{C_{c,d}}{P_c}
+  \]
+
+  \smallskip
+  \begin{itemize}
+    \item $\rho_d$ — \textbf{under-reporting adjustment}: scales
+          reported cases $C_{c,d}$ up to true incidence
+    \item $p_d$ — \textbf{probability of travelling while infectious}
+  \end{itemize}
+
+  \smallskip
   \begin{center}
   \footnotesize
   \begin{tabular}{lcccl}
@@ -196,16 +208,10 @@
   \end{tabular}
   \end{center}
 
-  \smallskip
   {\footnotesize
-  $\rho_d$ range from: Bhatt et al.\ 2013 (dengue);
+  $\rho_d$ ranges from: Bhatt et al.\ 2013 (dengue);
   WHO WMR 2024 (malaria); Simons et al.\ 2012 (measles);
   McLaughlin et al.\ 2016 (pertussis).}
-
-  \smallskip
-  $\rho_d$ — \textbf{reporting adjustment} $\cdot$
-  $p_d$ — \textbf{travel-while-infectious probability} $\cdot$
-  $I_{c,d} = \rho_d \cdot C_{c,d} / P_c$
 \end{frame}
 
 % ------------------------------------------------------------
@@ -266,13 +272,13 @@
     \node[box, fill=sched!30, draw=sched!80!black, right=1.4cm of m2] (m3)
       {\textcolor{sched!70!black}{\textbf{Model 3: Schedule}}\\
        Same 2026 travel\\WC fans $\to$ venue cities\\
-       16 host venues};
+       11 US venue cities};
 
     \draw[arrow, color=baseline] (m1) --
-      node[above, font=\footnotesize, align=center, text width=2.2cm]
+      node[above, font=\tiny, align=center, text width=2.2cm]
         {WC surge\\($\phi_c$ factors)} (m2);
     \draw[arrow, color=wcadj] (m2) --
-      node[above, font=\footnotesize, align=center, text width=2cm]
+      node[above, font=\tiny, align=center, text width=2cm]
         {fan routing\\by schedule} (m3);
 
     \node[below=0.4cm of m1, font=\footnotesize, text width=3.8cm, align=center]
@@ -280,15 +286,14 @@
     \node[below=0.4cm of m2, font=\footnotesize, text width=3.8cm, align=center]
       {Same routing \&\\incidence; only\\travel volume changes};
     \node[below=0.4cm of m3, font=\footnotesize, text width=3.8cm, align=center]
-      {+5 non-US venues:\\Toronto, Vancouver,\\Guadalajara\ldots};
+      {WC fans routed\\by match schedule\\to US venue cities};
   \end{tikzpicture}
   \end{center}
 
   \smallskip
   \textbf{M1 $\to$ M2}: isolates the WC travel surge ($\phi_c$
   growth factors applied to COR 2024 base volumes).\\
-  \textbf{M2 $\to$ M3}: isolates schedule-based fan routing; adds
-  5 non-US venues.
+  \textbf{M2 $\to$ M3}: isolates schedule-based fan routing to US venue cities.
 \end{frame}
 
 % ------------------------------------------------------------
@@ -296,8 +301,7 @@
   \textbf{Why T-100 routing for the baseline?}
   T-100 covers all \textbf{11 US venue cities} at country level,
   making it the only source that provides a consistent spatial grid
-  across all three models --- so M1 $\to$ M2 isolates travel volume
-  only.
+  across all three models.
 
   \medskip
   \textbf{Baseline arrivals} (COR June 2024, no WC growth):
@@ -306,6 +310,8 @@
       \cdot f_{c,v}^{\text{T100}}
     \tag{baseline arrivals}
   \end{equation}
+  {\footnotesize $f_{c,v}^{\text{T100}}$: T-100 routing fraction (mean June 2023--2025),
+  same in all three models, covering \textbf{all 11 US venue cities}.}
 
   \textbf{Country-level incidence} (shared across all 3 models):
   \begin{equation}
@@ -338,11 +344,7 @@
       \item WC-qualified: $\phi_{\text{WC}} = 85{,}017/72{,}390
             = \mathbf{1.174}$ (aggregate NTTO WC uplift)
       \item Non-qualified: $\phi_{\text{base}} = \mathbf{1.077}$
-            — data-driven from COR + T-100 June 2023--2025\\
-            {\footnotesize
-             $\bar{g} = \sqrt{N_{2024}/N_{2023}\;\cdot\;N_{2025}/N_{2024}}$,\;
-             $\phi_{\text{base}} = \bar{g}^{\,2}$;\;
-             COR: 1.062 \quad T-100: 1.092 \quad avg: \textbf{1.077}}
+            — data-driven from COR + T-100 June 2023--2025
     \end{itemize}
   \end{block}
 
@@ -352,8 +354,6 @@
     \quad
     N_{c,v}^{2026} = N_{c,\,\text{Jun 2026}} \cdot f_{c,v}^{\text{T100}}
   \]
-  {\footnotesize $f_{c,v}^{\text{T100}}$: T-100 routing fraction (mean June 2023--2025),
-  same in all three models, covering \textbf{all 11 US venue cities}.}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -458,40 +458,31 @@
   \begin{columns}[T]
     \begin{column}{0.52\textwidth}
       \footnotesize
-      \begin{tabular}{lll}
+      \begin{tabular}{ll}
         \toprule
-        \textbf{City} & \textbf{Country} & \textbf{T-100 bg?} \\
+        \textbf{City} & \textbf{State} \\
         \midrule
-        New York       & USA    & \textcolor{wcblue}{Yes} \\
-        Dallas         & USA    & \textcolor{wcblue}{Yes} \\
-        Houston        & USA    & \textcolor{wcblue}{Yes} \\
-        Philadelphia   & USA    & \textcolor{wcblue}{Yes} \\
-        Boston         & USA    & \textcolor{wcblue}{Yes} \\
-        Los Angeles    & USA    & \textcolor{wcblue}{Yes} \\
-        Atlanta        & USA    & \textcolor{wcblue}{Yes} \\
-        Kansas City    & USA    & \textcolor{wcblue}{Yes*} \\
-        Miami          & USA    & \textcolor{wcblue}{Yes} \\
-        San Francisco  & USA    & \textcolor{wcblue}{Yes} \\
-        Seattle        & USA    & \textcolor{wcblue}{Yes} \\
-        Vancouver      & Canada & No \\
-        Toronto        & Canada & No \\
-        Mexico City    & Mexico & No \\
-        Monterrey      & Mexico & No \\
-        Guadalajara    & Mexico & No \\
+        New York      & New York \\
+        Dallas        & Texas \\
+        Houston       & Texas \\
+        Philadelphia  & Pennsylvania \\
+        Boston        & Massachusetts \\
+        Los Angeles   & California \\
+        Atlanta       & Georgia \\
+        Kansas City   & Missouri$^*$ \\
+        Miami         & Florida \\
+        San Francisco & California \\
+        Seattle       & Washington \\
         \bottomrule
       \end{tabular}
-      {\tiny * Near-zero fractions; mainly WC-fan stream}
+      {\tiny $^*$ Near-zero T-100 fractions; mainly WC-fan stream\\
+      All 11 cities covered by T-100 routing fractions}
     \end{column}
     \begin{column}{0.45\textwidth}
       \small
       \begin{block}{Key insight}
-        \textcolor{baseline}{\textbf{11 US cities}}: both WC-fan
-        and background streams contribute (T-100 covers all).
-      \end{block}
-      \begin{block}{}
-        \textcolor{wcgray}{\textbf{5 non-US venues}}: only the
-        WC-fan stream contributes.\\
-        \textit{No T-100 data for Canada/Mexico cities.}
+        All 11 US venue cities have both WC-fan and background
+        travel streams — T-100 provides routing fractions for all.
       \end{block}
       \smallskip
       \textbf{England + Scotland issue:}\\
@@ -513,28 +504,6 @@
   \vspace{-0.3em}
   {\footnotesize Numbers above bars = $P(\geq 1\,\text{importation})$;
   bar height = expected importation intensity $\lambda$.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Model 2 — WC-adjusted results}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/estimated_importations_wc_adjusted.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize All 11 US venue cities (same as Model 1); travel
-  volumes now reflect June 2026 projections ($\phi_c$ growth factors).}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Model 3 — Schedule-driven results}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/estimated_importations_schedule_driven.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize Up to 16 venue cities visible; WC fans are routed to
-  where their team plays; background travelers use T-100 routing.}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -615,9 +584,8 @@
           estimated importation intensity for qualified nations but
           city rankings remain broadly stable.
     \item \textbf{Schedule-driven routing} (Model 2 $\to$ 3) reveals
-          concentration of risk at specific match venues (e.g.,
-          Houston for Brazil games) and adds the 5 non-US venues
-          (Toronto, Vancouver, Guadalajara, Mexico City, Monterrey).
+          concentration of risk at specific US match venues (e.g.,
+          Houston for Brazil games).
     \item \textbf{Background travel} dominates the total importation
           burden for most diseases; the WC-fan increment is $\approx
           8.3\%$ of projected arrivals for qualified countries.
@@ -643,8 +611,6 @@
       \textbf{Travel data coverage}
       \begin{itemize}
         \item T-100 covers all 11 US venue cities across all models
-        \item 5 non-US venues receive only WC-fan stream —
-              background risk underestimated there
         \item T-100 covers nonstop segments only; connecting
               passengers appear at entry city
       \end{itemize}
@@ -715,85 +681,6 @@
   \end{columns}
 \end{frame}
 
-% ------------------------------------------------------------
-\begin{frame}{WC fans vs.\ background — malaria, measles, pertussis}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/stream_breakdown_panel.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize All four diseases. \textcolor{wcadj}{$\blacksquare$ WC fans} \quad
-   \textcolor{baseline}{$\blacksquare$ Background}.
-   Background dominates total importation burden for most countries;
-   WC-fan increment $\approx 8.3\%$ of projected arrivals for qualified nations.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Country $\times$ city matrix — malaria}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/heatmap_malaria.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize Risk concentrated in West and Central African source countries
-  at their specific match venues.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Country $\times$ city matrix — measles \& pertussis}
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \includegraphics[width=\textwidth, height=0.55\textheight, keepaspectratio]%
-        {../Figures/heatmap_measles.png}
-      {\tiny Measles: low absolute intensities due to $p = 0.05$}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \includegraphics[width=\textwidth, height=0.55\textheight, keepaspectratio]%
-        {../Figures/heatmap_pertussis.png}
-      {\tiny Pertussis: broad geographic spread; $p = 0.70$}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% ============================================================
-\section{Sensitivity analysis}
-% ============================================================
-
-\begin{frame}{Sensitivity analysis — absolute $\lambda$}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/sensitivity_analysis_lambda.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize $\rho_d$ and $p_d$ each varied $\times$0.50 -- $\times$1.50
-   independently. $\Lambda$ is strictly linear in both parameters.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Sensitivity analysis — relative $P(\geq 1)$}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/sensitivity_analysis_relative.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize $P(\geq 1)_{\text{perturbed}} / P(\geq 1)_{\text{central}}$.
-   High-$\Lambda$ cities (near-certain importation) are \textbf{insensitive}
-   to $\pm$50\% parameter errors; mid-range cities show the largest relative
-   shifts — city rankings are \textbf{robust} at the top.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Sensitivity analysis — absolute $\Delta P(\geq 1)$}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/sensitivity_analysis_delta_prob.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize Absolute probability shift $\Delta P = P_{\text{perturbed}} -
-   P_{\text{central}}$. Peak uncertainty falls on \textbf{mid-range} cities,
-   not highest-risk destinations already near certainty.}
-\end{frame}
-
 \begin{frame}{Next steps}
   \begin{enumerate}
     \item \textbf{Airport-level allocation} — distribute city-level
@@ -812,9 +699,9 @@
     \item \textbf{Expand disease scope} — cholera, mpox, and
           influenza are under consideration for a follow-up analysis
 
-    \item \textbf{Canadian and Mexican venue routing} — obtain
-          Statistics Canada and SICT/IATA data to extend T-100-style
-          routing fractions to non-US host cities
+    \item \textbf{Extended routing data} — booking-level data
+          (OAG, Amadeus) to refine city-level routing fractions
+          beyond T-100 segment data
   \end{enumerate}
 \end{frame}
 

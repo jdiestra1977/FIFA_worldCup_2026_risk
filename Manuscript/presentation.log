@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  19 MAY 2026 18:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  20 MAY 2026 09:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1023,7 +1023,7 @@ thkerncmss.
 ) [3
 
 ]
-<../Figures/wc2026_venue_map.png, id=108, 867.24pt x 578.16pt>
+<../Figures/wc2026_venue_map.png, id=102, 867.24pt x 578.16pt>
 File: ../Figures/wc2026_venue_map.png Graphic file (type png)
 <use ../Figures/wc2026_venue_map.png>
 Package pdftex.def Info: ../Figures/wc2026_venue_map.png  used on input line 97
@@ -1065,12 +1065,6 @@ LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <8> not available
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <6> not available
 (Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 357.
 
-LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <9> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 357.
-
-LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <5> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 357.
-
  [11
 
 ] [12
@@ -1079,167 +1073,87 @@ LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <5> not available
 
 ] [14
 
-] [15
+]
+LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <9> not available
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 493.
+
+ [15
 
 ]
-<../Figures/estimated_importations.png, id=274, 1445.4pt x 939.51pt>
+<../Figures/estimated_importations.png, id=257, 1445.4pt x 1228.59pt>
 File: ../Figures/estimated_importations.png Graphic file (type png)
 <use ../Figures/estimated_importations.png>
 Package pdftex.def Info: ../Figures/estimated_importations.png  used on input l
-ine 516.
-(pdftex.def)             Requested size: 254.62497pt x 165.50623pt.
+ine 507.
+(pdftex.def)             Requested size: 194.72359pt x 165.51505pt.
  [16
 
  <../Figures/estimated_importations.png>]
-<../Figures/estimated_importations_wc_adjusted.png, id=283, 1445.4pt x 939.51pt
->
-File: ../Figures/estimated_importations_wc_adjusted.png Graphic file (type png)
-
-<use ../Figures/estimated_importations_wc_adjusted.png>
-Package pdftex.def Info: ../Figures/estimated_importations_wc_adjusted.png  use
-d on input line 527.
-(pdftex.def)             Requested size: 254.62497pt x 165.50623pt.
- [17
-
- <../Figures/estimated_importations_wc_adjusted.png>]
-<../Figures/estimated_importations_schedule_driven.png, id=292, 1445.4pt x 939.
-51pt>
-File: ../Figures/estimated_importations_schedule_driven.png Graphic file (type 
-png)
-<use ../Figures/estimated_importations_schedule_driven.png>
-Package pdftex.def Info: ../Figures/estimated_importations_schedule_driven.png 
- used on input line 538.
-(pdftex.def)             Requested size: 254.62497pt x 165.50623pt.
-
-[18
-
- <../Figures/estimated_importations_schedule_driven.png>]
-<../Figures/model_comparison_probability.png, id=301, 1300.86pt x 867.24pt>
+<../Figures/model_comparison_probability.png, id=266, 1300.86pt x 867.24pt>
 File: ../Figures/model_comparison_probability.png Graphic file (type png)
 <use ../Figures/model_comparison_probability.png>
 Package pdftex.def Info: ../Figures/model_comparison_probability.png  used on i
-nput line 552.
+nput line 521.
 (pdftex.def)             Requested size: 248.25769pt x 165.50513pt.
- [19
+ [17
 
  <../Figures/model_comparison_probability.png>]
-<../Figures/model_comparison_intensity.png, id=311, 1300.86pt x 867.24pt>
+<../Figures/model_comparison_intensity.png, id=275, 1300.86pt x 867.24pt>
 File: ../Figures/model_comparison_intensity.png Graphic file (type png)
 <use ../Figures/model_comparison_intensity.png>
 Package pdftex.def Info: ../Figures/model_comparison_intensity.png  used on inp
-ut line 563.
+ut line 532.
 (pdftex.def)             Requested size: 248.25769pt x 165.50513pt.
- [20
+ [18
 
  <../Figures/model_comparison_intensity.png>]
-<../Figures/country_importation_ranking.png, id=319, 1156.32pt x 867.24pt>
+<../Figures/country_importation_ranking.png, id=283, 1156.32pt x 867.24pt>
 File: ../Figures/country_importation_ranking.png Graphic file (type png)
 <use ../Figures/country_importation_ranking.png>
 Package pdftex.def Info: ../Figures/country_importation_ranking.png  used on in
-put line 577.
+put line 546.
 (pdftex.def)             Requested size: 220.67351pt x 165.50513pt.
- [21
+ [19
 
  <../Figures/country_importation_ranking.png>]
-<../Figures/stream_breakdown_dengue.png, id=326, 939.51pt x 650.43pt>
+<../Figures/stream_breakdown_dengue.png, id=291, 939.51pt x 650.43pt>
 File: ../Figures/stream_breakdown_dengue.png Graphic file (type png)
 <use ../Figures/stream_breakdown_dengue.png>
 Package pdftex.def Info: ../Figures/stream_breakdown_dengue.png  used on input 
-line 591.
+line 560.
 (pdftex.def)             Requested size: 239.0773pt x 165.51505pt.
- [22
+ [20
 
  <../Figures/stream_breakdown_dengue.png>]
-<../Figures/heatmap_dengue.png, id=334, 939.51pt x 650.43pt>
+<../Figures/heatmap_dengue.png, id=299, 939.51pt x 650.43pt>
 File: ../Figures/heatmap_dengue.png Graphic file (type png)
 <use ../Figures/heatmap_dengue.png>
-Package pdftex.def Info: ../Figures/heatmap_dengue.png  used on input line 603.
+Package pdftex.def Info: ../Figures/heatmap_dengue.png  used on input line 572.
 
 (pdftex.def)             Requested size: 239.0773pt x 165.51505pt.
- [23
+ [21
 
- <../Figures/heatmap_dengue.png>] [24
+ <../Figures/heatmap_dengue.png>] [22
 
 ]
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <10> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 670.
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 636.
 
 LaTeX Font Info:    Font shape `OT1/cmss/b/n' in size <7> not available
-(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 670.
+(Font)              Font shape `OT1/cmss/bx/n' tried instead on input line 636.
 
- [25
+ [23
 
 ]
 
 LaTeX Font Warning: Font shape `OT1/cmss/bx/it' undefined
-(Font)              using `OT1/cmss/bx/n' instead on input line 716.
+(Font)              using `OT1/cmss/bx/n' instead on input line 682.
 
-[26
+[24
 
-]
-<../Figures/stream_breakdown_panel.png, id=365, 1589.94pt x 1156.32pt>
-File: ../Figures/stream_breakdown_panel.png Graphic file (type png)
-<use ../Figures/stream_breakdown_panel.png>
-Package pdftex.def Info: ../Figures/stream_breakdown_panel.png  used on input l
-ine 729.
-(pdftex.def)             Requested size: 227.56348pt x 165.50072pt.
- [27
+] [25
 
- <../Figures/stream_breakdown_panel.png>]
-<../Figures/heatmap_malaria.png, id=374, 939.51pt x 650.43pt>
-File: ../Figures/heatmap_malaria.png Graphic file (type png)
-<use ../Figures/heatmap_malaria.png>
-Package pdftex.def Info: ../Figures/heatmap_malaria.png  used on input line 740
-.
-(pdftex.def)             Requested size: 239.0773pt x 165.51505pt.
- [28
-
- <../Figures/heatmap_malaria.png>]
-<../Figures/heatmap_measles.png, id=382, 939.51pt x 650.43pt>
-File: ../Figures/heatmap_measles.png Graphic file (type png)
-<use ../Figures/heatmap_measles.png>
-Package pdftex.def Info: ../Figures/heatmap_measles.png  used on input line 756
-.
-(pdftex.def)             Requested size: 193.37492pt x 133.87494pt.
-<../Figures/heatmap_pertussis.png, id=383, 939.51pt x 650.43pt>
-File: ../Figures/heatmap_pertussis.png Graphic file (type png)
-<use ../Figures/heatmap_pertussis.png>
-Package pdftex.def Info: ../Figures/heatmap_pertussis.png  used on input line 7
-56.
-(pdftex.def)             Requested size: 193.37492pt x 133.87494pt.
- [29
-
- <../Figures/heatmap_measles.png> <../Figures/heatmap_pertussis.png>]
-<../Figures/sensitivity_analysis_lambda.png, id=391, 1300.86pt x 1011.78pt>
-File: ../Figures/sensitivity_analysis_lambda.png Graphic file (type png)
-<use ../Figures/sensitivity_analysis_lambda.png>
-Package pdftex.def Info: ../Figures/sensitivity_analysis_lambda.png  used on in
-put line 770.
-(pdftex.def)             Requested size: 212.80649pt x 165.51614pt.
- [30
-
- <../Figures/sensitivity_analysis_lambda.png>]
-<../Figures/sensitivity_analysis_relative.png, id=398, 1300.86pt x 1011.78pt>
-File: ../Figures/sensitivity_analysis_relative.png Graphic file (type png)
-<use ../Figures/sensitivity_analysis_relative.png>
-Package pdftex.def Info: ../Figures/sensitivity_analysis_relative.png  used on 
-input line 783.
-(pdftex.def)             Requested size: 212.80649pt x 165.51614pt.
- [31
-
- <../Figures/sensitivity_analysis_relative.png>]
-<../Figures/sensitivity_analysis_delta_prob.png, id=408, 1300.86pt x 1011.78pt>
-
-File: ../Figures/sensitivity_analysis_delta_prob.png Graphic file (type png)
-<use ../Figures/sensitivity_analysis_delta_prob.png>
-Package pdftex.def Info: ../Figures/sensitivity_analysis_delta_prob.png  used o
-n input line 795.
-(pdftex.def)             Requested size: 212.80649pt x 165.51614pt.
- [32
-
- <../Figures/sensitivity_analysis_delta_prob.png>] [33
-
-] [34
+] [26
 
 ]
 \tf@nav=\write6
@@ -1261,42 +1175,43 @@ L3 programming layer <2026-01-19>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `presentation.out' has not changed.
-(rerunfilecheck)             Checksum: ADC5A81EA0CD3B46EFDECAECE3073BD2;787.
+(rerunfilecheck)             Checksum: 05C1893134F22A2E0422866C54959A41;641.
  ) 
 Here is how much of TeX's memory you used:
- 26664 strings out of 467525
- 537137 string characters out of 5418982
- 917696 words of memory out of 5000000
- 54973 multiletter control sequences out of 15000+600000
- 646228 words of font info for 106 fonts, out of 8000000 for 9000
+ 26556 strings out of 467525
+ 533541 string characters out of 5418982
+ 915696 words of memory out of 5000000
+ 54882 multiletter control sequences out of 15000+600000
+ 645872 words of font info for 105 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,15n,123p,387b,856s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb
-></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex9.
-pfb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.p
-fb></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pf
-b></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb>
-</usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></
-usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></us
-r/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/
-local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/l
-ocal/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/lo
-cal/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/loca
-l/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/
-texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local
-/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local
-/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi12.pfb></usr/local
-/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/local/
-texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi9.pfb></usr/local/t
-exlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
-xlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texl
-ive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texliv
-e/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive
-/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on presentation.pdf (34 pages, 10547544 bytes).
+></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
+</usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></u
+sr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr
+/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/l
+ocal/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/loc
+al/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/loca
+l/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local
+/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/t
+exlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/tex
+live/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/te
+xlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi10.pfb></usr/local/te
+xlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi12.pfb></usr/local/te
+xlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi8.pfb></usr/local/tex
+live/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmssi9.pfb></usr/local/texl
+ive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
+ve/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive
+/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2
+026/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/202
+6/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2026/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2026/t
+exmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
+Output written on presentation.pdf (26 pages, 3573026 bytes).
 PDF statistics:
- 544 PDF objects out of 1000 (max. 8388607)
- 350 compressed objects within 4 object streams
- 75 named destinations out of 1000 (max. 500000)
- 453 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 455 PDF objects out of 1000 (max. 8388607)
+ 295 compressed objects within 3 object streams
+ 58 named destinations out of 1000 (max. 500000)
+ 364 words of extra memory for PDF output out of 10000 (max. 10000000)
 
