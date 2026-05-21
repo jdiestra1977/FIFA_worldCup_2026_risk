@@ -25,9 +25,9 @@
 \definecolor{wcred}{RGB}{190, 30, 45}
 \definecolor{wcblue}{RGB}{0, 64, 140}
 \definecolor{wcgray}{RGB}{100, 100, 100}
-\definecolor{baseline}{RGB}{67, 147, 195}
-\definecolor{wcadj}{RGB}{214, 96, 77}
-\definecolor{sched}{RGB}{116, 196, 118}
+\definecolor{baseline}{RGB}{149, 165, 166}
+\definecolor{wcadj}{RGB}{230, 126, 34}
+\definecolor{sched}{RGB}{41, 128, 185}
 
 % --- Metadata ------------------------------------------------
 \title[WC 2026 Importation Risk]{%
@@ -101,18 +101,20 @@
   \begin{center}
     \large
     \textit{What is the probability that at least one case of
-    dengue, malaria, measles, or pertussis is \textbf{imported}
-    into each WC host city during June 2026 — and which
-    source countries drive that risk?}
+    dengue, influenza, malaria, measles, or pertussis is
+    \textbf{imported} into each WC host city during June 2026 —
+    and which source countries drive that risk?}
   \end{center}
 
   \vspace{1em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \textbf{Four diseases studied}
+      \textbf{Five diseases studied}
       \begin{itemize}
         \item \textbf{Dengue} — endemic in Latin America, SE Asia,
               Africa; strongly seasonal
+        \item \textbf{Influenza} — Southern Hemisphere \textit{winter
+              peak} coincides with June tournament window
         \item \textbf{Malaria} — sub-Saharan Africa, SE Asia,
               Middle East
         \item \textbf{Measles} — resurgent globally; under-vaccinated
@@ -195,11 +197,14 @@
     Dengue
       & 0.06--0.26 & \textbf{0.10} & 0.50
       & Mild viremia; $\sim$40\% viremic at arrival \\
+    Influenza
+      & 0.033--0.20 & \textbf{0.10} & 0.50
+      & Moderate illness; many travel during early illness \\
     Malaria
       & 0.10--0.35 & \textbf{0.20} & 0.30
       & Severe illness; most febrile after return \\
     Measles
-      & 0.10--0.60 & \textbf{0.60} & 0.05
+      & 0.40--0.80 & \textbf{0.60} & 0.05
       & Prostrating; only short pre-rash window \\
     Pertussis
       & 0.01--0.10 & \textbf{0.10} & 0.70
@@ -210,8 +215,10 @@
 
   {\footnotesize
   $\rho_d$ ranges from: Bhatt et al.\ 2013 (dengue);
+  WHO GISRS / Iuliano et al.\ 2018 (influenza);
   WHO WMR 2024 (malaria); Simons et al.\ 2012 (measles);
-  McLaughlin et al.\ 2016 (pertussis).}
+  McLaughlin et al.\ 2016 (pertussis).
+  MC: 5,000 Uniform draws on each $(\rho_d,\, p_d)$ pair.}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -236,6 +243,8 @@
       \begin{itemize}
         \item \textbf{Dengue}: WHO Global Dengue Surveillance
               (monthly, accessed Dec 2025)
+        \item \textbf{Influenza}: WHO FluNet / GISRS global sentinel
+              surveillance (ISO weeks 22--26, 2023--2025)
         \item \textbf{Malaria}: WHO Global Malaria Programme
               National Unit Data (2024 annual)
         \item \textbf{Measles}: WHO Immunization Data portal
@@ -248,6 +257,31 @@
       16 venues from FIFA event records
     \end{column}
   \end{columns}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{Monte Carlo uncertainty propagation}
+  Both $\rho_d$ and $p_d$ span \textbf{one or more orders of magnitude}
+  in the literature.
+
+  \bigskip
+  \textbf{Approach}: 5,000 independent draws from
+  $\rho_d \sim \text{Uniform}(\rho_{\min},\rho_{\max})$ and
+  $p_d \sim \text{Uniform}(p_{\min},p_{\max})$.
+  Because $\Lambda \propto \rho_d \cdot p_d$, each draw rescales the
+  central estimate by a scalar factor — \textit{no recomputation needed}.
+
+  \bigskip
+  \begin{block}{Why this matters}
+    \begin{itemize}
+      \item Dengue/influenza 95\% CI extends \textbf{upward}: risk may
+            be underestimated
+      \item Pertussis 95\% CI extends \textbf{downward}: central estimate
+            is a conservative upper bound ($\rho_c = \rho_{\max}$)
+      \item Uncertainty is \textbf{integrated into every result}, not
+            relegated to a sensitivity appendix
+    \end{itemize}
+  \end{block}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -496,79 +530,57 @@
 \section{Results}
 % ============================================================
 
-\begin{frame}{Model 1 — Baseline results}
+\begin{frame}{Importation risk overview — all five diseases}
   \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/estimated_importations.png}
+    \includegraphics[width=\textwidth, height=0.72\textheight, keepaspectratio]%
+      {../Figures/fig1_risk_heatmap.png}
   \end{center}
   \vspace{-0.3em}
-  {\footnotesize Numbers above bars = $P(\geq 1\,\text{importation})$;
-  bar height = expected importation intensity $\lambda$.}
+  {\footnotesize $P(\geq 1)$ under the schedule-driven model (MC median,
+  5,000 draws). Dengue is near-certain at every venue;
+  measles risk is lowest. Cities ordered by decreasing aggregate
+  importation intensity.}
 \end{frame}
 
 % ------------------------------------------------------------
-\begin{frame}{Three-model comparison — importation probability}
+\begin{frame}{Importation intensity with 95\% uncertainty intervals}
   \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/model_comparison_probability.png}
+    \includegraphics[width=\textwidth, height=0.72\textheight, keepaspectratio]%
+      {../Figures/fig2_lambda_ci.png}
   \end{center}
   \vspace{-0.3em}
-  {\footnotesize \textcolor{baseline}{$\blacksquare$ Baseline} \quad
-   \textcolor{wcadj}{$\blacksquare$ WC-adjusted} \quad
-   \textcolor{sched}{$\blacksquare$ Schedule-driven}. \quad
-   $P(\geq 1)$ saturates to 1 for high-risk cities — see next slide
-   for the linear-scale $\lambda$ comparison.}
+  {\footnotesize Point = MC median $\Lambda$; whiskers = 95\%
+  uncertainty interval (Uniform draws on $\rho_d$ and $p_d$).
+  Dengue is orders of magnitude above other diseases;
+  pertussis CIs extend downward (central estimate is conservative).}
 \end{frame}
 
 % ------------------------------------------------------------
-\begin{frame}{Three-model comparison — importation intensity ($\lambda$)}
+\begin{frame}{WC travel surge amplifies but does not restructure risk}
   \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/model_comparison_intensity.png}
+    \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]%
+      {../Figures/fig3_model_comparison.png}
   \end{center}
   \vspace{-0.3em}
-  {\footnotesize $\lambda$ stays linear even when $P(\geq 1) \to 1$,
-   revealing relative risk more clearly than the probability scale.}
+  {\footnotesize Grouped bars: Baseline (M1), WC-adjusted (M2), Schedule-driven (M3).
+  Bars = MC median $\Lambda$; whiskers = 95\% CI.
+  M1$\to$M2: near-uniform proportional surge across cities.
+  M2$\to$M3: city-specific divergence from schedule-based fan routing.}
 \end{frame}
 
 % ============================================================
 \section{Country contributions}
 % ============================================================
 
-\begin{frame}{Which countries drive importation risk?}
+\begin{frame}{Top source countries by disease — with uncertainty}
   \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/country_importation_ranking.png}
+    \includegraphics[width=\textwidth, height=0.65\textheight, keepaspectratio]%
+      {../Figures/fig4_country_drivers.png}
   \end{center}
   \vspace{-0.3em}
-  {\footnotesize Top 15 source countries by total expected importations
-  (schedule-driven model, summed across all destination cities).}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{WC fans vs.\ background tourists — dengue}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/stream_breakdown_dengue.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize
-    \textcolor{wcadj}{$\blacksquare$ WC fans} \quad
-    \textcolor{baseline}{$\blacksquare$ Background}.
-    Countries with WC teams show a non-zero WC-fan component;
-    non-qualified countries contribute only through background travel.}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Country $\times$ city importation matrix — dengue}
-  \begin{center}
-    \includegraphics[width=\textwidth, height=0.68\textheight, keepaspectratio]%
-      {../Figures/heatmap_dengue.png}
-  \end{center}
-  \vspace{-0.3em}
-  {\footnotesize Colour = expected dengue importations $\lambda_{c,v}$.
-  WC-qualified countries show concentration in specific match venues;
-  non-qualified countries show diffuse contributions via T-100 routing.}
+  {\footnotesize Top 10 source countries per disease (schedule-driven, all 11 US cities).
+  Bars = MC median; whiskers = 95\% CI. Colours = world region.
+  Latin America: dengue \& influenza; Africa: malaria; Europe: pertussis \& measles.}
 \end{frame}
 
 % ============================================================
@@ -577,22 +589,65 @@
 
 \begin{frame}{Key findings}
   \begin{enumerate}
-    \item \textbf{Dengue dominates} importation intensity across all
-          three models and all destination cities, driven by high
-          incidence in Latin America and SE Asia.
-    \item \textbf{The WC travel surge} (Model 1 $\to$ 2) increases
-          estimated importation intensity for qualified nations but
-          city rankings remain broadly stable.
-    \item \textbf{Schedule-driven routing} (Model 2 $\to$ 3) reveals
-          concentration of risk at specific US match venues (e.g.,
-          Houston for Brazil games).
-    \item \textbf{Background travel} dominates the total importation
-          burden for most diseases; the WC-fan increment is $\approx
-          8.3\%$ of projected arrivals for qualified countries.
-    \item \textbf{A small number of high-incidence countries} (Brazil,
-          Colombia, and others by disease) account for a
-          disproportionate share of city-level risk.
+    \item \textbf{Dengue importation is near-certain} ($P(\geq 1)>0.99$
+          at every US venue city) — robust across the full MC parameter
+          space.
+    \item \textbf{Influenza ranks second}, amplified by coincidence
+          with the Southern Hemisphere winter peak during the June
+          tournament window.
+    \item \textbf{The WC travel surge} (M1 $\to$ M2) amplifies risk
+          \textit{proportionally}; city rankings are stable.
+    \item \textbf{Schedule-driven routing} (M2 $\to$ M3) concentrates
+          risk at specific US match venues; Kansas City gains
+          meaningful risk almost entirely through the WC-fan stream.
+    \item \textbf{Background travel dominates}: the WC-fan increment
+          is $\approx 8.3\%$ of projected arrivals for qualified
+          countries.
+    \item \textbf{Country rankings are robust}: the top three
+          contributors per disease are stable across the full MC
+          parameter range.
   \end{enumerate}
+\end{frame}
+
+% ------------------------------------------------------------
+\begin{frame}{What this model can (and cannot) offer}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textbf{What it can offer}
+      \begin{itemize}
+        \item A \textbf{transparent, reproducible baseline}
+              for importation risk — built entirely from
+              public data
+        \item A natural \textbf{planning timeline}: M1
+              once cities are known; M2 when projections
+              arrive; M3 once the schedule is confirmed
+        \item Country $\times$ city risk breakdowns that
+              can \textbf{inform} which cities and source
+              streams to prioritise for surveillance
+        \item A \textbf{quantified uncertainty range}
+              (MC 95\% CI) — shows where estimates are
+              robust and where they are not
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{What it cannot replace}
+      \begin{itemize}
+        \item Local context: vector presence, vaccination
+              coverage, healthcare capacity
+        \item Real-time surveillance — data lags mean
+              this is a \textit{planning} tool, not an
+              operational alert system
+        \item Onward transmission risk after importation
+        \item Event-specific travel data (ticket sales,
+              booking records)
+      \end{itemize}
+      \vspace{4pt}
+      {\small\textit{The outputs are one transparent,
+      reproducible input to preparedness planning —
+      not a substitute for local epidemiological
+      judgement.}}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -602,10 +657,12 @@
     \begin{column}{0.48\textwidth}
       \textbf{Parameter uncertainty}
       \begin{itemize}
-        \item $\rho_d$ and $p_d$ are central estimates — no strong
-              empirical constraint for mass sporting events
-        \item Sensitivity analysis ($\pm50\%$) recommended before
-              policy communication
+        \item \textbf{Monte Carlo uncertainty integrated}: 5,000
+              Uniform draws on $(\rho_d, p_d)$ — 95\% intervals
+              reported for all main estimates
+        \item Dengue/influenza CIs skew upward (risk may be
+              understated); pertussis CIs skew downward (conservative
+              upper bound)
       \end{itemize}
       \vspace{2pt}
       \textbf{Travel data coverage}
@@ -683,21 +740,21 @@
 
 \begin{frame}{Next steps}
   \begin{enumerate}
-    \item \textbf{Airport-level allocation} — distribute city-level
-          importation risk across individual US airports using BTS
-          enplanement data and spatial join to counties (code
-          already in supplementary file)
-
     \item \textbf{Incorporate knockout rounds} — as the WC bracket
-          becomes known, update the schedule-driven model with
-          resolved match assignments
+          is resolved, update the schedule-driven model with actual
+          match assignments beyond the group stage
 
     \item \textbf{Real-time surveillance linkage} — compare model
           predictions against actual case notifications from CDC
           and partner health agencies during the tournament
 
-    \item \textbf{Expand disease scope} — cholera, mpox, and
-          influenza are under consideration for a follow-up analysis
+    \item \textbf{Expand disease scope} — chikungunya (active 2025--2026
+          outbreak in Brazil \& Argentina) and mumps are the
+          highest-priority additions; both have accessible public data
+
+    \item \textbf{Domestic routing extension} — use DOT enplanement
+          data to capture importation pressure at cities receiving
+          onward domestic connections from T-100 gateway cities
 
     \item \textbf{Extended routing data} — booking-level data
           (OAG, Amadeus) to refine city-level routing fractions
