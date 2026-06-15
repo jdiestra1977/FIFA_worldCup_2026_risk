@@ -32,10 +32,11 @@
 % --- Metadata ------------------------------------------------
 \title[WC 2026 Importation Risk]{%
   Estimating Infectious Disease Importation Risk\\
-  during the 2026 FIFA World Cup}
-\author{Jose Herrera-Diestra}
+  during the 2026 FIFA World Cup\\
+  in the United States, June--July 2026}
+\author{Jose L. Herrera-Diestra}
 \institute{Tarleton State University}
-\date{May 2026}
+\date{June 2026}
 
 % ============================================================
 \begin{document}
@@ -171,54 +172,71 @@
 \end{frame}
 
 % ------------------------------------------------------------
-\begin{frame}{Disease-specific parameters}
-  \[
-    I_{c,d} = \rho_d \cdot \frac{C_{c,d}}{P_c}
-  \]
+\begin{frame}{Disease parameters \& uncertainty propagation}
 
-  \smallskip
-  \begin{itemize}
-    \item $\rho_d$ — \textbf{under-reporting adjustment}: scales
-          reported cases $C_{c,d}$ up to true incidence
-    \item $p_d$ — \textbf{probability of travelling while infectious}
-  \end{itemize}
-
-  \smallskip
   \begin{center}
-  \footnotesize
-  \begin{tabular}{lcccl}
-    \toprule
-    \textbf{Disease}
-      & \textbf{$\rho_d$ range}
-      & \textbf{$\rho_d$ (used)}
-      & \textbf{$p_d$}
-      & \textbf{Rationale for $p_d$} \\
-    \midrule
-    Dengue
-      & 0.06--0.26 & \textbf{0.10} & 0.50
-      & Mild viremia; $\sim$40\% viremic at arrival \\
-    Influenza
-      & 0.033--0.20 & \textbf{0.10} & 0.50
-      & Moderate illness; many travel during early illness \\
-    Malaria
-      & 0.10--0.35 & \textbf{0.20} & 0.30
-      & Severe illness; most febrile after return \\
-    Measles
-      & 0.40--0.80 & \textbf{0.60} & 0.05
-      & Prostrating; only short pre-rash window \\
-    Pertussis
-      & 0.01--0.10 & \textbf{0.10} & 0.70
-      & Catarrhal stage $\approx$ common cold; unrecognised \\
-    \bottomrule
-  \end{tabular}
+  \small\textit{Both $\rho_d$ and $p_d$ span wide literature ranges — we sample both simultaneously.}
   \end{center}
 
-  {\footnotesize
-  $\rho_d$ ranges from: Bhatt et al.\ 2013 (dengue);
-  WHO GISRS / Iuliano et al.\ 2018 (influenza);
-  WHO WMR 2024 (malaria); Simons et al.\ 2012 (measles);
-  McLaughlin et al.\ 2016 (pertussis).
-  MC: 5,000 Uniform draws on each $(\rho_d,\, p_d)$ pair.}
+  \vspace{0.2em}
+
+  \begin{columns}[T]
+
+    % --- Left: what is uncertain ---
+    \begin{column}{0.50\textwidth}
+      \footnotesize
+      \[
+        I_{c,d} = \rho_d \cdot \frac{C_{c,d}}{P_c}
+      \]
+      \vspace{-0.8em}
+      \begin{itemize}
+        \item $\rho_d$: under-reporting factor
+        \item $p_d$: probability of travelling while infectious
+      \end{itemize}
+      \vspace{0.4em}
+      \begin{tabular}{lcc}
+        \toprule
+        \textbf{Disease} & \textbf{$\rho_d$ range} & \textbf{$p_d$ range} \\
+        \midrule
+        Dengue    & 0.06--0.26  & 0.30--0.70 \\
+        Influenza & 0.033--0.20 & 0.30--0.70 \\
+        Malaria   & 0.10--0.35  & 0.10--0.50 \\
+        Measles   & 0.40--0.80  & 0.02--0.10 \\
+        Pertussis & 0.01--0.10  & 0.50--0.90 \\
+        \bottomrule
+      \end{tabular}
+    \end{column}
+
+    % --- Right: how we handle it ---
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Monte Carlo propagation}
+        \footnotesize
+        5,000 independent draws:\\[3pt]
+        \quad $\rho_d \sim \mathrm{Uniform}(\rho_{\min},\, \rho_{\max})$\\
+        \quad $p_d    \sim \mathrm{Uniform}(p_{\min},\, p_{\max})$\\[5pt]
+        Since $\Lambda \propto \rho_d \cdot p_d$, each draw is a
+        scalar rescaling of $\Lambda$ —
+        \textit{no recomputation needed}.\\[5pt]
+        Output: \textbf{MC median} $+$ \textbf{95\% uncertainty interval}
+      \end{block}
+      \vspace{0.5em}
+      \footnotesize
+      \begin{itemize}
+        \item Dengue \& influenza: CI skews \textbf{upward} —
+              risk may be understated
+        \item Pertussis: CI skews \textbf{downward} —
+              central value is a conservative upper bound
+      \end{itemize}
+    \end{column}
+
+  \end{columns}
+
+  \vspace{0.4em}
+  {\tiny
+  $\rho_d$ sources: Bhatt et al.\ 2013 (dengue); Iuliano et al.\ 2018 (influenza);
+  WHO WMR 2024 (malaria); Simons et al.\ 2012 (measles); McLaughlin et al.\ 2016 (pertussis).
+  \quad $p_d$ rationale: dengue/influenza mild–moderate; malaria severe; measles prostrating; pertussis catarrhal.}
+
 \end{frame}
 
 % ------------------------------------------------------------
@@ -257,31 +275,6 @@
       16 venues from FIFA event records
     \end{column}
   \end{columns}
-\end{frame}
-
-% ------------------------------------------------------------
-\begin{frame}{Monte Carlo uncertainty propagation}
-  Both $\rho_d$ and $p_d$ span \textbf{one or more orders of magnitude}
-  in the literature.
-
-  \bigskip
-  \textbf{Approach}: 5,000 independent draws from
-  $\rho_d \sim \text{Uniform}(\rho_{\min},\rho_{\max})$ and
-  $p_d \sim \text{Uniform}(p_{\min},p_{\max})$.
-  Because $\Lambda \propto \rho_d \cdot p_d$, each draw rescales the
-  central estimate by a scalar factor — \textit{no recomputation needed}.
-
-  \bigskip
-  \begin{block}{Why this matters}
-    \begin{itemize}
-      \item Dengue/influenza 95\% CI extends \textbf{upward}: risk may
-            be underestimated
-      \item Pertussis 95\% CI extends \textbf{downward}: central estimate
-            is a conservative upper bound ($\rho_c = \rho_{\max}$)
-      \item Uncertainty is \textbf{integrated into every result}, not
-            relegated to a sensitivity appendix
-    \end{itemize}
-  \end{block}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -537,9 +530,11 @@
   \end{center}
   \vspace{-0.3em}
   {\footnotesize $P(\geq 1)$ under the schedule-driven model (MC median,
-  5,000 draws). Dengue is near-certain at every venue;
-  measles risk is lowest. Cities ordered by decreasing aggregate
-  importation intensity.}
+  5,000 draws). Dengue leads at most venues ($P(\geq 1)>0.99$ at Miami,
+  New York, and Houston); Atlanta is an exception --- malaria exceeds
+  dengue there ($P(\geq 1)>0.99$ vs.\ 0.97), driven by direct travel
+  from West and Central African nations. Measles risk is lowest. Cities
+  ordered by decreasing aggregate importation intensity.}
 \end{frame}
 
 % ------------------------------------------------------------
@@ -589,12 +584,15 @@
 
 \begin{frame}{Key findings}
   \begin{enumerate}
-    \item \textbf{Dengue importation is near-certain} ($P(\geq 1)>0.99$
-          at every US venue city) — robust across the full MC parameter
-          space.
-    \item \textbf{Influenza ranks second}, amplified by coincidence
-          with the Southern Hemisphere winter peak during the June
-          tournament window.
+    \item \textbf{Dengue leads importation risk} at most venue cities
+          ($P(\geq 1)>0.99$ at Miami, New York, and Houston), robust
+          across the full MC parameter space. \textbf{Atlanta is a notable
+          exception}: malaria exceeds dengue there ($P(\geq 1)>0.99$
+          vs.\ 0.97), driven by direct travel from West and Central
+          African nations.
+    \item \textbf{Influenza ranks second} at most cities, amplified by
+          coincidence with the Southern Hemisphere winter peak during
+          the June tournament window.
     \item \textbf{The WC travel surge} (M1 $\to$ M2) amplifies risk
           \textit{proportionally}; city rankings are stable.
     \item \textbf{Schedule-driven routing} (M2 $\to$ M3) concentrates
@@ -740,17 +738,18 @@
 
 \begin{frame}{Next steps}
   \begin{enumerate}
-    \item \textbf{Incorporate knockout rounds} — as the WC bracket
-          is resolved, update the schedule-driven model with actual
-          match assignments beyond the group stage
+    \item \textbf{Incorporate knockout rounds} — the group stage
+          bracket is now being resolved; update the schedule-driven
+          model with actual match assignments as they are confirmed
 
     \item \textbf{Real-time surveillance linkage} — compare model
           predictions against actual case notifications from CDC
-          and partner health agencies during the tournament
+          and partner health agencies as the tournament progresses
 
-    \item \textbf{Expand disease scope} — chikungunya (active 2025--2026
-          outbreak in Brazil \& Argentina) and mumps are the
-          highest-priority additions; both have accessible public data
+    \item \textbf{Expand disease scope} — chikungunya (active
+          2025--2026 outbreak in Brazil \& Argentina) and mumps are
+          the highest-priority additions; both have accessible
+          public data
 
     \item \textbf{Domestic routing extension} — use DOT enplanement
           data to capture importation pressure at cities receiving
@@ -769,7 +768,9 @@
     {\Large\textbf{Thank you}}\\[1em]
     \texttt{jherreradiestra@tarleton.edu}\\[0.8em]
     {\small Code and data:}\\[0.2em]
-    {\small\url{https://github.com/jdiestra1977/FIFA_worldCup_2026_risk}}
+    {\small\url{https://github.com/jdiestra1977/FIFA_worldCup_2026_risk}}\\[0.6em]
+    {\small Preprint:}\\[0.2em]
+    {\small\url{https://www.medrxiv.org/content/10.64898/2026.06.03.26354828v1}}
   \end{center}
   \vfill
 \end{frame}

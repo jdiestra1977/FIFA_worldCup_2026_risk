@@ -1,5 +1,5 @@
 \beamer@sectionintoc {1}{Context and question}{3}{0}{1}
 \beamer@sectionintoc {2}{Methods}{6}{0}{2}
-\beamer@sectionintoc {3}{Results}{17}{0}{3}
-\beamer@sectionintoc {4}{Country contributions}{20}{0}{4}
-\beamer@sectionintoc {5}{Key findings \& Limitations}{21}{0}{5}
+\beamer@sectionintoc {3}{Results}{16}{0}{3}
+\beamer@sectionintoc {4}{Country contributions}{19}{0}{4}
+\beamer@sectionintoc {5}{Key findings \& Limitations}{20}{0}{5}

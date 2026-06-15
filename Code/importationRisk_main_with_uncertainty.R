@@ -51,9 +51,9 @@
 #
 # KEY DIFFERENCE FROM importationRisk_main.R
 # ------------------------------------------
-# Monte Carlo uncertainty (5,000 draws, Uniform parameter distributions)
-# is integrated directly into every main figure. Each bar shows the
-# posterior median; whiskers show the 95% uncertainty interval. There is
+# Monte Carlo uncertainty (5,000 Uniform draws on rho_d and p_d) is integrated
+# directly into every main figure. Each bar shows the
+# MC median; whiskers show the 95% uncertainty interval. There is
 # no separate MC section — uncertainty IS the result, not an afterthought.
 # The sensitivity sweep (§12) is retained for the appendix.
 # ============================================================
@@ -650,9 +650,9 @@ compute_importation_country_level <- function(arrivals_df,
 # ---- 5d. Monte Carlo uncertainty helper ----------------------
 #
 # Given a vector of central Lambda values (one per city) and the
-# literature ranges for rho and p, draws n_mc (rho, p) pairs from
-# independent Uniform distributions, rescales Lambda for each draw,
-# and returns median + 95% uncertainty intervals.
+# literature ranges for rho and p, draws n_mc (rho, p) pairs,
+# rescales Lambda for each draw, and returns median + 95% uncertainty
+# intervals.
 #
 # Because Lambda = p × rho × (constant city factor), the MC reduces
 # to a scalar rescaling: Lambda_i = (rho_i × p_i)/(rho_c × p_c) × Lambda_c.
@@ -661,9 +661,9 @@ compute_importation_country_level <- function(arrivals_df,
 # Arguments:
 #   lambda_central_vec — numeric vector of central Lambda per city
 #   city_names         — character vector matching lambda_central_vec
-#   rho_c, p_c         — central values (used as denominators)
-#   rho_min, rho_max   — Uniform range for rho
-#   p_min, p_max       — Uniform range for p
+#   rho_c, p_c         — central values (used as scale denominators)
+#   rho_min, rho_max   — literature range for rho
+#   p_min, p_max       — literature range for p
 #   n_mc               — number of MC draws (default: 5,000)
 #
 # Returns a tibble: destination_city, lambda_median/lo/hi, prob_median/lo/hi
@@ -672,8 +672,11 @@ compute_mc_summary <- function(lambda_central_vec, city_names,
                                 rho_c, p_c,
                                 rho_min, rho_max, p_min, p_max,
                                 n_mc = 5000) {
-  scales   <- (runif(n_mc, rho_min, rho_max) * runif(n_mc, p_min, p_max)) /
-              (rho_c * p_c)
+
+  rho_draws <- runif(n_mc, rho_min, rho_max)
+  p_draws   <- runif(n_mc, p_min,   p_max)
+
+  scales   <- (rho_draws * p_draws) / (rho_c * p_c)
   imp_mat  <- outer(scales, lambda_central_vec)   # n_mc × n_cities
   prob_mat <- 1 - exp(-imp_mat)
 
@@ -2116,6 +2119,7 @@ fig1_risk_heatmap <- ggplot(fig1_data,
 ggsave(fig1_risk_heatmap,
        file   = "Figures/fig1_risk_heatmap.png",
        height = 4.5, width = 12.5, dpi = 300)
+print(fig1_risk_heatmap)
 
 # ---- 12b-extra. Appendix heatmaps: Baseline (M1) and WC-adjusted (M2) ----
 # Same layout as fig1_risk_heatmap (schedule-driven, M3) so all three
@@ -2248,6 +2252,7 @@ fig2_lambda_ci <- ggplot(fig2_data,
 ggsave(fig2_lambda_ci,
        file   = "Figures/fig2_lambda_ci.png",
        height = 9, width = 14, dpi = 300)
+print(fig2_lambda_ci)
 
 # ---- 12d. FIGURE 3 — Three-model comparison (dodged bars) ----
 #
@@ -2357,6 +2362,7 @@ fig3_model_comparison <- fig3_optB
 ggsave(fig3_model_comparison,
        file   = "Figures/fig3_model_comparison.png",
        height = 8.5, width = 14, dpi = 300)
+print(fig3_model_comparison)
 
 # ---- 12e. FIGURE 4 — Source country drivers -----------------
 # Top 10 source countries per disease, colored by world region.
@@ -2434,11 +2440,11 @@ make_country_panel <- function(dis) {
       labels = scales::number_format(accuracy = 0.0001, drop0trailing = TRUE)
     ) +
     labs(x = "", y = expression(Lambda), title = dis) +
-    theme_minimal(base_size = 11) +
+    theme_minimal(base_size = 17) +
     theme(
       panel.grid.major.y = element_blank(),
       panel.grid.minor   = element_blank(),
-      plot.title         = element_text(face = "bold", size = 12, color = "gray15"),
+      plot.title         = element_text(face = "bold", size = 18, color = "gray15"),
       legend.position    = "none"
     )
 }
@@ -2449,12 +2455,12 @@ shared_legend <- cowplot::get_legend(
          aes(x = Country, y = total_imports, fill = new_region)) +
     geom_col() +
     scale_fill_manual(values = region_colors, name = "World region") +
-    theme_minimal(base_size = 11) +
+    theme_minimal(base_size = 17) +
     theme(
       legend.position = "right",
-      legend.title    = element_text(size = 9, face = "bold"),
-      legend.text     = element_text(size = 8),
-      legend.key.size = unit(0.4, "cm")
+      legend.title    = element_text(size = 15, face = "bold"),
+      legend.text     = element_text(size = 14),
+      legend.key.size = unit(0.6, "cm")
     )
 )
 
@@ -2472,9 +2478,10 @@ fig4_country_drivers <- cowplot::plot_grid(
   plotlist   = country_panels,
   ncol       = 2,
   labels     = c("A", "B", "C", "D", "E", ""),
-  label_size = 11
+  label_size = 14
 )
 
 ggsave(fig4_country_drivers,
        file   = "Figures/fig4_country_drivers.png",
        height = 13, width = 15, dpi = 300)
+print(fig4_country_drivers)

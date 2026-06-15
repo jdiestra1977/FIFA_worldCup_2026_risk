@@ -13,17 +13,32 @@
 \usepackage{lscape}
 \usepackage{longtable}
 \usepackage{subcaption}
+\usepackage{lineno}
+\usepackage{authblk}
 
 \onehalfspacing
 
 \title{\textbf{Estimating Infectious Disease Importation Risk
 during the 2026 FIFA World Cup}}
-\author{All authors here...}
+
+\author[1]{Jose L. Herrera-Diestra}
+\author[2]{Kaiming Bi}
+\author[4]{Zeynep Ertem}
+\author[5]{Amera Al-Amery}
+\author[3]{Mallory Harris}
+
+\affil[1]{Tarleton State University, Stephenville, TX, USA}
+\affil[2]{UTHealth Houston, Houston, TX, USA}
+\affil[3]{University of Texas at Austin, Austin, TX, USA}
+\affil[4]{Binghamton University, Binghamton, NY, USA}
+\affil[5]{Jordan University of Science and Technology, Irbid, Jordan}
+
 \date{\today}
 
 \begin{document}
 
 \maketitle
+\linenumbers
 
 % ============================================================
 \begin{abstract}
@@ -45,20 +60,33 @@ increasing resolution were constructed: a baseline model using
 routine June~2024 arrival data; a World Cup--adjusted model
 incorporating projected visitor growth factors; and a
 schedule-driven model routing WC fans to specific cities based on
-match assignments. Country-level disease incidence was sourced from
-WHO surveillance datasets. City routing fractions were derived from
-BTS T-100 international segment data.
+match assignments. WHO incidence and BTS T-100 routing fractions were
+combined with Monte Carlo uncertainty propagation (5,000 Uniform
+draws on under-reporting and travel-while-infectious parameters)
+to yield median importation estimates with 95\% uncertainty
+intervals.
 
 \medskip
 \noindent\textbf{Results.}
-Dengue posed the highest importation risk across all venue cities under the schedule-driven model (median $\Lambda > 10$ expected importations from Brazil alone; 95\% uncertainty interval 7.2--28.4), a finding robust to the full range of literature-supported parameter values. Influenza ranked second, coinciding with the Southern Hemisphere winter peak. Pertussis showed broad geographic spread but carries the widest relative uncertainty, as the assumed detection rate sits at the upper bound of the literature range. Malaria risk was concentrated in West and Central African nations. Background tourism accounted for the dominant share of total importation risk; the World Cup fan increment contributed approximately 8.3\% of projected arrivals for WC-qualified nations.
+Dengue posed the highest importation risk at most venue cities under
+the schedule-driven model (median $\Lambda > 10$ expected importations
+from Brazil alone; 95\% uncertainty interval 5.9--33.1), robust across the full literature-supported parameter range;
+Atlanta was the exception, where malaria probability exceeded dengue,
+driven by direct travel from West and Central African nations.
+Influenza ranked second at most cities, coinciding with the Southern
+Hemisphere winter peak. Pertussis showed broad geographic spread but
+carries the widest relative uncertainty, as the assumed detection rate
+sits at the upper bound of the literature range. Background tourism
+accounted for the dominant share of total importation risk; the World
+Cup fan increment contributed approximately 8.3\% of projected arrivals
+for WC-qualified nations.
 
 \medskip
 \noindent\textbf{Conclusions.}
 This Poisson importation framework, built entirely from publicly
 available data, provides reproducible importation risk estimates for
-mass gathering events. The approach is extensible to additional
-diseases, destination cities, and international gatherings, offering
+mass gathering events. The framework extends to additional
+diseases, cities, and gatherings, offering
 a transparent baseline complementary to proprietary modeling systems.
 \end{abstract}
 
@@ -175,7 +203,7 @@ $p_d=0.50$). Full details are given in Appendix~A.
 
 \subsection*{Monte Carlo uncertainty propagation}
 
-Both $\rho_d$ (under-reporting factor) and $p_d$ (travel-while-infectious probability) are uncertain across one or more orders of magnitude in the literature (Table~\ref{tab:models}). To propagate this uncertainty through the importation estimates, we drew 5,000 independent samples of each parameter from independent Uniform distributions calibrated to the literature ranges: $\rho_d \sim \text{Uniform}(\rho_\text{min}, \rho_\text{max})$ and $p_d \sim \text{Uniform}(p_\text{min}, p_\text{max})$. Uniform distributions were chosen for transparency; they make no assumption about the shape of uncertainty within the documented range.
+Both $\rho_d$ (under-reporting factor) and $p_d$ (travel-while-infectious probability) are uncertain across one or more orders of magnitude in the literature (Table~\ref{tab:params} in Appendix~A). To propagate this uncertainty through the importation estimates, we drew 5,000 independent samples of each parameter from independent Uniform distributions calibrated to the literature ranges: $\rho_d \sim \text{Uniform}(\rho_\text{min}, \rho_\text{max})$ and $p_d \sim \text{Uniform}(p_\text{min}, p_\text{max})$. Uniform distributions were chosen for transparency; they make no assumption about the shape of uncertainty within the documented range.
 
 Because $\Lambda_{v,d} = p_d \cdot \rho_d \cdot \sum_c (C_{c,d}/P_c) \cdot N_{c,v}$ is linear in the product $(p_d \cdot \rho_d)$, each Monte Carlo draw rescales the central estimate by a factor $(p_d^{(i)} \cdot \rho_d^{(i)}) / (p_c \cdot \rho_c)$. We report the median and 95\% interval (2.5th--97.5th percentile) across the 5,000 draws. Figures show bars at the median with whiskers spanning the 95\% interval; the probability of at least one importation $P(\geq 1)$ is derived from the sampled $\Lambda$ distributions. Literature ranges used are: dengue ($\rho$: 0.06--0.26; $p$: 0.30--0.70), malaria ($\rho$: 0.10--0.35; $p$: 0.10--0.50), measles ($\rho$: 0.40--0.80; $p$: 0.02--0.10), pertussis ($\rho$: 0.01--0.10; $p$: 0.50--0.90), and influenza ($\rho$: 0.033--0.20; $p$: 0.30--0.70).
 
@@ -187,14 +215,16 @@ Because $\Lambda_{v,d} = p_d \cdot \rho_d \cdot \sum_c (C_{c,d}/P_c) \cdot N_{c,
 
 Figure~\ref{fig:risk_heatmap} shows the probability of at least one importation
 $[P(\geq 1)]$ for all five diseases across the 11~US venue cities under the
-schedule-driven model (Model~3). Dengue fever is the dominant risk at every
-venue city: $P(\geq 1) > 0.99$ across the full Monte Carlo parameter space,
-making dengue importation virtually certain regardless of detection-rate
-assumptions. Influenza ranks second at most cities, its risk amplified by
-coincidence with the Southern Hemisphere winter peak. Pertussis shows broad but
-moderate probability; malaria risk is lower and geographically concentrated in
-cities receiving West and Central African visitors. Measles consistently
-shows the lowest probability, driven by its severe prodrome suppressing
+schedule-driven model (Model~3). Dengue fever leads importation risk at most
+venue cities, with $P(\geq 1) > 0.99$ at Miami, New York, and Houston and
+ranging from 0.09 to 0.97 at the remaining cities. Atlanta is a notable
+exception: malaria reaches $P(\geq 1) > 0.99$---exceeding dengue
+(0.97)---driven by direct travel from West and Central African nations.
+Influenza ranks second at most cities, its risk amplified by coincidence with
+the Southern Hemisphere winter peak. Pertussis shows broad but moderate
+probability; outside Atlanta and New York, malaria risk is low and
+geographically concentrated. Measles consistently shows the lowest probability,
+driven by its severe prodrome suppressing
 travel during the infectious window ($p_d = 0.05$). These five diseases
 occupy distinct niches---by magnitude, geography, and uncertainty structure---as
 the following subsections detail. The equivalent heatmaps for the Baseline
@@ -209,8 +239,9 @@ Appendix~B (Figures~\ref{fig:heatmap_m1}--\ref{fig:heatmap_m2}).
     (Model~3), June~2026, with Monte Carlo median from 5,000 parameter draws.
     Cities are ordered left to right by decreasing aggregate importation
     intensity; diseases are ordered top to bottom by decreasing overall
-    probability. Dengue importation is near-certain at every venue city;
-    measles risk is the lowest of the five diseases considered.}
+    probability. Dengue leads at most cities; malaria exceeds dengue at Atlanta
+    ($P(\geq 1) > 0.99$ vs.\ 0.97). Measles risk is the lowest of the five
+    diseases considered.}
   \label{fig:risk_heatmap}
 \end{figure}
 
@@ -233,7 +264,7 @@ upper bounds: at the lower end of the plausible detection range, expected
 importations could be as low as 7\% of the median. Malaria carries a moderate,
 roughly symmetric CI. Measles and influenza uncertainties are modest relative
 to their medians. The directional asymmetry of each CI is visualised in
-Appendix~Figure~\ref{fig:ci_asym}: diseases with upward-skewed CIs
+Figure~\ref{fig:ci_asym} in Appendix~B: diseases with upward-skewed CIs
 (dengue, influenza) may be underestimated; diseases with downward-skewed CIs
 (pertussis) are conservative upper bounds.
 
@@ -250,45 +281,17 @@ Appendix~Figure~\ref{fig:ci_asym}: diseases with upward-skewed CIs
   \label{fig:lambda_ci}
 \end{figure}
 
-\subsection*{World Cup travel surge: amplification without restructuring}
-
-Figure~\ref{fig:model_comparison} compares $\Lambda$ across the three nested
-model tiers for the six highest-risk US cities, with 95\% Monte Carlo
-uncertainty intervals. Each panel shows one disease; within each city,
-bars are grouped by model tier (Baseline, WC-adjusted, Schedule-driven),
-allowing direct visual comparison of how the travel surge and schedule
-routing sequentially amplify risk. The near-uniform step-up from
-Model~1 to Model~2 confirms proportional amplification across cities
-($\phi_\text{WC}=1.174$ vs.\ $\phi_\text{base}=1.077$; the fan increment is
-approximately 8.3\% of projected arrivals for WC-qualified nations). The
-further step from Model~2 to Model~3 introduces city-specific divergence:
-cities hosting matches against high-incidence nations gain disproportionate
-risk while cities with fewer such fixtures gain less. Kansas City, which has
-limited routine international service, acquires meaningful importation risk
-almost entirely through the WC-fan stream.
-
-City rankings and the relative ordering of diseases are stable across all three
-model tiers. Background tourism---travel that would occur regardless of the
-tournament---accounts for the dominant share of importation risk even for
-strongly WC-associated source countries such as Brazil and Colombia.
-Non-qualified countries contribute exclusively through background travel.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\textwidth]{../Figures/fig3_model_comparison.png}
-  \caption{Three-model comparison of expected importations ($\Lambda$) for
-    the six highest-risk US venue cities. Each panel shows one disease; bars
-    are grouped by city and filled by model tier: Baseline (Model~1, routine
-    June~2024 travel), WC-adjusted (Model~2, June~2026 projections), and
-    Schedule-driven (Model~3, fan routing by match schedule). Bars show
-    the MC median; whiskers span the 95\% uncertainty interval (5,000
-    Uniform draws on $\rho_d$ and $p_d$). The step-up from Model~1 to
-    Model~2 is near-uniform across cities, confirming that the World Cup
-    surge amplifies risk proportionally. The further step from Model~2 to
-    Model~3 produces city-specific divergence driven by schedule-based
-    redistribution toward match venues.}
-  \label{fig:model_comparison}
-\end{figure}
+The city and disease rankings visible in Figure~\ref{fig:lambda_ci} are robust
+across all three model tiers (Figure~\ref{fig:model_comparison} in
+Appendix~B). The step from the Baseline to the WC-adjusted model produces a
+near-uniform $\sim$17\% uplift in $\Lambda$ ($\phi_\text{WC}=1.174$; the WC
+fan increment accounts for approximately 8.3\% of projected arrivals for
+qualified nations); the further step to the schedule-driven model introduces
+modest city-specific divergence without altering rankings. Background
+tourism---travel that would occur regardless of the tournament---accounts for
+the dominant share of importation risk even for strongly WC-associated nations
+such as Brazil and Colombia; non-qualified countries contribute exclusively
+through this background stream.
 
 \subsection*{Source country drivers}
 
@@ -373,52 +376,72 @@ at any US airport city, independent of any scheduled event.
 \section*{Discussion}
 % ============================================================
 
-Integrating Monte Carlo uncertainty propagation directly into every main result---rather than relegating it to a separate appendix---is the central methodological choice of this analysis. The result is a more honest and actionable picture: dengue importation to the major US venue cities is near-certain across the full plausible parameter space, while pertussis estimates should be read as conservative upper bounds given the poorly constrained adult detection rate. The asymmetric CI structure is itself informative: diseases whose central detection rates sit at the lower end of the literature range (dengue, influenza) may be systematically underestimated, whereas diseases at the upper end (pertussis) are conservative by construction.
+The dominant empirical finding of this analysis---that background tourism
+accounts for the majority of importation risk even during a major
+international sporting event---carries a direct practical implication:
+public health preparedness should not focus exclusively on World Cup fans
+but should treat the entire June international visitor population as the
+primary exposure group.
 
-Applied to the 2026 World Cup, the framework reveals that importation
-risk is substantial, quantifiable, and spatially heterogeneous.
-The dominant empirical finding---that background tourism accounts
-for the majority of importation risk even at a major international
-sporting event---has an important practical implication: preparedness
-efforts should not focus exclusively on World Cup fans, but should
-treat the entire June international visitor population as the
-exposure group of interest.
+The uncertainty analysis reveals important asymmetries in the reliability of
+estimates across diseases. Dengue importation risk is robust across the full
+parameter space, remaining near-certain at the highest-risk cities regardless
+of detection-rate assumptions. Pertussis estimates, by contrast, should be
+interpreted as conservative upper bounds: the central detection rate
+($\rho = 0.10$) lies at the upper end of the literature range, so true
+importation intensity is more likely to fall below the median than above it.
+More broadly, diseases whose central detection rates fall near the lower bound
+of the literature range (dengue, influenza) may be systematically
+underestimated, a finding with direct implications for surveillance
+prioritization.
 
-The convergence of city rankings across all three models for the
-highest-risk venues (New York, Los Angeles, Miami, Houston) provides
-reassurance that these results are robust to the considerable
-uncertainty in WC-specific travel projections. A public health planner
-who uses only the conservative Model~1 will still correctly identify
-the same priority cities as a planner who uses the more complex
-Model~3.
+The stability of city rankings across all three model tiers---with New
+York, Los Angeles, Miami, and Houston consistently at highest aggregate
+risk---demonstrates that the principal findings are robust to uncertainty
+in WC-specific travel projections. A baseline analysis using only routine
+June~2024 arrivals (Model~1) identifies the same priority cities as the
+schedule-driven model (Model~3), supporting the practical utility of the
+framework even when event-specific inputs are unavailable.
 
-The inclusion of influenza is a distinguishing feature of this
-analysis. June corresponds to the Southern Hemisphere winter
-influenza peak, and WC-qualified nations in South America and Oceania
-carry substantial seasonal burden during the tournament window. To
-our knowledge this is the first importation risk analysis for the
-2026 World Cup to quantify influenza alongside vector-borne and
-vaccine-preventable diseases.
+Quantifying influenza alongside vector-borne and vaccine-preventable
+diseases reflects an important seasonal consideration: June coincides
+with the Southern Hemisphere winter influenza peak, and WC-qualified
+nations in South America and Oceania carry substantial seasonal burden
+during the tournament window.
 
-A central design goal of this analysis is accessibility: every data
-source used is freely available, and all code is shared openly. This
-distinguishes the approach from concurrent analyses that employ
-proprietary airline booking data and commercial mobility
-models~\cite{epistorm2026}. Rather than competing with those
-data-intensive approaches, this framework is intended as a
-reproducible baseline that any public health team can deploy,
-update, and adapt without institutional data-sharing agreements or
-commercial licenses. The WC2026 estimates are broadly consistent
-with those of more complex models for endemically stable diseases
-(dengue, malaria), validating the public-data approach for
-first-order risk assessment. For outbreak-sensitive diseases, the
-discrepancy between annual and rolling surveillance data---most
-evident for UK measles and Norwegian pertussis---is itself a
-methodological finding: it quantifies the premium on data currency
-for rapidly evolving pathogens and motivates real-time data linkage
-as the primary improvement pathway.
+This framework is designed for transparency and reproducibility: all data
+sources are publicly available and all code is openly shared, enabling
+any public health team to deploy, update, and adapt the analysis without
+proprietary data agreements. This positions the framework as
+complementary to concurrent analyses employing airline booking records
+and commercial mobility models~\cite{epistorm2026}, which are suited to
+different institutional contexts. The WC2026 estimates are broadly
+consistent with those of more resource-intensive models for endemically
+stable diseases (dengue, malaria), validating the public-data approach
+for first-order risk assessment. For outbreak-sensitive diseases,
+discrepancies arising from the use of annual rather than rolling
+surveillance data---most evident for UK measles and Norwegian
+pertussis---quantify the premium on data currency for rapidly evolving
+pathogens and motivate real-time data linkage as a priority
+methodological improvement.
 
-Despite its reliance on publicly available data, this framework can serve as a transparent, reproducible input to public health preparedness planning. The three-model structure maps onto a natural planning timeline: Model~1 can be run as soon as host cities are announced to establish a baseline risk ranking, Model~2 can be updated once attendance projections become available, and Model~3 can be finalised once the match schedule is confirmed. The country-level breakdowns and city-specific risk estimates can help inform decisions about which venue cities and source-country streams to prioritise for enhanced surveillance---though such decisions require additional local context (healthcare capacity, vector presence, vaccination coverage) that this model does not provide. In Model~1 mode, updated periodically with current COR arrivals and WHO surveillance data, the framework can also serve as a baseline monitoring approach for importation pressure at US international gateways between events, subject to the data-currency limitations noted below. The Monte Carlo uncertainty intervals support more transparent risk communication: rather than a single point estimate, the results convey a range that reflects genuine uncertainty in under-reporting rates and travel-while-infectious probabilities, allowing decision-makers to understand where estimates are robust and where they are not.
+The three-model structure maps onto a practical planning timeline:
+Model~1 can be executed as soon as host cities are announced;
+Model~2 updated once attendance projections become available; and
+Model~3 finalised once the match schedule is confirmed. City-specific
+estimates and country-level contributions can inform decisions on which
+venues and source-country streams to prioritise for enhanced
+surveillance, though operational decisions require additional local
+context---vector presence, population immunity, and healthcare
+capacity---not captured here. The Monte Carlo uncertainty intervals
+allow decision-makers to distinguish robust findings from estimates
+warranting caution, supporting more calibrated risk communication than
+a single point estimate permits. Beyond event-specific applications,
+the simplicity of the data requirements opens the possibility of a
+continuous monitoring mode: updated monthly with current COR arrivals
+and WHO surveillance figures, the framework can track importation
+pressure at US international gateways as a standing epidemiological
+tool, independent of any scheduled mass gathering.
 
 Several key limitations bound the scope of these estimates; full detail is given in Appendix~C. BTS T-100 data cover nonstop international segments only; passengers connecting through foreign hubs lose their country identity, and passengers connecting through US hubs are assigned to the gateway city rather than their final destination. Disease incidence is derived from annual WHO reporting cycles, which underestimate risk during active outbreaks (UK measles, European pertussis surges) and may reflect prior-year dynamics rather than the current transmission season. Growth factors $\phi_c$ are aggregate projections; actual June~2026 travel volumes will differ. The model estimates importation risk only---it does not model onward local transmission, which depends on vector presence, population immunity, and healthcare capacity not captured here. Finally, the Monte Carlo analysis propagates uncertainty in disease parameters ($\rho_d$, $p_d$) but treats travel volumes as fixed; uncertainty in the NTTO projections, T-100 routing fractions, and the WC growth factor decomposition would widen all intervals further.
 
@@ -1450,6 +1473,29 @@ the schedule-based concentration at specific match venues.
     scaled by NTTO growth factors (MC median, 5,000 draws).
     Same city and disease ordering as Figure~\ref{fig:risk_heatmap}.}
   \label{fig:heatmap_m2}
+\end{figure}
+
+\subsection*{Three-model comparison of importation intensity}
+
+Figure~\ref{fig:model_comparison} compares expected importation intensity
+($\Lambda$, median and 95\% MC uncertainty interval) across the three nested
+model tiers for the six highest-risk US cities. The near-uniform step-up from
+Model~1 to Model~2 reflects proportional amplification driven by the WC growth
+factor; the further step to Model~3 introduces modest city-specific divergence
+through schedule-based fan routing, without changing city or disease rankings.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/fig3_model_comparison.png}
+  \caption{Three-model comparison of expected importations ($\Lambda$) for
+    the six highest-risk US venue cities. Each panel shows one disease; bars
+    are grouped by city and filled by model tier: Baseline (Model~1),
+    WC-adjusted (Model~2), and Schedule-driven (Model~3). Bars show the MC
+    median; whiskers span the 95\% uncertainty interval (5,000 Uniform draws
+    on $\rho_d$ and $p_d$). The WC surge amplifies risk proportionally;
+    schedule-based routing introduces modest city-specific divergence but
+    leaves rankings unchanged.}
+  \label{fig:model_comparison}
 \end{figure}
 
 \subsection*{Dengue stream decomposition by source country}
