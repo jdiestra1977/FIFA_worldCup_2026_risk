@@ -64,7 +64,13 @@ match assignments. WHO incidence and BTS T-100 routing fractions were
 combined with Monte Carlo uncertainty propagation (5,000 Uniform
 draws on under-reporting and travel-while-infectious parameters)
 to yield median importation estimates with 95\% uncertainty
-intervals.
+intervals. We further extended the framework by incorporating
+US diaspora population data (American Community Survey 2019--2023,
+Table B05006) to quantify community-weighted importation risk,
+capturing two mechanisms: local mixing between arriving infectious
+travelers and co-national diaspora communities at the venue city, and
+secondary seeding in diaspora hub cities after residents attend games
+and return home.
 
 \medskip
 \noindent\textbf{Results.}
@@ -85,9 +91,13 @@ for WC-qualified nations.
 \noindent\textbf{Conclusions.}
 This Poisson importation framework, built entirely from publicly
 available data, provides reproducible importation risk estimates for
-mass gathering events. The framework extends to additional
-diseases, cities, and gatherings, offering
-a transparent baseline complementary to proprietary modeling systems.
+mass gathering events. The diaspora extension reveals that the
+social environment an imported case enters---not just the arrival
+volume---shapes local transmission potential, and identifies cities
+at secondary risk through diaspora return travel that would be
+invisible to conventional importation models. The framework extends
+to additional diseases, cities, and gatherings, offering a transparent
+baseline complementary to proprietary modeling systems.
 \end{abstract}
 
 % ============================================================
@@ -193,19 +203,166 @@ malaria from the World Malaria Report~\cite{whoWMR2024}, measles
 and pertussis from the WHO Immunization Data
 portal~\cite{WHO_immunization}, and influenza from the WHO FluNet /
 GISRS global sentinel surveillance system (ISO weeks 22--26,
-2023--2025). Under-reporting factors and travel-while-infectious
-probabilities were taken from the
-literature~\cite{bhatt2013,undurraga2013,whoWMR2024,simons2012,mclaughlin2016}.
-Key parameter values are: dengue ($\rho=0.10$, $p_d=0.50$), malaria
-($\rho=0.20$, $p_d=0.30$), measles ($\rho=0.60$, $p_d=0.05$),
-pertussis ($\rho=0.10$, $p_d=0.70$), and influenza ($\rho=0.10$,
-$p_d=0.50$). Full details are given in Appendix~A.
+2023--2025). Under-reporting factors ($\rho_d$) and travel-while-infectious
+probabilities ($p_d$) were drawn from literature-derived ranges
+rather than fixed at point
+estimates~\cite{bhatt2013,undurraga2013,whoWMR2024,simons2012,mclaughlin2016}.
+Parameter uncertainty was propagated via Monte Carlo simulation
+(5,000 independent Uniform draws per parameter); reported estimates
+are medians with 95\% uncertainty intervals. Literature ranges used
+are: dengue ($\rho$: 0.06--0.26; $p_d$: 0.30--0.70), malaria
+($\rho$: 0.10--0.35; $p_d$: 0.10--0.50), measles ($\rho$: 0.40--0.80;
+$p_d$: 0.02--0.10), pertussis ($\rho$: 0.01--0.10; $p_d$: 0.50--0.90),
+and influenza ($\rho$: 0.033--0.20; $p_d$: 0.30--0.70). Full details
+are given in Appendix~A.
+
+\subsection*{Diaspora-adjusted importation risk}
+
+The importation model (Equation~\ref{eq:lambda}) captures who arrives at each
+venue city but not the social environment those arrivals enter. An infectious
+traveler from Brazil landing in Boston faces a very different transmission
+context than the same traveler landing in Kansas City: Boston's foreign-born
+population is 7.9\% Brazilian, while Kansas City's diaspora from any single
+source country is far smaller. To capture this dimension, we extended the
+framework using US diaspora population data from the Census Bureau American
+Community Survey (ACS) 5-year estimates (2019--2023), Table B05006 (Place of
+Birth for the Foreign-Born Population), extracted for the Core-Based
+Statistical Area (CBSA) corresponding to each of the 11 WC host metro areas
+via the \texttt{tidycensus} R package~\cite{tidycensus}.
+
+\subsubsection*{Notation}
+
+\begin{itemize}
+  \item $D_{c,v}$ --- number of US residents born in country $c$ living in
+    metro area $v$ (ACS estimate).
+  \item $\mathit{FB}_{v}$ --- total foreign-born population of metro area $v$
+    (ACS Table B05006, row total).
+  \item $\kappa_{c,v} = D_{c,v} / \mathit{FB}_{v}$ ---
+    \textbf{diaspora concentration}: the share of metro $v$'s
+    foreign-born community that was born in country $c$. Ranges from 0 to 1.
+    For example, Brazilians represent 7.9\% of Boston's foreign-born
+    population ($\kappa_{\text{Brazil, Boston}} = 0.079$); Haitians represent
+    8.8\% of Miami's ($\kappa_{\text{Haiti, Miami}} = 0.088$); Ecuadorians
+    represent 4.8\% of New York's ($\kappa_{\text{Ecuador, New York}} = 0.048$).
+    These three values are taken directly from the Census Bureau story
+    accompanying Table B05006~\cite{Census2026WC}; all remaining values are
+    derived from the full ACS download.
+\end{itemize}
+
+\subsubsection*{Mechanism A: local social mixing at the venue city}
+
+International visitors from country $c$ are more likely to interact with
+co-national residents than with the general population, through shared language,
+cultural spaces, restaurants, and social gatherings centered on the matches.
+We quantify how much of each city's importation intensity flows into a
+pre-existing co-national network using the \textbf{community-weighted
+importation risk}:
+
+\begin{equation}
+  \Omega^A_{c,v,d} = \lambda_{c,v,d} \times \kappa_{c,v}
+    = \lambda_{c,v,d} \times \frac{D_{c,v}}{\mathit{FB}_{v}}
+  \label{eq:omegaA}
+\end{equation}
+
+\paragraph{What each term means.}
+\begin{itemize}
+  \item $\lambda_{c,v,d}$ is the expected number of infectious travelers
+    from country $c$ arriving at city $v$ for disease $d$, computed from the
+    schedule-driven model (Equation~\ref{eq:lambda_schedule}, Appendix~A).
+  \item $\kappa_{c,v} = D_{c,v}/\mathit{FB}_{v}$ is the probability that a
+    randomly chosen immigrant in city $v$ was born in country $c$. It
+    represents the density of the co-national social network into which
+    an arriving infectious traveler is likely to embed.
+  \item $\Omega^A_{c,v,d}$ therefore has the same units as $\lambda$ (expected
+    importations) but is discounted by how sparse or dense the co-national
+    community is. Two cities with identical $\lambda$ receive very different
+    $\Omega^A$ values if their diaspora compositions differ. A city where
+    $\kappa_{c,v} = 0.08$ (8\% of immigrants are from $c$) generates
+    $\Omega^A = 0.08\,\lambda$; one where $\kappa_{c,v} = 0.01$ generates
+    $\Omega^A = 0.01\,\lambda$.
+\end{itemize}
+
+The city-level aggregate across all source countries for each disease is:
+\begin{equation}
+  \Omega^A_{v,d} = \sum_c \Omega^A_{c,v,d}
+    = \sum_c \lambda_{c,v,d} \cdot \kappa_{c,v}
+\end{equation}
+
+Because $\Omega^A_{v,d}$ is a Poisson rate for a sub-population, the
+same logic as Equation~\ref{eq:poisson} gives the probability that at
+least one imported case enters a co-national diaspora network in city $v$:
+\begin{equation}
+  P^A(\geq 1)_{v,d} = 1 - e^{-\Omega^A_{v,d}}
+  \label{eq:probA}
+\end{equation}
+This quantity is directly comparable to $P(\geq 1)$ from the core model
+(Figure~\ref{fig:risk_heatmap}): the difference between the two probabilities
+for the same city--disease cell measures how much of the overall importation
+risk is specifically channelled into co-national social networks.
+
+\subsubsection*{Mechanism B: diaspora convergence and return seeding}
+
+A second, less visible mechanism operates in the opposite direction.
+US-resident diaspora members---who already live in the United States---may
+travel domestically to a venue city to watch their home country's matches, be
+exposed to infectious co-nationals at the venue, and then return to their home
+city. This generates secondary importation risk in diaspora hub cities that
+receive no direct international travelers from the source country and would
+therefore be invisible to the standard importation model.
+
+Formally, let $v_{\text{match}}$ denote the venue city where country $c$
+plays, and $v_{\text{home}}$ the hub city where the diaspora lives.
+The \textbf{secondary seeding potential} for hub city $v_{\text{home}}$ is:
+
+\begin{equation}
+  \Omega^B_{c,\,v_{\text{match}},\,v_{\text{home}},\,d}
+    = \lambda_{c,\,v_{\text{match}},\,d} \times \kappa_{c,\,v_{\text{home}}}
+    = \lambda_{c,\,v_{\text{match}},\,d}
+      \times \frac{D_{c,\,v_{\text{home}}}}{\mathit{FB}_{v_{\text{home}}}}
+  \label{eq:omegaB}
+\end{equation}
+
+\paragraph{What each term means.}
+\begin{itemize}
+  \item $\lambda_{c,\,v_{\text{match}},\,d}$ is the importation intensity at
+    the match venue: how many infectious travelers from country $c$ land there.
+    This is the exposure source that diaspora attendees encounter.
+  \item $\kappa_{c,\,v_{\text{home}}} = D_{c,\,v_{\text{home}}}/
+    \mathit{FB}_{v_{\text{home}}}$ is the concentration of the source-country
+    diaspora in the hub city they return to. A large value means many
+    co-nationals are concentrated in that hub, amplifying the potential for
+    onward transmission after return.
+  \item $\Omega^B$ quantifies what fraction of the venue's importation
+    intensity is ``carried home'' by diaspora attendees to their residential
+    city. Critically, $v_{\text{home}} \neq v_{\text{match}}$: the risk
+    materialises in the hub city, not the venue.
+\end{itemize}
+
+The hub-city aggregate across all source countries and match venues for each
+disease is:
+\begin{equation}
+  \Omega^B_{v_{\text{home}},\,d}
+    = \sum_c \sum_{v_{\text{match}} \neq v_{\text{home}}}
+      \Omega^B_{c,\,v_{\text{match}},\,v_{\text{home}},\,d}
+\end{equation}
+
+\paragraph{Key distinction between mechanisms.}
+Mechanism~A asks: \emph{does the arriving infectious traveler land in a city
+with a large co-national community?} Mechanism~B asks: \emph{does a large
+co-national community elsewhere in the US converge on the match venue and
+carry exposure home?} Both mechanisms operate simultaneously; together they
+reveal the full web of community-level transmission potential that importation
+counts alone do not capture.
 
 \subsection*{Monte Carlo uncertainty propagation}
 
 Both $\rho_d$ (under-reporting factor) and $p_d$ (travel-while-infectious probability) are uncertain across one or more orders of magnitude in the literature (Table~\ref{tab:params} in Appendix~A). To propagate this uncertainty through the importation estimates, we drew 5,000 independent samples of each parameter from independent Uniform distributions calibrated to the literature ranges: $\rho_d \sim \text{Uniform}(\rho_\text{min}, \rho_\text{max})$ and $p_d \sim \text{Uniform}(p_\text{min}, p_\text{max})$. Uniform distributions were chosen for transparency; they make no assumption about the shape of uncertainty within the documented range.
 
-Because $\Lambda_{v,d} = p_d \cdot \rho_d \cdot \sum_c (C_{c,d}/P_c) \cdot N_{c,v}$ is linear in the product $(p_d \cdot \rho_d)$, each Monte Carlo draw rescales the central estimate by a factor $(p_d^{(i)} \cdot \rho_d^{(i)}) / (p_c \cdot \rho_c)$. We report the median and 95\% interval (2.5th--97.5th percentile) across the 5,000 draws. Figures show bars at the median with whiskers spanning the 95\% interval; the probability of at least one importation $P(\geq 1)$ is derived from the sampled $\Lambda$ distributions. Literature ranges used are: dengue ($\rho$: 0.06--0.26; $p$: 0.30--0.70), malaria ($\rho$: 0.10--0.35; $p$: 0.10--0.50), measles ($\rho$: 0.40--0.80; $p$: 0.02--0.10), pertussis ($\rho$: 0.01--0.10; $p$: 0.50--0.90), and influenza ($\rho$: 0.033--0.20; $p$: 0.30--0.70).
+Because $\Lambda_{v,d}$ is linear in the product $(\rho_d \cdot p_d)$, each draw $i$ produces a city-level rate
+\[
+  \Lambda_{v,d}^{(i)} = \sum_c N_{c,v} \cdot \frac{\rho_d^{(i)} \cdot C_{c,d}}{P_c} \cdot p_d^{(i)}.
+\]
+We report the median and 95\% interval (2.5th--97.5th percentile) across the 5,000 draws as the primary summary. Figures show bars at the median with whiskers spanning the 95\% interval; the probability of at least one importation $P(\geq 1)$ is derived from the sampled $\Lambda$ distributions. Literature ranges used are: dengue ($\rho$: 0.06--0.26; $p_d$: 0.30--0.70), malaria ($\rho$: 0.10--0.35; $p_d$: 0.10--0.50), measles ($\rho$: 0.40--0.80; $p_d$: 0.02--0.10), pertussis ($\rho$: 0.01--0.10; $p_d$: 0.50--0.90), and influenza ($\rho$: 0.033--0.20; $p_d$: 0.30--0.70).
 
 % ============================================================
 \section*{Results}
@@ -224,8 +381,8 @@ Influenza ranks second at most cities, its risk amplified by coincidence with
 the Southern Hemisphere winter peak. Pertussis shows broad but moderate
 probability; outside Atlanta and New York, malaria risk is low and
 geographically concentrated. Measles consistently shows the lowest probability,
-driven by its severe prodrome suppressing
-travel during the infectious window ($p_d = 0.05$). These five diseases
+driven by its narrow travel-while-infectious window
+(literature $p_d$ range: 0.02--0.10). These five diseases
 occupy distinct niches---by magnitude, geography, and uncertainty structure---as
 the following subsections detail. The equivalent heatmaps for the Baseline
 (Model~1) and WC-adjusted (Model~2) tiers are shown in
@@ -253,18 +410,20 @@ For dengue, New York leads (median $\Lambda = 12.4$, 95\%~CI 6.1--30.8),
 followed by Los Angeles ($\Lambda = 11.8$, CI 5.8--29.2) and Miami
 ($\Lambda = 10.9$, CI 5.3--27.1), driven in all cases by Brazil's combination
 of high endemic burden and high June travel volume. The dengue CI extends
-substantially above the median because the central detection rate $\rho = 0.10$
-lies near the lower end of the literature range (0.06--0.26): true importation
-intensity may be considerably higher than the central estimate.
+substantially above the median because the $\rho$ range (0.06--0.26) is wide
+and skewed upward in effect: draws from the upper end of the range produce
+estimates more than 4$\times$ those from the lower end, pulling the upper CI
+far above the median.
 
-Pertussis shows the opposite asymmetry. Its central $\rho = 0.10$ is the
-\emph{upper} bound of its literature range (0.01--0.10), so the 95\%~CI
-extends far below the median. Pertussis estimates are best read as conservative
-upper bounds: at the lower end of the plausible detection range, expected
-importations could be as low as 7\% of the median. Malaria carries a moderate,
-roughly symmetric CI. Measles and influenza uncertainties are modest relative
-to their medians. The directional asymmetry of each CI is visualised in
-Figure~\ref{fig:ci_asym} in Appendix~B: diseases with upward-skewed CIs
+Pertussis shows the opposite asymmetry: $\rho = 0.10$ is the
+\emph{upper bound} of its literature range (0.01--0.10), so the full space
+of plausible draws falls at or below this value. The 95\%~CI therefore
+extends far below the median, and pertussis estimates are best read as
+conservative upper bounds: at the lower end of the plausible detection range,
+expected importations could be as low as 7\% of the median. Malaria carries a
+moderate, roughly symmetric CI. Measles and influenza uncertainties are modest
+relative to their medians. The directional asymmetry of each CI is visualised
+in Figure~\ref{fig:ci_asym} in Appendix~B: diseases with upward-skewed CIs
 (dengue, influenza) may be underestimated; diseases with downward-skewed CIs
 (pertussis) are conservative upper bounds.
 
@@ -319,6 +478,80 @@ pertussis simultaneously.
     and influenza risk; Africa drives malaria; Europe is the primary source
     for pertussis and measles.}
   \label{fig:country_drivers}
+\end{figure}
+
+\subsection*{Community-weighted importation risk and diaspora networks}
+
+Figure~\ref{fig:diaspora_mixing} shows $P^A(\geq 1)_{v,d}$
+(Equation~\ref{eq:probA}) --- the probability that at least one imported case
+enters a co-national diaspora network --- for all five diseases and 11~US venue
+cities under Mechanism~A. Because it uses the same Poisson logic as
+Figure~\ref{fig:risk_heatmap}, the two figures are directly comparable: where
+Figure~\ref{fig:risk_heatmap} shows $P(\geq 1) = 1$ for dengue at Miami, a
+value of $P^A(\geq 1) = 0.45$ in Figure~\ref{fig:diaspora_mixing} means
+importation is near-certain but only 45\% likely to land specifically inside
+a co-national social network; the remainder circulates in the general
+population. The gap between the two probabilities quantifies how much of the
+total importation risk is community-channelled versus diffuse.
+
+The heatmap reveals a different geographic risk pattern than Figure~\ref{fig:risk_heatmap}.
+Miami rises prominently across multiple diseases: its large Caribbean, South
+American, and Central American diaspora communities --- Haitian-born residents
+constituting 8.8\% of its foreign-born population --- raise the probability
+that arriving cases enter co-national networks. Boston, despite lower raw
+$\lambda$ for most diseases, ranks higher in diaspora-channelled dengue risk
+due to its concentrated Brazilian community (7.9\% of foreign-born). New York
+retains high $P^A(\geq 1)$ across all diseases, sustained by its exceptionally
+large and diverse diaspora, including Ecuadorians (4.8\% of foreign-born),
+Colombians, and Mexicans.
+
+Figure~\ref{fig:diaspora_countries} shows the top contributing source countries
+to community-weighted importation risk ($\Omega^A$, summed across all venue
+cities) per disease. The country rankings shift meaningfully relative to
+Figure~\ref{fig:country_drivers}: countries with moderate $\lambda$ but high
+diaspora concentration in WC cities --- notably Haiti (malaria, dengue),
+Ecuador (dengue), and Mexico (all diseases) --- rise in rank, while countries
+with high $\lambda$ but sparse US diaspora fall. Brazil remains the dominant
+contributor to dengue $\Omega^A$ given both its high arrival volumes and
+meaningful Brazilian communities in Miami, Boston, and New York simultaneously.
+
+Secondary seeding risk under Mechanism~B is shown in Appendix~B
+(Figure~\ref{fig:diaspora_seeding}). Cities at highest secondary risk include
+Los Angeles (Korean diaspora attending Seoul matches in other venues), Houston
+(large Venezuelan and Colombian diaspora), and Miami (Haitian and Colombian
+communities). These cities would not appear in a standard importation analysis
+focused only on international arrivals.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/figA_diaspora_local_mixing.png}
+  \caption{Probability of at least one importation into local diaspora
+    networks (Mechanism~A), FIFA World Cup 2026. Each cell shows
+    $P^A(\geq 1)_{v,d} = 1 - e^{-\Omega^A_{v,d}}$, where
+    $\Omega^A_{v,d} = \sum_c \lambda_{c,v,d} \times (D_{c,v}/\mathit{FB}_v)$
+    is the expected number of imported cases entering co-national social
+    networks. Directly comparable to Figure~\ref{fig:risk_heatmap}: a cell
+    where Figure~\ref{fig:risk_heatmap} shows $P(\geq 1) = 1$ and this
+    figure shows $P^A(\geq 1) = 0.45$ means importation is near-certain
+    but only 45\% likely to land specifically inside a co-national community;
+    the remaining cases circulate in the general population. White text
+    indicates low probability (dark tiles); dark text indicates high
+    probability (bright tiles). Cities ordered as in
+    Figure~\ref{fig:risk_heatmap}.}
+  \label{fig:diaspora_mixing}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/figC_country_drivers_omegaA.png}
+  \caption{Top~10 source countries by community-weighted importation risk
+    ($\Omega^A$, summed across all US venue cities) for each disease.
+    Compare with Figure~\ref{fig:country_drivers}: countries whose rank rises
+    here relative to raw $\lambda$ rankings have high diaspora concentration
+    in WC cities relative to their arrival volume; countries whose rank falls
+    send many travelers into cities with sparse co-national communities.
+    Colors indicate world region (same palette as Figure~\ref{fig:country_drivers}).}
+  \label{fig:diaspora_countries}
 \end{figure}
 
 % ============================================================
@@ -387,13 +620,14 @@ The uncertainty analysis reveals important asymmetries in the reliability of
 estimates across diseases. Dengue importation risk is robust across the full
 parameter space, remaining near-certain at the highest-risk cities regardless
 of detection-rate assumptions. Pertussis estimates, by contrast, should be
-interpreted as conservative upper bounds: the central detection rate
-($\rho = 0.10$) lies at the upper end of the literature range, so true
-importation intensity is more likely to fall below the median than above it.
-More broadly, diseases whose central detection rates fall near the lower bound
-of the literature range (dengue, influenza) may be systematically
-underestimated, a finding with direct implications for surveillance
-prioritization.
+interpreted as conservative upper bounds: $\rho = 0.10$ is the upper bound
+of the pertussis literature range (0.01--0.10), so the full plausible space
+of MC draws falls at or below this value and the CI extends predominantly
+downward from the median. More broadly, diseases whose $\rho$ ranges are
+concentrated near their lower bounds (dengue, influenza) yield CIs that
+extend further upward than downward, indicating that the median may
+systematically underestimate true importation intensity---a finding with
+direct implications for surveillance prioritization.
 
 The stability of city rankings across all three model tiers---with New
 York, Los Angeles, Miami, and Houston consistently at highest aggregate
@@ -443,6 +677,40 @@ and WHO surveillance figures, the framework can track importation
 pressure at US international gateways as a standing epidemiological
 tool, independent of any scheduled mass gathering.
 
+The diaspora extension introduces a structural insight that raw importation
+counts cannot provide: the social environment into which an imported case
+arrives shapes its onward transmission potential as much as the arrival itself.
+The shift in country rankings between Figure~\ref{fig:country_drivers} (raw
+$\lambda$) and Figure~\ref{fig:diaspora_countries} ($\Omega^A$) illustrates
+this directly. Haiti, for instance, contributes modestly to raw dengue
+importation intensity but rises substantially in diaspora-channelled risk at
+Miami, where 8.8\% of the foreign-born population is Haitian. The probability
+metric in Figure~\ref{fig:diaspora_mixing} makes this actionable: where
+$P(\geq 1) \approx 1$ in Figure~\ref{fig:risk_heatmap} but
+$P^A(\geq 1) \ll 1$ in Figure~\ref{fig:diaspora_mixing}, importation is
+near-certain but most arriving cases disperse into the general population
+rather than a concentrated co-national network. This distinction matters
+for surveillance design: a strategy that monitors only the highest-$\lambda$
+streams may miss the city--disease combinations with the highest
+$P^A(\geq 1)$, where community spread is most likely if an importation occurs.
+
+Mechanism~B identifies a category of cities at secondary risk that is entirely
+absent from standard importation models: diaspora hub cities where residents
+travel to WC venues and return home. These cities would not register in any
+analysis based on international arrivals data because the returning residents
+are domestic travelers. Public health teams in Los Angeles, Houston, and Miami
+--- which appear prominently in the Mechanism~B analysis --- should consider
+enhanced passive surveillance during and immediately after the tournament window
+regardless of whether their city hosts a match.
+
+The diaspora framework relies on ACS 5-year estimates (2019--2023), which
+reflect the composition of immigrant communities at the time of the survey.
+Rapid demographic change (e.g., the large Venezuelan diaspora growth in Houston
+post-2022) may not be fully captured. Additionally, $\kappa_{c,v}$ weights by
+foreign-born concentration, not by social contact rates; actual mixing depends
+on community organization, event attendance, and social network structure that
+are not observable from Census data alone.
+
 Several key limitations bound the scope of these estimates; full detail is given in Appendix~C. BTS T-100 data cover nonstop international segments only; passengers connecting through foreign hubs lose their country identity, and passengers connecting through US hubs are assigned to the gateway city rather than their final destination. Disease incidence is derived from annual WHO reporting cycles, which underestimate risk during active outbreaks (UK measles, European pertussis surges) and may reflect prior-year dynamics rather than the current transmission season. Growth factors $\phi_c$ are aggregate projections; actual June~2026 travel volumes will differ. The model estimates importation risk only---it does not model onward local transmission, which depends on vector presence, population immunity, and healthcare capacity not captured here. Finally, the Monte Carlo analysis propagates uncertainty in disease parameters ($\rho_d$, $p_d$) but treats travel volumes as fixed; uncertainty in the NTTO projections, T-100 routing fractions, and the WC growth factor decomposition would widen all intervals further.
 
 The highest-priority methodological improvement is timelier disease data: substituting WHO FluNet-style rolling surveillance averages for annual incidence tables---where such data exist---would close the data-currency gap most evident for measles and pertussis. Extensions to additional diseases (chikungunya, mumps) and to domestic-connection cities beyond T-100 gateways are described in the Extensions and Generalizability section above. Longer term, coupling importation estimates with local vector surveillance and population immunity data would enable a full importation-to-transmission risk pathway, the primary gap between what this framework currently provides and what would be needed for outbreak probability estimation.
@@ -464,6 +732,19 @@ peak during the June tournament window. Background international
 travel---not World Cup fan travel specifically---is the dominant
 risk driver for all diseases, a finding with direct implications for
 surveillance prioritization at any international event.
+
+The diaspora extension reveals that the social environment an imported
+case enters determines its community-level impact as much as the
+arrival count itself. Miami and Boston emerge as cities where
+diaspora network density amplifies risk beyond what raw importation
+volumes suggest. Cities that host large diaspora communities from
+WC-participating nations --- even those without a WC venue --- face
+secondary seeding risk from returning domestic travelers that
+conventional importation models cannot detect. These findings
+motivate a two-tier surveillance strategy: monitoring international
+arrivals at venue cities (addressed by the core model) and enhanced
+passive surveillance in diaspora hub cities during and after the
+tournament window (addressed by the diaspora extension).
 
 % ============================================================
 \bibliographystyle{unsrtnat}
@@ -823,7 +1104,7 @@ The WC-adjusted model addresses this limitation by projecting June
 2026 arrival volumes at the country level using NTTO forecasts and
 COR data scaled by WC growth factors. All other modelling choices
 (T-100 routing fractions, country-level disease incidence, same
-$\rho_d$ and $p_d$ values) are unchanged, so the Model~1 to Model~2
+literature ranges for $\rho_d$ and $p_d$) are unchanged, so the Model~1 to Model~2
 comparison isolates the effect of the WC travel surge alone.
 
 \subsubsection*{Construction of 2026 travel volume}
@@ -934,9 +1215,8 @@ incidence is defined as:
 
 where $C_{c,d}$ is the reported cases of disease $d$ in country $c$
 and $P_c$ is the national population (2020 estimates from the UN
-World Population Prospects~\cite{PopUN2020}). The same $\rho_d$ and
-$p_d$
-values are used in all three models to ensure that model comparisons
+World Population Prospects~\cite{PopUN2020}). The same literature ranges for $\rho_d$ and
+$p_d$ are used in all three models to ensure that model comparisons
 reflect travel volume differences alone.
 
 \subsubsection*{Importation intensity (WC-adjusted)}
@@ -1147,7 +1427,7 @@ city. The three models form a nested hierarchy:
 The step from Model~1 to Model~2 isolates the effect of the WC travel
 surge (growth factors $\phi_c$ applied to 2024 base volumes). All
 other modelling choices---routing fractions, disease incidence,
-$\rho_d$, $p_d$---are held fixed.
+and the literature ranges for $\rho_d$ and $p_d$---are identical across models.
 The step from Model~2 to Model~3 isolates the effect of schedule-based
 venue routing: WC fans are no longer spread by habitual tourist flows
 but directed to the specific cities where their team plays. The five
@@ -1285,61 +1565,61 @@ vaccine-preventable diseases.
 % ============================================================
 \subsection*{Model parameters}
 
-Table~\ref{tab:params} summarises the disease-specific parameters
-used in all three models. The adjustment factor $\rho_d$ captures the
-combined effect of under-reporting in routine surveillance and the
-fraction of reported cases that represent actively infectious
-individuals at a given time. Values were assigned based on published
-burden studies: dengue and pertussis are the most severely
-under-reported diseases, with global detection fractions well below
-20\% in most endemic settings~\cite{bhatt2013,undurraga2013,mclaughlin2016};
-malaria detection at $\rho_d = 0.20$ is consistent with WHO World
-Malaria Report methodology~\cite{whoWMR2024}; and measles at
-$\rho_d = 0.60$ reflects the higher reporting rates typical of
-middle- and high-income source countries with mandatory
-notification~\cite{simons2012}.
-The travel infectiousness probability $p_d$ reflects the likelihood
-that a person with the disease travels internationally while
-infectious, and was informed by the typical severity and duration of
+Table~\ref{tab:params} summarises the literature ranges for
+disease-specific parameters sampled in the Monte Carlo propagation.
+The adjustment factor $\rho_d$ captures the combined effect of
+under-reporting in routine surveillance and the fraction of reported
+cases that represent actively infectious individuals at a given time.
+Ranges were derived from published burden studies: dengue and
+pertussis are the most severely under-reported diseases, with global
+detection fractions well below 20\% in most endemic
+settings~\cite{bhatt2013,undurraga2013,mclaughlin2016}; the malaria
+$\rho_d$ range is consistent with WHO World Malaria Report
+methodology~\cite{whoWMR2024}; and the measles range reflects the
+higher reporting rates typical of middle- and high-income source
+countries with mandatory notification~\cite{simons2012}.
+The travel infectiousness probability $p_d$ ranges reflect the
+likelihood that a person with the disease travels internationally
+while infectious, informed by the typical severity and duration of
 symptoms relative to the incubation period and infectious window.
 
 \begin{table}[h!]
 \centering
-\caption{Disease-specific model parameters. The $\rho_d$ literature
-  range is derived from published burden and under-reporting studies;
-  the adopted value falls within or at the conservative end of that
-  range. All $p_d$ values are supported by travel medicine literature.
-  Key references are given for $\rho_d$; $p_d$ values are based on
-  biological plausibility and importation-model precedent.}
+\caption{Literature ranges for disease-specific parameters used in the
+  Monte Carlo uncertainty propagation. For each of 5,000 draws,
+  $\rho_d \sim \text{Uniform}(\rho_\text{min}, \rho_\text{max})$ and
+  $p_d \sim \text{Uniform}(p_\text{min}, p_\text{max})$; all reported
+  estimates are MC medians and 95\% intervals across draws.
+  $\rho_d$ ranges are from published burden and under-reporting studies;
+  $p_d$ ranges reflect travel medicine evidence and biological plausibility.}
 \label{tab:params}
 \small
-\begin{tabular}{lcccp{3.5cm}p{3.2cm}}
+\begin{tabular}{lccp{3.5cm}p{3.2cm}}
 \toprule
 \textbf{Disease}
   & \textbf{$\rho_d$ range}
-  & \textbf{$\rho_d$}
-  & \textbf{$p_d$}
+  & \textbf{$p_d$ range}
   & \textbf{Rationale for $p_d$}
   & \textbf{Key ref.\ ($\rho_d$)} \\
 \midrule
 Dengue
-  & 0.06--0.26 & 0.10 & 0.50
+  & 0.06--0.26 & 0.30--0.70
   & Mild viraemic phase; $\sim$40\% viremic on arrival
   & \cite{bhatt2013,undurraga2013} \\[3pt]
 Influenza
-  & 0.033--0.20 & 0.10 & 0.50
+  & 0.033--0.20 & 0.30--0.70
   & Moderate illness; many travel during early illness; SH winter peak in June
   & \cite{WHO_immunization} \\[3pt]
 Malaria
-  & 0.10--0.35 & 0.20 & 0.30
+  & 0.10--0.35 & 0.10--0.50
   & Severe illness; most febrile after return
   & \cite{whoWMR2024} \\[3pt]
 Measles
-  & 0.40--0.80 & 0.60 & 0.05
+  & 0.40--0.80 & 0.02--0.10
   & Prostrating; ambulatory only in short pre-rash window
   & \cite{simons2012} \\[3pt]
 Pertussis
-  & 0.01--0.10 & 0.10 & 0.70
+  & 0.01--0.10 & 0.50--0.90
   & Catarrhal stage mimics common cold; unrecognised
   & \cite{mclaughlin2016} \\
 \bottomrule
@@ -1417,14 +1697,15 @@ compare the upside ratio ($\Lambda_\text{hi} / \Lambda_\text{median}$)
 against the downside ratio ($\Lambda_\text{median} / \Lambda_\text{lo}$).
 Points that fall above the dashed diagonal have CIs that extend further
 above the median than below it---these diseases may be underestimated
-at the central parameter values. Points below the diagonal carry CIs
+at median parameter values. Points below the diagonal carry CIs
 that compress below the median, indicating conservative upper bounds.
 
 Dengue and influenza consistently fall above the diagonal because their
-central detection rates sit near the lower end of the literature range.
-Pertussis sits well below the diagonal: the central $\rho = 0.10$ is the
-\emph{upper} bound of its range, so the plausible space is almost
-entirely downward. Malaria and measles occupy intermediate, roughly
+$\rho$ ranges span wide upward uncertainty: draws from the upper portions
+of those ranges produce estimates well above the median. Pertussis sits
+well below the diagonal: $\rho = 0.10$ is the \emph{upper bound} of its
+range (0.01--0.10), so virtually all plausible draws fall below the
+median. Malaria and measles occupy intermediate, roughly
 symmetric positions.
 
 \begin{figure}[h!]
@@ -1634,6 +1915,32 @@ countries in addition to Latin American ones.
     (e.g., Canada, Mexico, United Kingdom) contributes a broad diffuse
     signal across all cities.}
   \label{fig:heatmap_influenza}
+\end{figure}
+
+% ============================================================
+% Diaspora hub seeding figure (Mechanism B)
+% ============================================================
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{../Figures/figB_diaspora_hub_seeding.png}
+  \caption{\textbf{Secondary seeding risk via Mechanism B: diaspora hub cities.}
+    Each bar represents the expected number of importations seeded into a
+    diaspora hub city ($v_\text{home}$) by returning diaspora members who
+    attended a World Cup match at a venue city ($v_\text{match}$) and returned
+    home. The quantity plotted is
+    $\Omega^B_{c,v_\text{match},v_\text{home},d} = \lambda_{c,v_\text{match},d}
+    \times \kappa_{c,v_\text{home}}$, where
+    $\lambda_{c,v_\text{match},d}$ is the expected importation rate at the
+    match venue under the schedule-driven model (M3), and
+    $\kappa_{c,v_\text{home}} = D_{c,v_\text{home}} / \mathrm{FB}_{v_\text{home}}$
+    is the diaspora concentration of country $c$ in the hub metro.
+    Bars are faceted by hub city and disease.
+    Hub cities without a WC venue but with large diaspora populations
+    (e.g., Chicago for Mexico, Atlanta for Brazil) show non-trivial
+    secondary risk from domestic return travel after out-of-town match
+    attendance.}
+  \label{fig:diaspora_seeding}
 \end{figure}
 
 % ============================================================

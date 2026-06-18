@@ -1,0 +1,298 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{parskip}
+\usepackage{setspace}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\onehalfspacing
+
+\title{\textbf{Diaspora-Adjusted Importation Risk:\\
+       Methods, Logic, and Interpretation}}
+\author{Technical note --- FIFA World Cup 2026 importation risk analysis}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+% ============================================================
+\section*{1. What the core model gives us — and what it misses}
+% ============================================================
+
+The core Poisson model produces, for each source country $c$, venue city $v$,
+and disease $d$:
+\[
+  \lambda_{c,v,d} = N_{c,v} \cdot \rho_d \cdot \frac{C_{c,d}}{P_c} \cdot p_d
+\]
+where $N_{c,v}$ is the projected number of travelers from $c$ to $v$,
+$\rho_d$ is the under-reporting correction, $C_{c,d}/P_c$ is reported
+per-capita incidence, and $p_d$ is the probability of traveling while
+infectious. Summing across source countries gives the city-level
+importation intensity $\Lambda_{v,d} = \sum_c \lambda_{c,v,d}$, and
+the probability of at least one importation follows from the Poisson CDF:
+\[
+  P(\geq 1)_{v,d} = 1 - e^{-\Lambda_{v,d}}
+\]
+
+This answers the question: \textit{how many cases will arrive, and how
+likely is at least one?}
+
+What it does \textbf{not} answer is: \textit{what social environment
+do arriving cases enter?} An infectious traveler from Brazil who lands in
+Boston enters a city where 7.9\% of all foreign-born residents are
+Brazilian --- a large, socially connected community of co-nationals who
+share language, neighborhoods, community events, and World Cup watch
+gatherings. The same traveler landing in Kansas City enters a city with
+almost no such community. The Poisson intensity $\lambda$ is identical
+in both cases if the travel volumes are the same; the downstream
+transmission potential is not.
+
+The diaspora extension quantifies this difference.
+
+% ============================================================
+\section*{2. Diaspora data and notation}
+% ============================================================
+
+We use the US Census Bureau American Community Survey (ACS) 5-year
+estimates (2019--2023), Table B05006 (\textit{Place of Birth for the
+Foreign-Born Population}), for the Core-Based Statistical Area (CBSA)
+corresponding to each of the 11 WC host metro areas.
+
+\begin{itemize}
+  \item $D_{c,v}$ --- number of US residents born in country $c$ currently
+    living in metro area $v$ (ACS estimate).
+  \item $\mathrm{FB}_{v}$ --- total foreign-born population of metro $v$
+    (the row total of Table B05006). This is the denominator: it represents
+    \emph{all} immigrants in that city, regardless of origin country.
+  \item $\kappa_{c,v} = \dfrac{D_{c,v}}{\mathrm{FB}_{v}}$ ---
+    \textbf{diaspora concentration}: the share of metro $v$'s
+    foreign-born population that was born in country $c$. This is a
+    number between 0 and 1.
+\end{itemize}
+
+\medskip
+\noindent\textbf{Concrete examples.}
+Brazilians constitute 7.9\% of Boston's foreign-born population
+($\kappa_{\text{Brazil, Boston}} = 0.079$). Haitians constitute 8.8\%
+of Miami's ($\kappa_{\text{Haiti, Miami}} = 0.088$). Ecuadorians
+constitute 4.8\% of New York's ($\kappa_{\text{Ecuador, NY}} = 0.048$).
+For most country--city pairs $\kappa$ is much smaller, often below 1\%.
+
+A critical point: $\kappa$ is normalized by the \emph{total foreign-born}
+population, not by the total metro population. This makes $\kappa$ a
+measure of how concentrated the source-country community is
+\emph{within the immigrant population} of that city --- the relevant
+social network for co-national mixing.
+
+% ============================================================
+\section*{3. Mechanism A: local social mixing at the venue city}
+% ============================================================
+
+\subsection*{3.1 Reasoning}
+
+When an infectious traveler from country $c$ arrives at venue city $v$,
+they do not mix at random with the entire population. They are more
+likely to interact with co-nationals --- through shared language, cultural
+spaces, restaurants, community events, and World Cup gatherings organized
+within the diaspora. We model this selective mixing by assuming that, upon
+arrival, each traveler's social contacts are drawn proportionally from the
+foreign-born population of the city.
+
+\subsection*{3.2 The mixing assumption}
+
+\textbf{Assumption:} each infectious traveler from country $c$ who arrives
+at city $v$ interacts with the foreign-born population of $v$. Under
+proportional mixing, the probability that a randomly chosen interaction
+partner was born in country $c$ (i.e., is a co-national) equals
+$\kappa_{c,v}$.
+
+This is a simplification --- actual mixing rates depend on neighborhood
+clustering, social network structure, and event attendance --- but it
+provides a transparent, data-grounded lower bound on co-national contact
+probability.
+
+\subsection*{3.3 Mathematics: Poisson thinning}
+
+Let $X_{c,v,d}$ be the number of infectious travelers from country $c$
+arriving at city $v$. From the core model:
+\[
+  X_{c,v,d} \sim \text{Poisson}(\lambda_{c,v,d})
+\]
+Each of these $X_{c,v,d}$ travelers independently enters the co-national
+diaspora network with probability $\kappa_{c,v}$ (the mixing assumption
+above). Let $Y_{c,v,d}$ be the number of those travelers who actually
+enter the co-national network. By the \textbf{Poisson thinning theorem}:
+\[
+  Y_{c,v,d} \sim \text{Poisson}(\lambda_{c,v,d} \cdot \kappa_{c,v})
+\]
+We define:
+\begin{equation}
+  \Omega^A_{c,v,d} = \lambda_{c,v,d} \cdot \kappa_{c,v}
+    = \lambda_{c,v,d} \cdot \frac{D_{c,v}}{\mathrm{FB}_{v}}
+  \label{eq:omegaA}
+\end{equation}
+
+$\Omega^A_{c,v,d}$ is the expected number of imported cases of disease
+$d$, from country $c$, that enter the co-national social network in
+city $v$. It is a valid Poisson rate for a \emph{sub-population} of
+the original $\lambda_{c,v,d}$ arrivals.
+
+The city-level aggregate across all source countries is:
+\[
+  \Omega^A_{v,d} = \sum_c \Omega^A_{c,v,d}
+    = \sum_c \lambda_{c,v,d} \cdot \kappa_{c,v}
+\]
+
+Because this is a sum of independent Poisson random variables,
+$\Omega^A_{v,d}$ is itself a Poisson rate, and the probability that at
+least one imported case enters \emph{any} co-national network in city $v$
+is:
+\begin{equation}
+  P^A(\geq 1)_{v,d} = 1 - e^{-\Omega^A_{v,d}}
+  \label{eq:probA}
+\end{equation}
+
+\subsection*{3.4 How to read and compare the two probabilities}
+
+Figure~1 shows $P(\geq 1)_{v,d}$ --- the probability that at least one
+case arrives at city $v$. Figure~4 shows $P^A(\geq 1)_{v,d}$ --- the
+probability that at least one of those cases enters a co-national network.
+Both are derived from the same Poisson logic. Their difference is
+interpretable:
+
+\medskip
+\noindent\fbox{\parbox{0.93\textwidth}{%
+\textbf{Example.} Dengue at Miami: $P(\geq 1) \approx 1$ (virtually
+certain that at least one dengue case arrives). Suppose $P^A(\geq 1) =
+0.60$. This means: \emph{it is virtually certain that cases arrive, but
+there is only a 60\% probability that at least one of those cases enters
+a co-national social network}. In 40\% of scenarios, cases arrive but
+disperse into the general population --- still a public health concern,
+but without the added amplification of concentrated co-national social
+ties.
+}}
+
+\medskip
+The gap between $P(\geq 1)$ and $P^A(\geq 1)$ is the fraction of risk
+that is \emph{diffuse} (general population) rather than
+\emph{concentrated} (co-national network). Cities where this gap is
+small have highly concentrated diaspora communities relative to total
+importation intensity; cities where the gap is large have high importation
+volumes but dispersed or thin co-national networks.
+
+\textbf{Why are $P^A$ values always lower than $P$?} Because
+$\Omega^A_{v,d} \leq \Lambda_{v,d}$ always: $\kappa_{c,v} \leq 1$
+for all $c$, $v$, so multiplying $\lambda_{c,v,d}$ by $\kappa_{c,v}$
+can only reduce it. The diaspora network is always a sub-population of
+the full arrival stream; it cannot have more cases than the whole.
+
+% ============================================================
+\section*{4. Mechanism B: diaspora return seeding}
+% ============================================================
+
+\subsection*{4.1 Reasoning}
+
+Mechanism A asks what happens when international travelers arrive at venue
+cities where co-nationals already live. Mechanism B runs in the opposite
+direction: US-resident diaspora members --- already living in the US ---
+travel \emph{domestically} to a WC venue city to watch their country's
+matches, are exposed to infectious travelers from their home country at
+the venue, and then return to their home city. The risk lands not at
+the venue, but in the diaspora hub city.
+
+This mechanism is entirely invisible to the core model, which only tracks
+international arrivals. A city that hosts no WC matches and receives few
+international visitors from a given country can still face secondary
+seeding through returning diaspora members.
+
+\subsection*{4.2 Notation}
+
+Let $v_{\text{match}}$ be the venue city where country $c$ plays, and
+$v_{\text{home}}$ be a hub city where a diaspora community from $c$ lives
+($v_{\text{home}} \neq v_{\text{match}}$).
+
+\subsection*{4.3 Mathematics}
+
+The exposure source at $v_{\text{match}}$ is $\lambda_{c,\,v_{\text{match}},\,d}$
+--- the expected number of infectious travelers from country $c$ arriving
+at the match venue. This is the same Poisson rate computed by the
+schedule-driven model (M3). Diaspora members from $v_{\text{home}}$ who
+attend the match are exposed to this infectious pool. Upon return to
+$v_{\text{home}}$, they may seed transmission among co-nationals there.
+The secondary seeding potential is:
+\begin{equation}
+  \Omega^B_{c,\,v_{\text{match}},\,v_{\text{home}},\,d}
+    = \lambda_{c,\,v_{\text{match}},\,d}
+      \cdot \kappa_{c,\,v_{\text{home}}}
+    = \lambda_{c,\,v_{\text{match}},\,d}
+      \cdot \frac{D_{c,\,v_{\text{home}}}}{\mathrm{FB}_{v_{\text{home}}}}
+  \label{eq:omegaB}
+\end{equation}
+
+\textbf{Important:} $\Omega^B$ has the same algebraic form as $\Omega^A$
+but a different interpretation. In $\Omega^A$, both $\lambda$ and
+$\kappa$ refer to the \emph{same city} ($v$); the question is how many
+of the arrivals at $v$ contact co-nationals in $v$. In $\Omega^B$,
+$\lambda$ refers to the \emph{match venue} ($v_{\text{match}}$) and
+$\kappa$ refers to the \emph{hub city} ($v_{\text{home}}$); these are
+different places. $\Omega^B$ is therefore better interpreted as a
+\emph{relative seeding index} --- it ranks hub cities by their exposure
+potential, proportional to both the infectious pressure at the venue
+and the density of the diaspora in the hub --- rather than a strict
+Poisson rate for secondary cases.
+
+The hub-city aggregate across all source countries and match venues is:
+\[
+  \Omega^B_{v_{\text{home}},\,d}
+    = \sum_c \sum_{v_{\text{match}} \neq v_{\text{home}}}
+      \Omega^B_{c,\,v_{\text{match}},\,v_{\text{home}},\,d}
+\]
+
+% ============================================================
+\section*{5. Summary: what each quantity means}
+% ============================================================
+
+\begin{center}
+\small
+\begin{tabular}{p{2.8cm} p{4.2cm} p{5.8cm}}
+\toprule
+\textbf{Quantity} & \textbf{Definition} & \textbf{Plain interpretation} \\
+\midrule
+$\lambda_{c,v,d}$ &
+  $N_{c,v} \cdot \rho_d \cdot (C_{c,d}/P_c) \cdot p_d$ &
+  Expected infectious travelers from $c$ arriving at $v$. \\[6pt]
+$P(\geq 1)_{v,d}$ &
+  $1 - e^{-\Lambda_{v,d}}$ &
+  Probability $\geq 1$ case arrives at city $v$. \\[6pt]
+$\kappa_{c,v}$ &
+  $D_{c,v} / \mathrm{FB}_{v}$ &
+  Share of city $v$'s immigrants born in $c$. \\[6pt]
+$\Omega^A_{c,v,d}$ &
+  $\lambda_{c,v,d} \cdot \kappa_{c,v}$ &
+  Expected cases \emph{entering co-national network} in $v$.
+  Valid Poisson rate (thinned from $\lambda$). \\[6pt]
+$P^A(\geq 1)_{v,d}$ &
+  $1 - e^{-\Omega^A_{v,d}}$ &
+  Probability $\geq 1$ case enters a co-national network in $v$.
+  \textbf{Directly comparable to $P(\geq 1)_{v,d}$.} \\[6pt]
+$\Omega^B_{c,v_m,v_h,d}$ &
+  $\lambda_{c,v_m,d} \cdot \kappa_{c,v_h}$ &
+  Relative seeding index for hub city $v_h$ from match at $v_m$.
+  Ranks cities; not a probability. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\bigskip
+\noindent\textbf{Key constraint.} $\Omega^A_{c,v,d} \leq \lambda_{c,v,d}$
+always, because $\kappa_{c,v} \leq 1$. The diaspora framework does not
+create additional cases --- it partitions the existing importation risk
+into the fraction that enters co-national networks ($\Omega^A$) versus
+the fraction that disperses into the general population
+($\lambda - \Omega^A$). The sum $\Omega^A + (\lambda - \Omega^A) = \lambda$
+is exact.
+
+\end{document}

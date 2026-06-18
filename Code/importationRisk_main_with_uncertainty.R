@@ -81,10 +81,12 @@ setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 # 2. REFERENCE DATA
 # ============================================================
 
-# --- 2a. Country populations (2020 census baseline) ---------
+# --- 2a. Country populations (2026 Worldometers estimates) ---
 # Used as the denominator when converting raw case counts to
 # per-capita incidence (Eq. 3 and Eq. 6 in manuscript).
-population_of_world <- read_csv("Data/population2020.csv") %>%
+# Source: Worldometers, population-by-country, accessed June 2026.
+# population_of_world <- read_csv("Data/population2020.csv") %>%  # 2020 UN WPP estimates (replaced)
+population_of_world <- read_csv("Data/population2024.csv") %>%
   rename(Country = COUNTRY, population_country = POPULATION) %>%
   # Harmonise the DRC name to match the disease and arrivals datasets.
   # The COR dataset uses the older "Zaire" convention; we propagate
@@ -726,7 +728,7 @@ mc_ranges <- tribble(
   "Malaria",   0.10,     0.35,     0.10,   0.50,
   "Measles",   0.40,     0.80,     0.02,   0.10,
   "Pertussis", 0.01,     0.10,     0.50,   0.90,
-  "Influenza", 0.033,    0.20,     0.30,   0.70
+  "Influenza", 0.01,     0.10,     0.30,   0.70
 )
 
 # ============================================================
@@ -803,17 +805,17 @@ under_rho_pertussis    <- 0.10
 p_travel_inf_pertussis <- 0.7
 
 # Influenza:
-# rho = 0.10: FluNet reports laboratory-confirmed specimens; large
-#             fraction of community influenza goes untested. ILI-based
-#             studies (WHO GISRS, Iuliano et al. 2018 Lancet) estimate
-#             true incidence ~10-30x confirmed counts; we use 0.10 as a
-#             conservative upper bound for the positive-specimen proxy.
+# rho = 0.055 (midpoint of [0.01, 0.10]): expansion-factor literature
+#             (McCarthy et al. 2020 Theor Biol Med Model 17:11;
+#              Hayward et al. 2014 Lancet Respir Med 2:445) supports
+#             detection fractions of 1–10% (expansion 10–100x) across
+#             countries with typical GISRS-level sentinel surveillance.
 # p   = 0.50: influenza illness is moderate; many travellers continue
 #             journeys during early illness (2-3 day incubation + 1-2 day
 #             prodrome). GeoSentinel and sentinel surveillance data support
 #             ~0.4-0.6 for seasonal influenza. June = Southern Hemisphere
 #             peak season (Brazil, Argentina, Australia) amplifying risk.
-under_rho_influenza    <- 0.10
+under_rho_influenza    <- 0.055
 p_travel_inf_influenza <- 0.50
 
 # ---- 6b. Country-level disease incidence tables ---------------
@@ -933,7 +935,7 @@ dengue_mc_base    <- compute_mc_summary(dengue_results$importation$imp_intensity
 malaria_mc_base   <- compute_mc_summary(malaria_results$importation$imp_intensity,   malaria_results$importation$destination_city,   under_rho_malaria,   p_travel_inf_malaria,   0.10,  0.35,  0.10, 0.50, n_mc)
 measles_mc_base   <- compute_mc_summary(measles_results$importation$imp_intensity,   measles_results$importation$destination_city,   under_rho_measles,   p_travel_inf_measles,   0.40,  0.80,  0.02, 0.10, n_mc)
 pertussis_mc_base <- compute_mc_summary(pertussis_results$importation$imp_intensity, pertussis_results$importation$destination_city, under_rho_pertussis, p_travel_inf_pertussis, 0.01,  0.10,  0.50, 0.90, n_mc)
-influenza_mc_base <- compute_mc_summary(influenza_results$importation$imp_intensity, influenza_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.033, 0.20,  0.30, 0.70, n_mc)
+influenza_mc_base <- compute_mc_summary(influenza_results$importation$imp_intensity, influenza_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.01,  0.10,  0.30, 0.70, n_mc)
 
 # ============================================================
 # ===== BEGIN: ORIGINAL I-92 BASELINE (MODEL 1) — PRESERVED FOR REFERENCE =====
@@ -1329,7 +1331,7 @@ dengue_mc_wc    <- compute_mc_summary(dengue_wc_results$importation$imp_intensit
 malaria_mc_wc   <- compute_mc_summary(malaria_wc_results$importation$imp_intensity,   malaria_wc_results$importation$destination_city,   under_rho_malaria,   p_travel_inf_malaria,   0.10,  0.35,  0.10, 0.50, n_mc)
 measles_mc_wc   <- compute_mc_summary(measles_wc_results$importation$imp_intensity,   measles_wc_results$importation$destination_city,   under_rho_measles,   p_travel_inf_measles,   0.40,  0.80,  0.02, 0.10, n_mc)
 pertussis_mc_wc <- compute_mc_summary(pertussis_wc_results$importation$imp_intensity, pertussis_wc_results$importation$destination_city, under_rho_pertussis, p_travel_inf_pertussis, 0.01,  0.10,  0.50, 0.90, n_mc)
-influenza_mc_wc <- compute_mc_summary(influenza_wc_results$importation$imp_intensity, influenza_wc_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.033, 0.20,  0.30, 0.70, n_mc)
+influenza_mc_wc <- compute_mc_summary(influenza_wc_results$importation$imp_intensity, influenza_wc_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.01,  0.10,  0.30, 0.70, n_mc)
 
 # WC-adjusted panels are appendix-only; Section 12 contains the
 # narrative figures that supersede the per-model bar chart panels.
@@ -1617,7 +1619,20 @@ dengue_mc_sched    <- compute_mc_summary(dengue_sched_results$importation$imp_in
 malaria_mc_sched   <- compute_mc_summary(malaria_sched_results$importation$imp_intensity,   malaria_sched_results$importation$destination_city,   under_rho_malaria,   p_travel_inf_malaria,   0.10,  0.35,  0.10, 0.50, n_mc)
 measles_mc_sched   <- compute_mc_summary(measles_sched_results$importation$imp_intensity,   measles_sched_results$importation$destination_city,   under_rho_measles,   p_travel_inf_measles,   0.40,  0.80,  0.02, 0.10, n_mc)
 pertussis_mc_sched <- compute_mc_summary(pertussis_sched_results$importation$imp_intensity, pertussis_sched_results$importation$destination_city, under_rho_pertussis, p_travel_inf_pertussis, 0.01,  0.10,  0.50, 0.90, n_mc)
-influenza_mc_sched <- compute_mc_summary(influenza_sched_results$importation$imp_intensity, influenza_sched_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.033, 0.20,  0.30, 0.70, n_mc)
+influenza_mc_sched <- compute_mc_summary(influenza_sched_results$importation$imp_intensity, influenza_sched_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.01,  0.10,  0.30, 0.70, n_mc)
+
+# ---- COMPARISON TABLE: 11-city totals (schedule-driven, MC) ----
+for (dis in c("dengue", "malaria", "measles")) {
+  obj <- get(paste0(dis, "_mc_sched"))
+  tot <- obj %>%
+    summarise(
+      med = sum(lambda_median),
+      lo  = sum(lambda_lo),
+      hi  = sum(lambda_hi)
+    )
+  cat(sprintf("%-10s  median = %5.1f   95%% CI: %5.1f – %5.1f\n",
+              dis, tot$med, tot$lo, tot$hi))
+}
 
 # Schedule-driven panels are appendix-only; Section 12 contains the
 # narrative figures. To regenerate individual disease panels, uncomment:
@@ -2485,3 +2500,72 @@ ggsave(fig4_country_drivers,
        file   = "Figures/fig4_country_drivers.png",
        height = 13, width = 15, dpi = 300)
 print(fig4_country_drivers)
+
+# ============================================================
+# 13. SAVE OUTPUTS FOR DOWNSTREAM SCRIPTS
+# ============================================================
+# Objects saved here are loaded by importationRisk_diaspora_extension.R
+# (and any future extension scripts) so they do not need to re-run
+# the full pipeline. Re-run this script to refresh the cache.
+
+save(
+  all_contributions,   # country × city × stream lambda (Model 3)
+  mc_all_sched,        # MC summaries for schedule-driven model
+  comparison_all,      # three-model comparison table
+  top_countries_ci,    # country rankings with 95% CI
+  city_order_main,     # canonical city order (by descending total lambda)
+  disease_colors,      # shared color palette
+  region_colors,       # shared region color palette
+  mc_ranges,           # MC parameter bounds per disease
+  assign_region,       # function: country → world region label
+  file = "Data/model_outputs.RData"
+)
+message("Model outputs saved to Data/model_outputs.RData")
+
+# ============================================================
+# 14. CDC COMPARISON TABLE — 11-CITY TOTALS BY MODEL (M1–M3)
+# ============================================================
+# Sums expected importations (MC median + 95% CI) across all 11
+# US WC venue cities for dengue, malaria, and measles under each
+# of the three nested model tiers. Used to contextualise model
+# outputs against CDC-reported travel-associated case counts.
+#
+# CDC reference values (national, June equivalent):
+#   Dengue  — ~201 detected (604 travel-assoc. Apr–Jun 2024 ÷ 3)
+#   Malaria — ~167 detected (~2,000 imported/year ÷ 12)
+#   Measles —  ~24 detected (285 total 2024 ÷ 12)
+
+total_lambda <- function(mc_obj) {
+  mc_obj %>%
+    summarise(
+      median = sum(lambda_median),
+      lo     = sum(lambda_lo),
+      hi     = sum(lambda_hi)
+    )
+}
+
+cdc_comparison <- bind_rows(
+  total_lambda(dengue_mc_base)   %>% mutate(disease = "Dengue",  model = "Baseline (M1)"),
+  total_lambda(dengue_mc_wc)     %>% mutate(disease = "Dengue",  model = "WC-adjusted (M2)"),
+  total_lambda(dengue_mc_sched)  %>% mutate(disease = "Dengue",  model = "Schedule-driven (M3)"),
+  total_lambda(malaria_mc_base)  %>% mutate(disease = "Malaria", model = "Baseline (M1)"),
+  total_lambda(malaria_mc_wc)    %>% mutate(disease = "Malaria", model = "WC-adjusted (M2)"),
+  total_lambda(malaria_mc_sched) %>% mutate(disease = "Malaria", model = "Schedule-driven (M3)"),
+  total_lambda(measles_mc_base)  %>% mutate(disease = "Measles", model = "Baseline (M1)"),
+  total_lambda(measles_mc_wc)    %>% mutate(disease = "Measles", model = "WC-adjusted (M2)"),
+  total_lambda(measles_mc_sched) %>% mutate(disease = "Measles", model = "Schedule-driven (M3)")
+)
+
+cat("\n=== 11-CITY TOTALS — EXPECTED IMPORTATIONS BY MODEL (MC median, 95% CI) ===\n")
+cat(sprintf("%-9s  %-24s  %7s  %17s\n",
+            "Disease", "Model", "Median", "95% CI"))
+cat(strrep("-", 65), "\n")
+for (i in seq_len(nrow(cdc_comparison))) {
+  r <- cdc_comparison[i, ]
+  cat(sprintf("%-9s  %-24s  %7.2f  (%6.2f – %7.2f)\n",
+              r$disease, r$model, r$median, r$lo, r$hi))
+  if (i %in% c(3, 6)) cat(strrep("-", 65), "\n")
+}
+
+cat("\nCDC reference (national, June equiv.):  Dengue ~201  |  Malaria ~167  |  Measles ~24\n")
+cat("Note: model = true importations at 11 WC cities; CDC = detected cases nationally.\n")
