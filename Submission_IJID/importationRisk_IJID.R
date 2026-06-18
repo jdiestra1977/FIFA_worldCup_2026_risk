@@ -61,21 +61,22 @@ source("Code/importationRisk_diaspora_extension.R")
 #
 # Main text figures
 # -----------------
-#   Fig 1 — Risk heatmap          (P≥1, schedule-driven M3)
-#   Fig 2 — Expected importations (Lambda ± 95% CI, M3)
-#   Fig 3 — Three-model comparison (M1 / M2 / M3, top 6 cities)
-#   Fig 4 — Source-country drivers (top 10 per disease, M3)
-#   Fig 5 — Diaspora heatmap      (P^A≥1, Mechanism A)
+#   Fig 1 — Risk heatmap             (P≥1, schedule-driven M3)
+#   Fig 2 — Expected importations    (Lambda ± 95% CI, M3)
+#   Fig 3 — Three-model comparison   (M1 / M2 / M3, top 6 cities)
+#   Fig 4 — WC excess stacked bar    (baseline vs. WC increment, all diseases)
+#   Fig 5 — Source-country drivers   (top 10 per disease, M3)
+#   Fig 6 — Diaspora two-panel       (Mechanism A heatmap + Mechanism B bar, dengue & malaria)
 #
 # Supplementary figures
 # ---------------------
-#   Fig S1 — Baseline heatmap     (P≥1, M1)
-#   Fig S2 — WC-adjusted heatmap  (P≥1, M2)
-#   Fig S3 — CI asymmetry plot    (upside vs. downside ratio)
-#   Fig S4 — Venue map            (16 WC stadiums)
-#   Fig S5 — Hub seeding bar chart (Omega_B, Mechanism B)
-#   Fig S6 — Country drivers Omega_A (top 10 per disease, M3 diaspora)
-#   Fig S7 — Diaspora design comparison (rank-shift / kappa / top pairs)
+#   Fig S1 — Baseline heatmap        (P≥1, M1)
+#   Fig S2 — WC-adjusted heatmap     (P≥1, M2)
+#   Fig S3 — CI asymmetry plot       (upside vs. downside ratio)
+#   Fig S4 — Venue map               (16 WC stadiums)
+#   Fig S5 — Hub seeding bar chart   (Omega^B, Mechanism B, all 5 diseases)
+#   Fig S6 — Country drivers Omega^A (top 10 per disease, M3 diaspora)
+#   Fig S7 — Full diaspora heatmap   (P^A≥1, all 5 diseases, Mechanism A)
 
 message("\nSaving IJID figure set...")
 

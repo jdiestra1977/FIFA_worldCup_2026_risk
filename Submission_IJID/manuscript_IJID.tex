@@ -49,9 +49,9 @@ E-mail: \href{mailto:jherreradiestra@tarleton.edu}{jherreradiestra@tarleton.edu}
 
 \vspace{0.5cm}
 
-\textbf{Word count (main text):} $\approx$ 3,200
+\textbf{Word count (main text):} $\approx$ 3,500
 
-\textbf{Figures:} 6 main + 8 supplementary
+\textbf{Figures:} 6 main + 7 supplementary
 
 \textbf{Tables:} 1
 \end{center}
@@ -62,47 +62,39 @@ E-mail: \href{mailto:jherreradiestra@tarleton.edu}{jherreradiestra@tarleton.edu}
 % ---- Abstract -----------------------------------------------
 \begin{abstract}
 \noindent\textbf{Objectives:}
-The 2026 FIFA World Cup (June--July 2026; analysis covers the June
-group-stage period) will host 48 nations across 11 US cities with an
-estimated 3.5 million international visitors. We
-quantified city-level importation risk for five infectious diseases
-under the World Cup travel surge, with explicit uncertainty propagation
-and a diaspora network extension.
+The June 2026 FIFA World Cup group stage will bring an estimated
+3.5 million international visitors to 11 US host cities from 48 nations.
+We quantified city-level importation risk for five infectious diseases
+with explicit uncertainty propagation and a diaspora network extension.
 
 \medskip
 \noindent\textbf{Methods:}
-We built three nested Poisson importation models of increasing
-resolution: a pre-tournament baseline (M1), a World Cup-adjusted model
-(M2), and a schedule-driven model (M3) that routes fans to cities
-according to the actual match schedule. Under-reporting correction
-factors ($\rho_d$) and mild-symptom travel probabilities ($p_d$)
-were drawn from literature-derived Uniform distributions (5,000 Monte
-Carlo iterations). We extended the framework with US Census Bureau
-American Community Survey diaspora data to estimate the probability
-that imported cases enter co-national social networks at each host city.
+Three nested Poisson importation models were constructed: a
+pre-tournament baseline (M1), a World Cup-adjusted model (M2), and a
+schedule-driven model (M3) routing fans by actual match venues.
+Under-reporting correction factors and travel-while-infected
+probabilities were sampled via 5,000 Monte Carlo draws. A diaspora
+extension used US Census Bureau data to estimate the probability of
+imported cases entering co-national social networks at each host city.
 
 \medskip
 \noindent\textbf{Results:}
 Dengue importation was near-certain ($P(\geq 1) > 0.99$) at Miami,
 New York, and Houston under M3 (median $\Lambda = 45.0$, 95\% CI
-16.0--92.3 across 11 cities). Malaria risk was highest at Atlanta
-($P(\geq 1) > 0.99$). Baseline travel accounted for 86--93\% of total expected importations
-across all diseases, confirming that the dominant importation risk
-exists independently of the tournament. The World Cup travel surge
-added 7--14\% above that pre-existing baseline; schedule-driven
-routing reduced US totals slightly relative to the WC-adjusted model,
-reflecting fans redirected to Canadian and Mexican venues.
-Miami, New York, and Houston had the highest probability ($>$0.70)
-of dengue entering a co-national diaspora social network.
+16.0--92.3). Malaria risk was highest at Atlanta ($P(\geq 1) > 0.99$).
+Baseline travel accounted for 86--93\% of expected importations
+across all diseases; the World Cup surge added only 7--14\% above
+this pre-existing risk. Miami, New York, and Houston showed the
+highest probability ($>$0.70) of dengue entering co-national diaspora
+networks.
 
 \medskip
 \noindent\textbf{Conclusions:}
-Dengue is the dominant importation risk, with near-certain importation
-at Miami, New York, and Houston. A two-tier
-surveillance strategy --- city-level monitoring combined with targeted
-outreach within high-risk diaspora communities --- is warranted. The
-schedule-driven Poisson framework is directly transferable to future
-mega-events.
+Dengue is the dominant importation risk, near-certain at Miami, New
+York, and Houston; malaria dominates at Atlanta. City-level
+surveillance combined with targeted diaspora community outreach is
+warranted. The schedule-driven Poisson framework is directly
+transferable to future mega-events.
 
 \medskip
 \noindent\textbf{Keywords:} importation risk; FIFA World Cup 2026;
@@ -364,7 +356,7 @@ and WC-adjusted (M2) models are shown in Supplementary Figures~S1
 and S2). Miami had the highest absolute
 importation intensity ($\Lambda = 15.8$, 95\% CI 5.6--32.3),
 followed by New York (10.5, 95\% CI 3.7--21.5) and Houston (5.6,
-95\% CI 2.0--11.4). Importation probabilities exceeded 0.95 at
+95\% CI 2.0--11.4). Dengue importation probabilities exceeded 0.95 at
 Dallas and Atlanta, while smaller venues --- Boston, Seattle, and
 Kansas City --- showed substantially lower probabilities. The
 11-city dengue total under M3 was 45.0 (95\% CI 16.0--92.3).
@@ -381,7 +373,7 @@ Poisson arrivals estimated here.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig1_risk_heatmap_IJID.png}
+  \includegraphics[width=\textwidth]{fig1_risk_heatmap_IJID.png}
   \caption{\textbf{Importation probability for five infectious diseases
     at 11 US FIFA World Cup 2026 host cities.}
     Cells show $P(\geq 1)$, the probability of at least one imported
@@ -409,7 +401,7 @@ upper literature limit).
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig2_lambda_ci_IJID.png}
+  \includegraphics[width=\textwidth]{fig2_lambda_ci_IJID.png}
   \caption{\textbf{Expected importation intensity with 95\% Monte Carlo
     uncertainty intervals, by disease and host city (schedule-driven
     model, M3).}
@@ -439,7 +431,7 @@ M2: 16.6, M3: 16.4) and other diseases.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig3_model_comparison_IJID.png}
+  \includegraphics[width=\textwidth]{fig3_model_comparison_IJID.png}
   \caption{\textbf{Three-model comparison of expected importation
     intensity for the six highest-risk US host cities.}
     Bars show Monte Carlo median $\Lambda$; error bars show 95\%
@@ -462,7 +454,7 @@ only to the tournament window will miss the majority of the risk.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig4_wc_excess_IJID.png}
+  \includegraphics[width=\textwidth]{fig4_wc_excess_IJID.png}
   \caption{\textbf{World Cup travel increment above baseline
     importation by disease.}
     Each panel shows the 11-city Monte Carlo median $\Lambda$ split
@@ -493,16 +485,23 @@ exposure not visible from travel volumes alone.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig5_country_drivers_IJID.png}
+  \includegraphics[width=\textwidth]{fig5_country_drivers_IJID.png}
   \caption{\textbf{Top 10 source-country contributors to expected
     importation intensity under the schedule-driven model (M3),
     by disease.}
     Bars show expected importations $\lambda_{c,\cdot,d}$ summed
     across all 11 US venue cities; error bars show 95\% Monte Carlo
-    uncertainty intervals. Colors denote world region. (A) Dengue:
-    Latin America dominates, led by Brazil and Colombia.
-    (D) Malaria: Sub-Saharan Africa dominates, led by Nigeria and
-    the Democratic Republic of Congo.}
+    uncertainty intervals. Colors denote world region.
+    (A)~Dengue: Latin America dominates, led by Brazil and Colombia.
+    (B)~Influenza: contributions broadly distributed across source
+    countries, consistent with global co-circulation during June.
+    (C)~Pertussis: Europe and Latin America lead, reflecting
+    waning vaccine-induced immunity in adult traveler populations.
+    (D)~Malaria: Sub-Saharan Africa dominates, led by Nigeria and
+    the Democratic Republic of Congo.
+    (E)~Measles: near-zero contributions across all source countries,
+    consistent with the very low global per-capita incidence used
+    in the model.}
   \label{fig:countries}
 \end{figure}
 
@@ -525,18 +524,18 @@ the highest $P^A(\geq 1)$, consistent with its large Nigerian and
 Ghanaian diaspora populations relative to the total foreign-born
 community.
 
-Panel B shows the Mechanism B secondary seeding index ($\Omega_B$)
+Panel B shows the Mechanism B secondary seeding index ($\Omega^B$)
 for hub cities outside the WC venue network. Cities not hosting
 matches but with large diaspora populations from high-dengue or
 high-malaria source nations face non-trivial secondary exposure
 through returning co-national fans. Results for all five diseases
 are provided in Supplementary Figure~S5. The full Mechanism A
 diaspora probability ($P^A(\geq 1)$) across all five diseases and
-11 host cities is provided in Supplementary Figure~S8.
+11 host cities is provided in Supplementary Figure~S7.
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/fig6_diaspora_combined_IJID.png}
+  \includegraphics[width=\textwidth]{fig6_diaspora_combined_IJID.png}
   \caption{\textbf{Diaspora network seeding risk for dengue and
     malaria.}
     \textbf{Panel A (Mechanism A):} $P^A(\geq 1)_{v,d} =
@@ -549,7 +548,7 @@ diaspora probability ($P^A(\geq 1)$) across all five diseases and
     (Figure~\ref{fig:heatmap}); the gap represents risk entering the
     general population.
     \textbf{Panel B (Mechanism B):} Secondary seeding index
-    $\Omega_B$ for the top hub cities per disease. Hub cities are
+    $\Omega^B$ for the top hub cities per disease. Hub cities are
     non-venue cities where diaspora members may attend games and
     return home, potentially seeding local transmission.}
   \label{fig:diaspora}
@@ -640,7 +639,7 @@ confirms that malaria and measles estimates are most sensitive to
 this parameter (fold-change up to 5.0$\times$ across the literature
 range), while pertussis is least sensitive (1.8$\times$); absolute
 importation counts at each $p_d$ level are provided in the
-supplementary code output.
+analysis code repository.
 
 % =============================================================
 \section{Conclusions}
@@ -679,7 +678,7 @@ below. BTS T-100 and COR/I-94 travel data are available from the
 Bureau of Transportation Statistics and US Customs and Border
 Protection respectively. Diaspora data were obtained from the
 US Census Bureau ACS 5-year estimates (Table B05006).
-Analysis code is available at [REPOSITORY URL].
+Analysis code is available at \url{https://github.com/jdiestra1977/FIFA\_worldCup\_2026\_risk}.
 
 % =============================================================
 % REFERENCES
@@ -936,7 +935,7 @@ Let $X_{c,v,d} \sim \text{Poisson}(\lambda_{c,v,d})$ be the number
 of infected arrivals from country $c$ at city $v$. Under the
 proportional-mixing assumption, each arrival independently enters
 the co-national network with probability $\kappa_{c,v}$. By the
-the Poisson thinning theorem, the thinned count is:
+Poisson thinning theorem, the thinned count is:
 \[
   Y_{c,v,d} \sim \text{Poisson}(\lambda_{c,v,d} \cdot \kappa_{c,v})
 \]
@@ -998,8 +997,8 @@ importation totals that scale exactly as $p_d/p_{\text{mid}}$. The
 table below reports these relative values ($\Lambda_{\text{rel}}$,
 normalised to 1.00 at $p_{\text{mid}}$) and the exact fold-change
 $p_{\max}/p_{\min}$ for all five modelled diseases. Absolute 11-city
-importation counts at each $p_d$ level are printed to the console by
-Section~5 of \texttt{importationRisk\_IJID.R}.
+importation counts at each $p_d$ level are available in the
+analysis code at \url{https://github.com/jdiestra1977/FIFA\_worldCup\_2026\_risk}.
 
 \medskip
 \begin{center}
@@ -1039,16 +1038,16 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/figS1_heatmap_baseline_IJID.png}
+  \includegraphics[width=\textwidth]{figS1_heatmap_baseline_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Importation probability under the Baseline model (M1),
     June 2024 (no World Cup adjustment).}
     Same layout as Figure~\ref{fig:heatmap}. M1 represents the
     pre-tournament counterfactual: typical June travel volumes
     without the World Cup surge. Dengue $P(\geq 1) > 0.99$ is
-    already present at most major cities under baseline conditions,
-    confirming that the World Cup amplifies but does not create
-    the dengue importation threat.}
+    already present at Miami, New York, and Houston under baseline
+    conditions, confirming that the World Cup amplifies but does
+    not create the dengue importation threat.}
   \label{fig:s1}
 \end{figure}
 
@@ -1058,7 +1057,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/figS2_heatmap_wc_IJID.png}
+  \includegraphics[width=\textwidth]{figS2_heatmap_wc_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Importation probability under the WC-adjusted model (M2),
     June 2026.}
@@ -1077,7 +1076,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.85\textwidth]{../Figures/figS3_ci_asymmetry_IJID.png}
+  \includegraphics[width=0.85\textwidth]{figS3_ci_asymmetry_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Direction of Monte Carlo uncertainty by disease.}
     Each point represents one disease--city combination.
@@ -1104,7 +1103,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/figS4_venue_map_IJID.png}
+  \includegraphics[width=\textwidth]{figS4_venue_map_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Geographic distribution of the 16 FIFA World Cup 2026
     stadiums across the United States, Canada, and Mexico.}
@@ -1123,7 +1122,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/figS5_diaspora_hubseeding_IJID.png}
+  \includegraphics[width=\textwidth]{figS5_diaspora_hubseeding_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Secondary seeding risk index ($\Omega^B$) for diaspora
     hub cities, by disease (Mechanism B).}
@@ -1145,7 +1144,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=\textwidth]{../Figures/figS6_country_drivers_omegaA_IJID.png}
+  \includegraphics[width=\textwidth]{figS6_country_drivers_omegaA_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Top 10 source-country contributors to diaspora-network
     importation intensity ($\Omega^A$) per disease.}
@@ -1165,31 +1164,7 @@ the smallest.
 \refstepcounter{suppfig}
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.95\textwidth]{../Figures/figS7_diaspora_design_comparison_IJID.png}
-  \caption*{\textbf{Figure S\arabic{suppfig}.}
-    \textbf{Three candidate visualization designs for the diaspora
-    extension, shown for reference.}
-    (A) Rank-shift slopegraph: city rankings from raw importation
-    risk $\lambda$ (left) to community-weighted risk $\Omega^A$
-    (right) per disease. Blue lines indicate cities rising in rank
-    after diaspora weighting; red lines indicate cities falling.
-    (B) Diaspora concentration heatmap ($\kappa_{c,v}$): percentage
-    of each city's foreign-born population from each source country
-    (top 15 countries by total $\lambda$); this is the pure
-    demographic input, independent of disease burden.
-    (C) Top country--city pairs by $\Omega^A$: the eight
-    source-country $\to$ venue-city combinations with the highest
-    expected diaspora-network importation intensity per disease.}
-  \label{fig:s7}
-\end{figure}
-
-\newpage
-
-% ---- Figure S8 ----------------------------------------------
-\refstepcounter{suppfig}
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=\textwidth]{../Figures/figS8_diaspora_full_IJID.png}
+  \includegraphics[width=\textwidth]{figS8_diaspora_full_IJID.png}
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Diaspora network importation probability ($P^A(\geq 1)$)
     for all five diseases at 11 US host cities.}
@@ -1200,7 +1175,7 @@ the smallest.
     owing to their very low baseline importation intensities.
     The dengue and malaria rows correspond to Panel A of
     Figure~\ref{fig:diaspora} in the main text.}
-  \label{fig:s8}
+  \label{fig:s7b}
 \end{figure}
 
 \end{document}
