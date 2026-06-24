@@ -675,3 +675,251 @@ ggsave(figC,
        file   = "Figures/figC_country_drivers_omegaA.png",
        height = 13, width = 15, dpi = 300)
 print(figC)
+
+
+# ============================================================
+# DIAGNOSTIC: diaspora drivers per host city (for manuscript text)
+# Prints top diaspora source communities (with kappa = diaspora_conc)
+# and P^A(>=1) per city, to keep the Figure 6 narrative accurate.
+# Safe to comment out once the text is finalized.
+# ============================================================
+cat("\n===== DENGUE: top 3 diaspora drivers per host city =====\n")
+omega_A %>%
+  filter(disease == "Dengue") %>%
+  group_by(city) %>%
+  slice_max(omega_A, n = 3, with_ties = FALSE) %>%
+  ungroup() %>%
+  arrange(desc(omega_A)) %>%
+  transmute(city, Country,
+            kappa   = round(diaspora_conc, 3),
+            omega_A = round(omega_A, 3)) %>%
+  print(n = 40)
+
+cat("\n===== MALARIA: top 3 diaspora drivers per host city =====\n")
+omega_A %>%
+  filter(disease == "Malaria") %>%
+  group_by(city) %>%
+  slice_max(omega_A, n = 3, with_ties = FALSE) %>%
+  ungroup() %>%
+  arrange(desc(omega_A)) %>%
+  transmute(city, Country,
+            kappa   = round(diaspora_conc, 3),
+            omega_A = round(omega_A, 3)) %>%
+  print(n = 40)
+
+cat("\n===== P^A(>=1) per city (Dengue & Malaria) =====\n")
+omega_A_summary %>%
+  filter(disease %in% c("Dengue", "Malaria")) %>%
+  arrange(disease, desc(prob_A)) %>%
+  transmute(disease, city,
+            omega_A = round(omega_A, 3),
+            prob_A  = round(prob_A, 3)) %>%
+  print(n = 40)
+
+
+# ============================================================
+# 7. MECHANISM B EXTENSION — NON-VENUE DIASPORA HUB CITIES
+# ============================================================
+# Mechanism B was designed to capture secondary seeding when fans
+# travel to a match and return home, INCLUDING to cities that do not
+# host matches. The base analysis (Section 4) pulled ACS diaspora
+# data only for the 11 venue metros, so hub_city was restricted to
+# venues. Here we add major non-venue diaspora metros, pull the same
+# B05006 country-of-birth data for them, and recompute Omega_B over
+# the full set of hub cities (venue + non-venue). The original
+# venue-only objects (omega_B, omega_B_summary) are left untouched.
+#
+# NOTE: requires a Census API key (same as the venue pull). The
+# non-venue pull is cached to Data/census_diaspora_nonvenue_cities.csv.
+# Verify the CBSA codes below if a city appears to be missing — an
+# incorrect GEOID is silently dropped by the GEOID filter.
+
+# ---- 7a. Non-venue hub metros (CBSA codes) ------------------
+nonvenue_metros <- c(
+  "Chicago"       = "16980",   # Chicago-Naperville-Elgin, IL-IN-WI
+  "Washington DC" = "47900",   # Washington-Arlington-Alexandria, DC-VA-MD-WV
+  "Minneapolis"   = "33460",   # Minneapolis-St. Paul-Bloomington, MN-WI
+  "Phoenix"       = "38060",   # Phoenix-Mesa-Chandler, AZ
+  "Orlando"       = "36740",   # Orlando-Kissimmee-Sanford, FL
+  "San Diego"     = "41740",   # San Diego-Chula Vista-Carlsbad, CA
+  "Detroit"       = "19820",   # Detroit-Warren-Dearborn, MI
+  "Tampa"         = "45300",   # Tampa-St. Petersburg-Clearwater, FL
+  "Denver"        = "19740",   # Denver-Aurora-Lakewood, CO
+  "Charlotte"     = "16740",   # Charlotte-Concord-Gastonia, NC-SC
+  "Las Vegas"     = "29820",   # Las Vegas-Henderson-Paradise, NV
+  "Austin"        = "12420",   # Austin-Round Rock-Georgetown, TX
+  "San Antonio"   = "41700",   # San Antonio-New Braunfels, TX
+  "Portland"      = "38900",   # Portland-Vancouver-Hillsboro, OR-WA
+  "Sacramento"    = "40900"    # Sacramento-Roseville-Folsom, CA
+)
+
+nonvenue_cache <- "Data/census_diaspora_nonvenue_cities.csv"
+
+# ---- 7b. Download or load non-venue diaspora data -----------
+if (!file.exists(nonvenue_cache)) {
+
+  message("Downloading ACS B05006 data for non-venue hub metros...")
+
+  b05006_vars_nv <- load_variables(2023, "acs5", cache = TRUE) %>%
+    filter(str_starts(name, "B05006_")) %>%
+    mutate(country_census = label %>%
+             str_extract("[^!]+$") %>% str_remove(":$") %>% str_trim()) %>%
+    filter(!str_ends(label, ":"))
+
+  target_vars_nv <- b05006_vars_nv %>%
+    inner_join(census_to_cor, by = "country_census") %>%
+    select(variable = name, Country)
+
+  pull_vars_nv <- c("B05006_001", target_vars_nv$variable)
+
+  raw_nv <- get_acs(
+    geography   = "metropolitan statistical area/micropolitan statistical area",
+    variables   = pull_vars_nv,
+    year        = 2023,
+    survey      = "acs5",
+    cache_table = TRUE
+  ) %>%
+    filter(GEOID %in% nonvenue_metros)
+
+  metro_lookup_nv <- tibble(GEOID = nonvenue_metros,
+                            venue_city = names(nonvenue_metros))
+
+  total_fb_nv <- raw_nv %>%
+    filter(variable == "B05006_001") %>%
+    left_join(metro_lookup_nv, by = "GEOID") %>%
+    select(venue_city, total_foreign_born = estimate)
+
+  diaspora_nonvenue <- raw_nv %>%
+    filter(variable != "B05006_001") %>%
+    left_join(metro_lookup_nv, by = "GEOID") %>%
+    left_join(target_vars_nv,  by = "variable") %>%
+    select(Country, venue_city, diaspora_pop = estimate) %>%
+    drop_na(Country, venue_city, diaspora_pop) %>%
+    filter(diaspora_pop > 0) %>%
+    left_join(total_fb_nv, by = "venue_city") %>%
+    mutate(diaspora_conc = diaspora_pop / total_foreign_born)
+
+  write_csv(diaspora_nonvenue, nonvenue_cache)
+  message("Saved to ", nonvenue_cache)
+
+} else {
+  message("Loading cached non-venue diaspora data from ", nonvenue_cache)
+  diaspora_nonvenue <- read_csv(nonvenue_cache, show_col_types = FALSE)
+}
+
+# ---- 7c. Combined hub set (venue + non-venue) ---------------
+# Tag each hub so venue vs non-venue can be distinguished downstream.
+diaspora_hub_ext <- bind_rows(
+  diaspora          %>% mutate(hub_type = "venue"),
+  diaspora_nonvenue %>% mutate(hub_type = "non-venue")
+) %>%
+  select(Country, hub_city = venue_city, hub_type,
+         diaspora_conc_hub = diaspora_conc)
+
+diaspora_hub_ext %>% select(hub_city,hub_type) %>% unique() %>% print(n=26)
+
+# ---- 7d. Recompute Omega_B over all hub cities --------------
+# lambda_match (importation intensity at the match venue) is defined
+# in Section 4. The match_venue != hub_city guard still removes
+# self-seeding; hubs may now be non-venue metros.
+omega_B_ext <- lambda_match %>%
+  rename(match_venue = city) %>%
+  left_join(diaspora_hub_ext %>% rename(Country_hub = Country),
+            by = character()) %>%
+  filter(Country == Country_hub,
+         match_venue != hub_city) %>%
+  mutate(omega_B = lambda_match * diaspora_conc_hub) %>%
+  select(Country, match_venue, hub_city, hub_type, disease,
+         lambda_match, diaspora_conc_hub, omega_B)
+
+omega_B_ext_summary <- omega_B_ext %>%
+  group_by(hub_city, hub_type, disease) %>%
+  summarise(omega_B = sum(omega_B, na.rm = TRUE), .groups = "drop") %>%
+  arrange(disease, desc(omega_B))
+
+cat("\n===== MECHANISM B (extended): top hubs incl. non-venue =====\n")
+omega_B_ext_summary %>%
+  filter(disease %in% c("Dengue", "Malaria")) %>%
+  group_by(disease) %>%
+  slice_max(omega_B, n = 12, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(omega_B = round(omega_B, 4)) %>%
+  print(n = 40)
+
+# ---- 7e. Top diaspora drivers per hub city (for manuscript) -
+# For the top 8 hubs per disease, show the source countries that
+# contribute most to Omega_B (summed across all match venues), with
+# kappa (diaspora_conc_hub) = the hub's diaspora concentration.
+top_hubs_B <- omega_B_ext_summary %>%
+  filter(disease %in% c("Dengue", "Malaria")) %>%
+  group_by(disease) %>%
+  slice_max(omega_B, n = 8, with_ties = FALSE) %>%
+  ungroup() %>%
+  select(disease, hub_city)
+
+cat("\n===== MECHANISM B (extended): top diaspora drivers per hub =====\n")
+omega_B_ext %>%
+  group_by(disease, hub_city, hub_type, Country) %>%
+  summarise(kappa   = first(diaspora_conc_hub),
+            omega_B = sum(omega_B, na.rm = TRUE), .groups = "drop") %>%
+  inner_join(top_hubs_B, by = c("disease", "hub_city")) %>%
+  group_by(disease, hub_city) %>%
+  slice_max(omega_B, n = 2, with_ties = FALSE) %>%
+  ungroup() %>%
+  arrange(disease, desc(omega_B)) %>%
+  transmute(disease, hub_city, hub_type, Country,
+            kappa   = round(kappa, 3),
+            omega_B = round(omega_B, 3)) %>%
+  print(n = 40)
+
+
+# ---- 7f. Figure S5 (extended): all-disease Mechanism B ------
+# Rebuilds the supplementary Mechanism B figure on the extended hub
+# set (venue + non-venue), shaded by hub type, for all five diseases.
+# Used by the IJID figure script as figS5. reorder_within orders bars
+# within each facet (defined in the main pipeline; redefined here so
+# this section also works if the diaspora script is run standalone).
+if (!exists("reorder_within")) {
+  reorder_within <- function(x, by, within, fun = mean, sep = "___") {
+    stats::reorder(paste(x, within, sep = sep), by, FUN = fun)
+  }
+}
+
+hub_type_colors <- c("Venue" = "#0072B2", "Non-venue" = "#D55E00")  # CB-safe
+
+figB_ext_data <- omega_B_ext_summary %>%
+  mutate(
+    disease  = factor(disease, levels = c("Dengue", "Influenza",
+                                           "Pertussis", "Malaria", "Measles")),
+    hub_type = factor(if_else(hub_type == "venue", "Venue", "Non-venue"),
+                      levels = c("Venue", "Non-venue"))
+  ) %>%
+  group_by(disease) %>%
+  slice_max(omega_B, n = 15, with_ties = FALSE) %>%
+  ungroup()
+
+figB_ext <- ggplot(figB_ext_data,
+                   aes(x = reorder_within(hub_city, omega_B, disease),
+                       y = omega_B, fill = hub_type)) +
+  geom_col(alpha = 0.9, width = 0.75) +
+  coord_flip() +
+  facet_wrap(~ disease, scales = "free", ncol = 3) +
+  scale_x_discrete(labels = function(x) gsub("___.+$", "", x)) +
+  scale_fill_manual(values = hub_type_colors, name = NULL) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::number_format(accuracy = 0.0001, drop0trailing = TRUE)
+  ) +
+  labs(x = "", y = expression(Seeding~index~(Omega[B]))) +
+  theme_minimal(base_size = 12) +
+  theme(
+    strip.text         = element_text(face = "bold", size = 11),
+    strip.background   = element_rect(fill = "gray96", color = NA),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    legend.position    = c(0.8,0.3)
+  )
+
+ggsave(figB_ext,
+       file   = "Figures/figB_diaspora_hub_seeding_extended.png",
+       height = 8, width = 13, dpi = 300)

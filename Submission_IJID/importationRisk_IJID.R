@@ -78,58 +78,199 @@ source("Code/importationRisk_diaspora_extension.R")
 #   Fig S6 — Country drivers Omega^A (top 10 per disease, M3 diaspora)
 #   Fig S7 — Full diaspora heatmap   (P^A≥1, all 5 diseases, Mechanism A)
 
+# ============================================================
+# 3b. IJID REVISION: colorblind palettes + remove plot titles
+# ============================================================
+# Per collaborator request:
+#   (1) Remove figure-level titles and subtitles (the manuscript
+#       captions already carry this information).
+#   (2) Ensure colorblind-safe palettes. The heatmaps already use the
+#       viridis/magma scales, which are colorblind-safe by design. The
+#       only categorical palette that was NOT colorblind-safe was
+#       region_colors (several near-identical greens/teals plus
+#       red/orange collisions); it is replaced here with the
+#       Okabe-Ito palette. Per-disease panel names are kept because
+#       they identify each panel.
+
+# ---- Colorblind-safe region palette (Okabe-Ito) -------------
+region_colors <- c(
+  "Africa"        = "#E69F00",  # orange
+  "Latin America" = "#009E73",  # bluish green
+  "Caribbean"     = "#56B4E9",  # sky blue
+  "Europe"        = "#0072B2",  # blue
+  "Asia"          = "#CC79A7",  # reddish purple
+  "North America" = "#D55E00",  # vermillion (Canada + Mexico, the WC co-hosts)
+  "Mideast"       = "#F0E442",  # yellow
+  "Middle East"   = "#F0E442",  # yellow
+  "Oceania"       = "#999999",  # medium gray
+  "Other"         = "#DDDDDD"   # light gray
+)
+
+# ---- Colorblind-safe disease palette (Okabe-Ito) -----------
+# Replaces the original red/green pairing (Dengue/Measles), which
+# was indistinguishable under red-green color vision deficiency.
+# Set before fig6 is built (Section 4b) so its panels inherit it.
+disease_colors <- c(
+  "Dengue"    = "#D55E00",  # vermillion
+  "Influenza" = "#0072B2",  # blue
+  "Pertussis" = "#CC79A7",  # reddish purple
+  "Malaria"   = "#E69F00",  # orange
+  "Measles"   = "#009E73"   # bluish green
+)
+
+# ---- Colorblind-safe host-nation palette (venue map) -------
+host_nation_colors_cb <- c(
+  "USA"    = "#0072B2",  # blue
+  "Canada" = "#D55E00",  # vermillion
+  "Mexico" = "#009E73"   # bluish green
+)
+
+# ---- Helper: strip title + subtitle from a single ggplot ----
+strip_titles <- function(p) p + labs(title = NULL, subtitle = NULL)
+
+# ---- Helper: colorblind cividis fill for P(>=1) heatmaps ----
+# cividis is optimized specifically for color-vision deficiency and
+# is near-identical for CVD and non-CVD viewers. Replaces the
+# plasma/magma scales baked into the heatmaps during sourcing.
+cividis_prob <- function(name   = expression(P(X >= 1)),
+                         labels = c("0.00", "0.25", "0.50", "0.75", "1.00")) {
+  scale_fill_viridis_c(option = "cividis", name = name,
+                       limits = c(0, 1),
+                       breaks = c(0, 0.25, 0.5, 0.75, 1),
+                       labels = labels)
+}
+
+# ---- Fix: legend (colorbar) title clipped at the figure edge ----
+# The P(X>=1) title sits atop the colorbar and was cropped by the
+# top/right image boundary. Add margin so it is no longer clipped.
+legend_crop_fix <- theme(plot.margin = margin(t = 16, r = 14, b = 6, l = 6))
+
+# ---- Collapse Canada + Mexico into "North America" ----------
+# Consistency fix: every other category is a continent/macro-region,
+# so the two co-host countries are grouped into a single "North
+# America" region rather than carrying their own colors. The USA is
+# the destination and never appears as a source country.
+to_north_america <- function(x) if_else(x %in% c("Canada", "Mexico"),
+                                         "North America", x)
+top_countries_region <- top_countries_region %>%
+  mutate(new_region = to_north_america(new_region))
+top_countries_omegaA <- top_countries_omegaA %>%
+  mutate(new_region = to_north_america(new_region))
+
+# ---- Rebuild the two cowplot country-driver grids -----------
+# make_country_panel() / make_omegaA_panel() read region_colors from
+# the global environment, so rebuilding picks up the colorblind-safe
+# palette above. Only the colors change; panel names are preserved.
+fig4_country_drivers <- cowplot::plot_grid(
+  make_country_panel("Dengue"),
+  make_country_panel("Influenza"),
+  make_country_panel("Pertussis"),
+  make_country_panel("Malaria"),
+  make_country_panel("Measles"),
+  cowplot::get_legend(
+    ggplot(top_countries_region,
+           aes(x = Country, y = total_imports, fill = new_region)) +
+      geom_col() +
+      scale_fill_manual(values = region_colors, name = "World region") +
+      theme_minimal(base_size = 17) +
+      theme(legend.position = "right",
+            legend.title    = element_text(size = 15, face = "bold"),
+            legend.text     = element_text(size = 14),
+            legend.key.size = unit(0.6, "cm"))
+  ),
+  ncol = 2, labels = c("A", "B", "C", "D", "E", ""), label_size = 14
+)
+
+figC <- cowplot::plot_grid(
+  make_omegaA_panel("Dengue"),
+  make_omegaA_panel("Influenza"),
+  make_omegaA_panel("Pertussis"),
+  make_omegaA_panel("Malaria"),
+  make_omegaA_panel("Measles"),
+  cowplot::get_legend(
+    ggplot(top_countries_omegaA,
+           aes(x = Country, y = omega_A_total, fill = new_region)) +
+      geom_col() +
+      scale_fill_manual(values = region_colors, name = "World region") +
+      theme_minimal(base_size = 17) +
+      theme(legend.position = "right",
+            legend.title    = element_text(size = 15, face = "bold"),
+            legend.text     = element_text(size = 14),
+            legend.key.size = unit(0.6, "cm"))
+  ),
+  ncol = 2, labels = c("A", "B", "C", "D", "E", ""), label_size = 14
+)
+
+# ---- Remove figure-level titles/subtitles (single ggplots) --
+fig1_risk_heatmap     <- strip_titles(fig1_risk_heatmap)     + cividis_prob() + legend_crop_fix
+fig2_lambda_ci        <- strip_titles(fig2_lambda_ci)
+fig3_model_comparison <- strip_titles(fig3_model_comparison)
+fig1_heatmap_baseline <- strip_titles(fig1_heatmap_baseline) + cividis_prob() + legend_crop_fix
+fig1_heatmap_wc       <- strip_titles(fig1_heatmap_wc)       + cividis_prob() + legend_crop_fix
+ci_asymmetry_plot     <- strip_titles(ci_asymmetry_plot) +
+  scale_color_manual(values = disease_colors, name = "")
+venue_map             <- strip_titles(venue_map) +
+  scale_color_manual(values = host_nation_colors_cb, name = "Host nation")
+figA                  <- strip_titles(figA) +
+  cividis_prob(name   = "P(≥1 importation\ninto diaspora\nnetwork)",
+               labels = c("0", "0.25", "0.50", "0.75", "1"))
+# figS5 now uses figB_ext (extended hub set, venue + non-venue, all
+# five diseases), built in Section 7f of the diaspora extension. It
+# has no title/subtitle, so no strip_titles needed.
+
+
 message("\nSaving IJID figure set...")
 
 # ---- Main figures -------------------------------------------
 
 ggsave(fig1_risk_heatmap,
-       file   = "Figures/fig1_risk_heatmap_IJID.png",
+       file   = "Submission_IJID/fig1_risk_heatmap_IJID.png",
        height = 4.5, width = 12.5, dpi = 300)
 
 ggsave(fig2_lambda_ci,
-       file   = "Figures/fig2_lambda_ci_IJID.png",
+       file   = "Submission_IJID/fig2_lambda_ci_IJID.png",
        height = 9, width = 14, dpi = 300)
 
 ggsave(fig3_model_comparison,
-       file   = "Figures/fig3_model_comparison_IJID.png",
+       file   = "Submission_IJID/fig3_model_comparison_IJID.png",
        height = 8.5, width = 14, dpi = 300)
 
 ggsave(fig4_country_drivers,
-       file   = "Figures/fig4_country_drivers_IJID.png",
+       file   = "Submission_IJID/fig4_country_drivers_IJID.png",
        height = 13, width = 15, dpi = 300)
 
 ggsave(figA,
-       file   = "Figures/fig5_diaspora_probA_IJID.png",
+       file   = "Submission_IJID/fig5_diaspora_probA_IJID.png",
        height = 4.5, width = 13, dpi = 300)
 
 # ---- Supplementary figures ----------------------------------
 
 ggsave(fig1_heatmap_baseline,
-       file   = "Figures/figS1_heatmap_baseline_IJID.png",
+       file   = "Submission_IJID/figS1_heatmap_baseline_IJID.png",
        height = 4.5, width = 12.5, dpi = 300)
 
 ggsave(fig1_heatmap_wc,
-       file   = "Figures/figS2_heatmap_wc_IJID.png",
+       file   = "Submission_IJID/figS2_heatmap_wc_IJID.png",
        height = 4.5, width = 12.5, dpi = 300)
 
 ggsave(ci_asymmetry_plot,
-       file   = "Figures/figS3_ci_asymmetry_IJID.png",
+       file   = "Submission_IJID/figS3_ci_asymmetry_IJID.png",
        height = 6, width = 9, dpi = 300)
 
 ggsave(venue_map,
-       file   = "Figures/figS4_venue_map_IJID.png",
+       file   = "Submission_IJID/figS4_venue_map_IJID.png",
        height = 8, width = 12, dpi = 300)
 
-ggsave(figB,
-       file   = "Figures/figS5_diaspora_hubseeding_IJID.png",
+ggsave(figB_ext,
+       file   = "Submission_IJID/figS5_diaspora_hubseeding_IJID.png",
        height = 8, width = 13, dpi = 300)
 
 ggsave(figC,
-       file   = "Figures/figS6_country_drivers_omegaA_IJID.png",
+       file   = "Submission_IJID/figS6_country_drivers_omegaA_IJID.png",
        height = 13, width = 15, dpi = 300)
 
 ggsave(fig_comparison,
-       file   = "Figures/figS7_diaspora_design_comparison_IJID.png",
+       file   = "Submission_IJID/figS7_diaspora_design_comparison_IJID.png",
        height = 22, width = 18, dpi = 300)
 
 message("Done. All IJID figures saved to Figures/ with _IJID suffix.")
@@ -186,10 +327,7 @@ fig4_wc_excess <- ggplot(wc_long,
   scale_x_discrete(labels = c("Baseline\n(M1)", "WC\nincrement")) +
   labs(
     x        = NULL,
-    y        = expression(Expected~importations~(Lambda)),
-    title    = "World Cup travel increment above baseline by disease",
-    subtitle = paste0("Each panel: 11-city MC median. ",
-                      "Percentage shows WC increment relative to baseline.")
+    y        = expression(Expected~importations~(Lambda))
   ) +
   theme_minimal(base_size = 12) +
   theme(
@@ -201,12 +339,12 @@ fig4_wc_excess <- ggplot(wc_long,
   )
 
 ggsave(fig4_wc_excess,
-       file   = "Figures/fig4_wc_excess_IJID.png",
+       file   = "Submission_IJID/fig4_wc_excess_IJID.png",
        height = 5, width = 12, dpi = 300)
 
 # ---- Figure 5 (renamed from Fig 4): source country drivers --
 ggsave(fig4_country_drivers,
-       file   = "Figures/fig5_country_drivers_IJID.png",
+       file   = "Submission_IJID/fig5_country_drivers_IJID.png",
        height = 13, width = 15, dpi = 300)
 
 # ---- New Figure 6: Two-panel diaspora (dengue + malaria) ----
@@ -226,13 +364,12 @@ fig6_panelA <- ggplot(fig6_panelA_data,
   geom_text(aes(label = label, color = text_col), size = 3.5) +
   scale_color_identity() +
   scale_fill_viridis_c(
-    option = "magma",
+    option = "cividis",
     name   = expression(P^A*(phantom(x) >= 1)),
     limits = c(0, 1),
     breaks = c(0, 0.25, 0.5, 0.75, 1)
   ) +
-  labs(x = NULL, y = NULL,
-       title = "A. Mechanism A: diaspora network importation probability") +
+  labs(x = NULL, y = NULL) +
   theme_minimal(base_size = 12) +
   theme(
     axis.text.x       = element_text(angle = 35, hjust = 1, size = 10),
@@ -243,49 +380,60 @@ fig6_panelA <- ggplot(fig6_panelA_data,
     plot.title        = element_text(size = 12, face = "bold")
   )
 
-fig6_panelB_data <- omega_B_summary %>%
+# Extended hub set (venue + non-venue), from Section 7 of the
+# diaspora extension. Shade by hub type to show that non-venue hubs
+# carry much of the secondary seeding risk. reorder_within (defined
+# in the main pipeline) orders bars correctly within each facet.
+hub_type_colors <- c("Venue" = "#0072B2", "Non-venue" = "#D55E00")  # CB-safe
+
+fig6_panelB_data <- omega_B_ext_summary %>%
   filter(disease %in% c("Dengue", "Malaria")) %>%
   group_by(disease) %>%
-  slice_max(omega_B, n = 8, with_ties = FALSE) %>%
+  slice_max(omega_B, n = 10, with_ties = FALSE) %>%
   ungroup() %>%
-  mutate(disease = factor(disease, levels = c("Dengue", "Malaria")))
+  mutate(
+    disease  = factor(disease, levels = c("Dengue", "Malaria")),
+    hub_type = factor(if_else(hub_type == "venue", "Venue", "Non-venue"),
+                      levels = c("Venue", "Non-venue"))
+  )
 
 fig6_panelB <- ggplot(fig6_panelB_data,
-                       aes(x = reorder(hub_city, omega_B),
-                           y = omega_B, fill = disease)) +
-  geom_col(show.legend = FALSE) +
+                       aes(x = reorder_within(hub_city, omega_B, disease),
+                           y = omega_B, fill = hub_type)) +
+  geom_col() +
   facet_wrap(~ disease, scales = "free", nrow = 1) +
   coord_flip() +
-  scale_fill_manual(values = disease_colors[c("Dengue", "Malaria")]) +
+  scale_x_discrete(labels = function(x) gsub("___.+$", "", x)) +
+  scale_fill_manual(values = hub_type_colors, name = NULL) +
   labs(x = NULL,
-       y     = expression(Seeding~index~(Omega[B])),
-       title = "B. Mechanism B: hub-city secondary seeding risk") +
+       y     = expression(Seeding~index~(Omega[B]))) +
   theme_minimal(base_size = 12) +
   theme(
     panel.grid.major.y = element_blank(),
     strip.text         = element_text(face = "bold"),
-    plot.title         = element_text(size = 12, face = "bold")
+    legend.position    = "bottom"
   )
 
 fig6_diaspora <- cowplot::plot_grid(
   fig6_panelA, fig6_panelB,
-  ncol = 1, rel_heights = c(1, 1.3)
+  ncol = 1, rel_heights = c(1, 1.3),
+  labels = c("A", "B"), label_size = 14
 )
 
 ggsave(fig6_diaspora,
-       file   = "Figures/fig6_diaspora_combined_IJID.png",
+       file   = "Submission_IJID/fig6_diaspora_combined_IJID.png",
        height = 10, width = 13, dpi = 300)
 
 # ---- Fig S8: full 5-disease diaspora heatmap (was Fig 5) ----
 ggsave(figA,
-       file   = "Figures/figS8_diaspora_full_IJID.png",
+       file   = "Submission_IJID/figS8_diaspora_full_IJID.png",
        height = 4.5, width = 13, dpi = 300)
 
 message("New figures saved:")
-message("  Figures/fig4_wc_excess_IJID.png")
-message("  Figures/fig5_country_drivers_IJID.png")
-message("  Figures/fig6_diaspora_combined_IJID.png")
-message("  Figures/figS8_diaspora_full_IJID.png")
+message("  Submission_IJID/fig4_wc_excess_IJID.png")
+message("  Submission_IJID/fig5_country_drivers_IJID.png")
+message("  Submission_IJID/fig6_diaspora_combined_IJID.png")
+message("  Submission_IJID/figS8_diaspora_full_IJID.png")
 
 
 # ============================================================

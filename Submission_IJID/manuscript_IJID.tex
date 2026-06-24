@@ -323,9 +323,13 @@ $P(\geq 1)$ metric.
 
 \textbf{Mechanism B (return seeding).} US diaspora members may
 travel domestically to match venues and carry infection back to
-their home city. A secondary seeding index ranks hub cities by
-their exposure potential, combining importation intensity at the
-match venue with the diaspora concentration in the hub city.
+their home city. A secondary seeding index ranks candidate hub
+cities by their exposure potential, combining importation intensity
+at the match venue with the diaspora concentration in the hub city.
+Hub cities comprise both the 11 host metropolitan areas and 15 major
+non-host metropolitan areas with large immigrant populations, drawn
+from the same ACS country-of-birth data, so that risk returning to
+non-venue cities is captured.
 
 Full mathematical derivations of both mechanisms, including the
 Poisson thinning argument, all intermediate quantities, and the
@@ -363,8 +367,9 @@ Kansas City --- showed substantially lower probabilities. The
 Malaria risk was highest at Atlanta ($P(\geq 1) > 0.99$),
 reflecting the concentration of Sub-Saharan African air routes
 through Hartsfield-Jackson airport; the 11-city malaria total was
-16.4 (95\% CI 4.9--39.1). Pertussis and influenza
-showed intermediate probabilities. Measles had near-zero expected
+16.4 (95\% CI 4.9--39.1). Pertussis ($\Lambda = 2.0$, 95\% CI
+0.5--4.2) and influenza ($\Lambda = 1.8$, 95\% CI 0.4--4.0) showed
+intermediate importation intensities. Measles had near-zero expected
 importation intensity ($\Lambda = 0.05$, 95\% CI 0.02--0.10) because
 WHO-reported per-capita incidence is very low across most World Cup
 source countries; US measles cases arise primarily from outbreak
@@ -379,10 +384,8 @@ Poisson arrivals estimated here.
     Cells show $P(\geq 1)$, the probability of at least one imported
     case arriving at each city in June 2026, under the schedule-driven
     model (M3) Monte Carlo median. Cities are ordered left-to-right by
-    total importation intensity across all five diseases. Dengue
-    $P(\geq 1) > 0.99$ at Miami, New York, and Houston; malaria exceeds
-    0.99 at Atlanta.
-    Values $<$0.01 shown as $<$0.01; values $>$0.99 as $>$0.99.}
+    total importation intensity across all five diseases. Values
+    $<0.01$ are shown as $<$0.01 and values $>0.99$ as $>$0.99.}
   \label{fig:heatmap}
 \end{figure}
 
@@ -511,24 +514,35 @@ Figure~\ref{fig:diaspora} summarises both diaspora risk mechanisms
 for dengue and malaria, the two diseases with meaningful diaspora
 signal. Panel A shows $P^A(\geq 1)_{v,d}$, the probability that at
 least one imported case enters a co-national diaspora social network
-at each host city. For dengue, Miami, New York, and Houston exceeded
-$P^A(\geq 1) = 0.70$, driven respectively by large Haitian and
-Brazilian communities in Miami ($\kappa = 0.088$ and $0.079$), large
-Ecuadorian and Colombian communities in New York, and large Venezuelan
-and Colombian communities in Houston. The gap between
-$P(\geq 1) \approx 1$ (near-certain arrival) and
-$P^A(\geq 1) \approx 0.60\text{--}0.80$ (diaspora network entry)
-quantifies risk dispersed into the general population rather than
-concentrated in a co-national community. For malaria, Atlanta showed
-the highest $P^A(\geq 1)$, consistent with its large Nigerian and
-Ghanaian diaspora populations relative to the total foreign-born
-community.
+at each host city. For dengue, the diaspora signal was highest at
+Dallas, Houston, and Los Angeles ($P^A(\geq 1) = 0.43$, $0.39$, and
+$0.35$), driven overwhelmingly by the large Mexican diaspora in these
+cities ($\kappa = 0.39$, $0.34$, and $0.34$); Miami
+($P^A(\geq 1) = 0.26$) was the exception, driven by its Colombian and
+Brazilian communities ($\kappa = 0.076$ and $0.025$). Although dengue
+importation is very likely at the city level in these metros
+($P(\geq 1) > 0.95$; Figure~\ref{fig:heatmap}), the probability that
+an imported case enters a co-national diaspora network is much lower
+($P^A(\geq 1) \leq 0.43$), indicating that most imported dengue risk
+disperses into the general urban population rather than concentrating
+within a single co-national community. For malaria, Atlanta showed the
+highest $P^A(\geq 1)$ ($0.23$), reflecting the high malaria importation
+intensity routed through Hartsfield-Jackson airport channeled into the
+city's Nigerian diaspora ($\kappa = 0.031$).
 
-Panel B shows the Mechanism B secondary seeding index ($\Omega^B$)
-for hub cities outside the WC venue network. Cities not hosting
-matches but with large diaspora populations from high-dengue or
-high-malaria source nations face non-trivial secondary exposure
-through returning co-national fans. Results for all five diseases
+Panel B shows the Mechanism B secondary seeding index ($\Omega^B$):
+the importation intensity at a match venue weighted by the diaspora
+concentration of the home metropolitan area to which fans return,
+evaluated across the 11 host cities and 15 major non-host
+metropolitan areas. For dengue, the seven highest-ranked hubs were
+all non-host cities with large Mexican diaspora populations ---
+San Antonio ($\Omega^B = 4.1$), Phoenix ($3.4$), San Diego, Denver,
+Chicago, Austin, and Las Vegas --- each ranking above the leading
+host-city hub (Dallas, $2.3$). For malaria, secondary seeding was
+more evenly divided between host cities (Houston, Dallas, and
+Philadelphia) and non-host cities (Washington, DC; Minneapolis; and
+Detroit), reflecting their Nigerian and Indian diaspora communities.
+Results for all five diseases
 are provided in Supplementary Figure~S5. The full Mechanism A
 diaspora probability ($P^A(\geq 1)$) across all five diseases and
 11 host cities is provided in Supplementary Figure~S7.
@@ -538,19 +552,14 @@ diaspora probability ($P^A(\geq 1)$) across all five diseases and
   \includegraphics[width=\textwidth]{fig6_diaspora_combined_IJID.png}
   \caption{\textbf{Diaspora network seeding risk for dengue and
     malaria.}
-    \textbf{Panel A (Mechanism A):} $P^A(\geq 1)_{v,d} =
-    1 - e^{-\Omega^A_{v,d}}$, the probability that at least one
+    \textbf{Panel A (Mechanism A):} probability that at least one
     imported case enters a co-national diaspora network at each host
-    city. Derived from $\Omega^A_{v,d} = \sum_c
-    \lambda_{c,v,d}\,\kappa_{c,v}$, where
-    $\kappa_{c,v} = D_{c,v}/\mathrm{FB}_v$ (ACS 2019--2023).
-    $P^A(\geq 1)$ is always $\leq P(\geq 1)$
-    (Figure~\ref{fig:heatmap}); the gap represents risk entering the
-    general population.
-    \textbf{Panel B (Mechanism B):} Secondary seeding index
-    $\Omega^B$ for the top hub cities per disease. Hub cities are
-    non-venue cities where diaspora members may attend games and
-    return home, potentially seeding local transmission.}
+    city, $P^A(\geq 1)_{v,d}$.
+    \textbf{Panel B (Mechanism B):} secondary seeding index
+    $\Omega^B$ for the top 10 hub metropolitan areas per disease,
+    shaded by whether the hub is a World Cup host city or a non-host
+    city. Hubs are the home cities to which fans return after
+    attending matches.}
   \label{fig:diaspora}
 \end{figure}
 
@@ -558,9 +567,9 @@ diaspora probability ($P^A(\geq 1)$) across all five diseases and
 \section{Discussion}
 % =============================================================
 
-Dengue importation is near-certain ($P(\geq 1) > 0.99$) at Miami,
-New York, and Houston, and exceeds $P(\geq 1) = 0.95$ at Dallas
-and Atlanta, driven by high reported burden in WC-qualified Latin
+The probability of at least one imported dengue case exceeded 0.99 at
+Miami, New York, and Houston, and 0.95 at Dallas and Atlanta, driven
+by high reported burden in WC-qualified Latin
 American nations during June, large and growing travel volumes, and
 a relatively long travel-while-infected window. Critically, the
 right-skewed uncertainty interval for dengue --- where the reference
@@ -983,6 +992,14 @@ across all source countries and match venues is:
     = \sum_c \sum_{v_{\text{match}} \neq v_{\text{home}}}
       \Omega^B_{c,\,v_{\text{match}},\,v_{\text{home}},\,d}
 \]
+The match venue $v_{\text{match}}$ ranges over the 11 host cities,
+while the hub city $v_{\text{home}}$ ranges over both the 11 host
+cities and 15 major non-host metropolitan areas with large immigrant
+populations (drawn from the same ACS B05006 country-of-birth data),
+so that secondary seeding into non-venue cities is captured. The 15
+non-host hub metropolitan areas are Austin, Charlotte, Chicago,
+Denver, Detroit, Las Vegas, Minneapolis, Orlando, Phoenix, Portland,
+Sacramento, San Antonio, San Diego, Tampa, and Washington, DC.
 
 \newpage
 
@@ -1126,15 +1143,11 @@ the smallest.
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Secondary seeding risk index ($\Omega^B$) for diaspora
     hub cities, by disease (Mechanism B).}
-    $\Omega^B_{c,v_\text{match},v_\text{home},d}
-      = \lambda_{c,v_\text{match},d}\,\cdot\,\kappa_{c,v_\text{home}}$
-    is the expected importation intensity at the match venue weighted
-    by the co-national diaspora concentration in the hub city.
-    Bars show top 8 hub cities per disease ranked by summed
-    $\Omega^B$ across all source countries and match venues.
-    This index identifies cities that face secondary risk through
-    diaspora members returning from World Cup matches, independently
-    of whether they host games themselves.}
+    Bars show the top 15 hub metropolitan areas per disease, ranked
+    by $\Omega^B$ summed across all source countries and match venues,
+    and shaded by whether the hub is a World Cup host city or a
+    non-host city. Hubs are the home cities to which diaspora members
+    return after attending matches.}
   \label{fig:s5}
 \end{figure}
 
@@ -1148,13 +1161,10 @@ the smallest.
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Top 10 source-country contributors to diaspora-network
     importation intensity ($\Omega^A$) per disease.}
-    $\Omega^A_{c,\cdot,d} = \sum_v \lambda_{c,v,d}\,\kappa_{c,v}$
-    summed across all 11 venue cities. Compare with
-    Figure~\ref{fig:countries}: countries whose rank rises here
-    (relative to raw $\lambda$) have large, concentrated diaspora
-    communities in the cities they tend to travel to; countries
-    whose rank falls send many travelers but into cities where
-    their community is thin. Colors denote world region.}
+    Bars show $\Omega^A$ for each source country, summed across the
+    11 host cities; colors denote world region (Canada and Mexico
+    grouped as North America). The corresponding raw-$\lambda$
+    ranking is shown in Figure~\ref{fig:countries}.}
   \label{fig:s6}
 \end{figure}
 
@@ -1168,12 +1178,9 @@ the smallest.
   \caption*{\textbf{Figure S\arabic{suppfig}.}
     \textbf{Diaspora network importation probability ($P^A(\geq 1)$)
     for all five diseases at 11 US host cities.}
-    Derived from $\Omega^A_{v,d} = \sum_c \lambda_{c,v,d}\,\kappa_{c,v}$
-    where $\kappa_{c,v} = D_{c,v}/\mathrm{FB}_v$ (ACS 2019--2023).
-    Dengue and malaria drive the majority of meaningful diaspora
-    signal; measles, pertussis, and influenza show near-zero values
-    owing to their very low baseline importation intensities.
-    The dengue and malaria rows correspond to Panel A of
+    Cells show $P^A(\geq 1)_{v,d}$, the probability that at least one
+    imported case enters a co-national diaspora network at each host
+    city. The dengue and malaria rows correspond to Panel A of
     Figure~\ref{fig:diaspora} in the main text.}
   \label{fig:s7b}
 \end{figure}
