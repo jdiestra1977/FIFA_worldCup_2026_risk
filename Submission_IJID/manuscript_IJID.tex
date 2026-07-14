@@ -595,32 +595,33 @@ for city-specific public health preparedness. Surveillance and
 response resources calibrated to M3 estimates will be better
 matched to the actual risk at US venues.
 
-Perhaps the most policy-relevant finding is that baseline travel
-already accounts for 86--93\% of total expected importations across
-all five diseases (Figure~\ref{fig:excess}). The World Cup adds
-7--14\% above a pre-existing risk that is present every June
-regardless of the tournament. This implies that targeted
-tournament-period surveillance, while valuable, cannot substitute
-for year-round monitoring of international travelers arriving at US
-airports from endemic regions. The marginal contribution of the WC
-travel surge is real but modest relative to the structural baseline
-risk --- a distinction that is obscured by event-specific assessments
-that do not include a pre-tournament counterfactual.
+The most policy-relevant finding is that baseline travel accounts
+for 86--93\% of total expected importations across all five diseases
+(Figure~\ref{fig:excess}). The World Cup adds 7--14\% above a risk
+that exists every June, tournament or not. Year-round monitoring of
+international travelers arriving at US airports from endemic regions
+is therefore indispensable; targeted tournament-period surveillance
+is a complement, not a substitute. The marginal contribution of the
+WC travel surge is real but modest relative to the structural
+baseline, and any risk assessment that excludes a pre-tournament
+counterfactual will overstate it.
 
-The diaspora extension introduces a distinction absent from
-standard importation models: whether an imported case enters a
+The diaspora extension asks whether an imported case enters a
 concentrated co-national social network or disperses into the
-general population. This distinction is operationally important
-because co-national networks have higher contact rates for disease
+general population, a distinction absent from standard importation
+models. This distinction is operationally important because
+co-national networks have higher contact rates for disease
 transmission, may face language and access barriers to healthcare,
 and are often the focus of World Cup watch-party gatherings that
 could amplify early transmission chains. The $P^A(\geq 1)$ metric
 provides a directly actionable quantity for targeted community
 health outreach that complements city-level $P(\geq 1)$ monitoring.
 
-Several limitations should be noted. First, the Poisson independence
-assumption may understate clustering risk from coordinated group travel
-by fans from the same country. Second, $\rho_d$ corrects for
+Our analysis has seven limitations. First, Poisson assumes independence
+and equates mean with variance; correlated arrivals from coordinated
+group travel by fans from the same country introduce overdispersion,
+so variance is understated and uncertainty bounds are narrower than
+the true sampling distribution warrants. Second, $\rho_d$ corrects for
 under-reporting in source-country surveillance but does not model
 US detection rates; our $\Lambda$ estimates represent true infected
 arrivals, not detected US cases, so comparisons with CDC surveillance
@@ -654,18 +655,18 @@ analysis code repository.
 \section{Conclusions}
 % =============================================================
 
-Dengue importation is near-certain at Miami, New York, and Houston,
-and represents a substantial risk at Dallas and Atlanta; malaria is
-the dominant threat at Atlanta. Baseline travel accounts for
-86--93\% of total expected importations across all diseases,
-confirming that the dominant risk exists year-round independently of
-the tournament, and that the World Cup travel surge contributes a
-real but modest 7--14\% increment above that pre-existing burden.
-A two-tier surveillance strategy is warranted: heightened city-level
-monitoring for dengue and malaria combined with targeted community
-outreach within co-national diaspora networks at Miami, New York,
-and Houston, where the probability of a case entering a co-national
-social network exceeds 0.70. The schedule-driven Poisson framework
+Dengue importation probability exceeds 0.99 in Miami, New York, and
+Houston, and exceeds 0.95 in Dallas and Atlanta; malaria is the
+dominant threat in Atlanta, where $P(\geq 1)$ also exceeds 0.99.
+Baseline travel accounts for 86--93\% of total expected importations
+across all diseases, confirming that the dominant risk exists
+year-round independently of the tournament; the World Cup travel
+surge contributes a real but modest 7--14\% increment above that
+pre-existing burden. A two-tier surveillance strategy is warranted,
+combining increased city-level monitoring for dengue and malaria
+with targeted community outreach within co-national diaspora
+networks at Miami, New York, and Houston, where $P^A(\geq 1)$
+exceeds 0.70. The schedule-driven Poisson framework
 is directly reusable for future mega-events by substituting updated
 travel volumes and disease incidence data, and its reliance on
 publicly available inputs makes it a practical first-pass tool for

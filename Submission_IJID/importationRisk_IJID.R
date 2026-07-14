@@ -588,3 +588,10 @@ for (i in seq_len(nrow(rho_configs))) {
 cat("\nΛ = 11-city total expected importations (M3, deterministic at rho_mid × p_mid).\n")
 cat("P(≥1) = probability of at least one importation across all 11 cities.\n")
 cat("Chosen range selected; Table S1 and Table 1 updated accordingly.\n")
+
+####
+
+malaria_mc_sched |>
+  dplyr::select(destination_city, lambda_median, prob_median) |>
+  dplyr::arrange(desc(prob_median)) |>
+  print()

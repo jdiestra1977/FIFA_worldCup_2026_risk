@@ -923,3 +923,76 @@ figB_ext <- ggplot(figB_ext_data,
 ggsave(figB_ext,
        file   = "Figures/figB_diaspora_hub_seeding_extended.png",
        height = 8, width = 13, dpi = 300)
+
+
+# ---- 7g. Figure S[new]: Source-country drivers of Mechanism B ---------------
+# Stacked bar chart showing which source countries contribute most to Omega_B
+# at the top hub cities, for dengue and malaria. Directly supports the
+# manuscript claim that secondary seeding reflects Nigerian and Indian diaspora
+# communities for malaria, and Mexican diaspora for dengue.
+# Top 10 hub cities per disease; top 3 source countries per hub shown.
+
+top_n_hubs_B <- 10
+
+figS_mechB_data <- omega_B_ext %>%
+  group_by(disease, hub_city, hub_type, Country) %>%
+  summarise(omega_B = sum(omega_B, na.rm = TRUE),
+            kappa   = first(diaspora_conc_hub),
+            .groups = "drop") %>%
+  filter(disease %in% c("Dengue", "Malaria")) %>%
+  group_by(disease, hub_city) %>%
+  mutate(omega_B_hub_total = sum(omega_B)) %>%
+  ungroup() %>%
+  group_by(disease) %>%
+  mutate(hub_rank = dense_rank(desc(omega_B_hub_total))) %>%
+  ungroup() %>%
+  filter(hub_rank <= top_n_hubs_B) %>%
+  group_by(disease, hub_city) %>%
+  slice_max(omega_B, n = 3, with_ties = FALSE) %>%
+  ungroup() %>%
+  mutate(
+    disease  = factor(disease, levels = c("Dengue", "Malaria")),
+    hub_type = factor(if_else(hub_type == "venue", "Venue", "Non-venue"),
+                      levels = c("Venue", "Non-venue"))
+  )
+
+# Okabe-Ito palette — colorblind-safe for up to 8 categories
+okabe_ito <- c(
+  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+  "#0072B2", "#D55E00", "#CC79A7", "#999999"
+)
+
+figS_mechB <- ggplot(figS_mechB_data,
+                     aes(x    = reorder_within(hub_city, omega_B_hub_total, disease),
+                         y    = omega_B,
+                         fill = Country)) +
+  geom_col(alpha = 0.88, width = 0.75) +
+  geom_point(aes(shape = hub_type, y = -0.003),
+             size = 4, color = "gray30", show.legend = TRUE) +
+  coord_flip() +
+  facet_wrap(~ disease, scales = "free", ncol = 2) +
+  scale_x_discrete(labels = function(x) gsub("___.+$", "", x)) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.15))) +
+  scale_fill_manual(values = okabe_ito, name = "Source country") +
+  scale_shape_manual(values = c("Venue" = 16, "Non-venue" = 17),
+                     name   = "Hub type") +
+  guides(fill = guide_legend(override.aes = list(shape = NA))) +
+  labs(
+    x    = "",
+    y    = expression(Seeding~index~(Omega[B])~"by source country"),
+    fill = "Source country"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    strip.text         = element_text(face = "bold", size = 11),
+    strip.background   = element_rect(fill = "gray96", color = NA),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    legend.position    = "right"
+  )
+
+ggsave(figS_mechB,
+       file   = "Figures/figS_mechB_country_drivers_IJID.png",
+       height = 7, width = 13, dpi = 300)
+print(figS_mechB)
+
