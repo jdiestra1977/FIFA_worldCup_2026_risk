@@ -51,3 +51,6 @@ References/
 
 # ── Claude Code project settings ───────────────────────────
 .claude/
+
+# ── Personal reminders (local calendar .ics files) ──────────
+Reminders_future/

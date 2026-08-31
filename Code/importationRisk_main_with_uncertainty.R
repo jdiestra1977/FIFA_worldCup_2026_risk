@@ -2379,6 +2379,127 @@ ggsave(fig3_model_comparison,
        height = 8.5, width = 14, dpi = 300)
 print(fig3_model_comparison)
 
+# ---- 12d-2. MANUSCRIPT FIGURE 3 — WC increment above baseline ----
+# This is the actual Figure 3 embedded in the manuscript
+# (Submission_IJID/Figure3.png, \label{fig:excess}), which is
+# NOT the dodged-bar model comparison built in §12d above (that one
+# was an earlier draft option, kept for reference).
+#
+# Manuscript definition (see caption + surrounding text):
+#   For each disease, sum lambda_median across all 11 US venue
+#   cities under (i) the baseline model (M1) and (ii) the
+#   schedule-driven model (M3). Each bar = M1 total (blue) topped
+#   by the WC increment M3 - M1 (red). The label above each bar is
+#   the increment as a % of the M1 baseline. A zoomed inset shows
+#   the measles bar, whose absolute scale is invisible next to dengue.
+#
+# Reuses total_lambda() from §14 below (moved up here since this
+# figure needs it before Figure 4).
+
+total_lambda <- function(mc_obj) {
+  mc_obj %>%
+    summarise(
+      median = sum(lambda_median),
+      lo     = sum(lambda_lo),
+      hi     = sum(lambda_hi)
+    )
+}
+
+excess_totals <- bind_rows(
+  total_lambda(dengue_mc_base)    %>% mutate(disease = "Dengue",    model = "Baseline"),
+  total_lambda(dengue_mc_sched)   %>% mutate(disease = "Dengue",    model = "Schedule-driven"),
+  total_lambda(malaria_mc_base)   %>% mutate(disease = "Malaria",   model = "Baseline"),
+  total_lambda(malaria_mc_sched)  %>% mutate(disease = "Malaria",   model = "Schedule-driven"),
+  total_lambda(pertussis_mc_base) %>% mutate(disease = "Pertussis", model = "Baseline"),
+  total_lambda(pertussis_mc_sched)%>% mutate(disease = "Pertussis", model = "Schedule-driven"),
+  total_lambda(influenza_mc_base) %>% mutate(disease = "Influenza", model = "Baseline"),
+  total_lambda(influenza_mc_sched)%>% mutate(disease = "Influenza", model = "Schedule-driven"),
+  total_lambda(measles_mc_base)   %>% mutate(disease = "Measles",   model = "Baseline"),
+  total_lambda(measles_mc_sched)  %>% mutate(disease = "Measles",   model = "Schedule-driven")
+)
+
+excess_wide <- excess_totals %>%
+  select(disease, model, median) %>%
+  pivot_wider(names_from = model, values_from = median) %>%
+  mutate(
+    increment  = `Schedule-driven` - Baseline,
+    pct_label  = sprintf("+%.0f%%", 100 * increment / Baseline)
+  ) %>%
+  arrange(desc(Baseline)) %>%
+  mutate(disease = factor(disease, levels = disease))
+
+excess_long <- excess_wide %>%
+  select(disease, Baseline, increment) %>%
+  pivot_longer(c(Baseline, increment), names_to = "segment", values_to = "value") %>%
+  mutate(segment = factor(segment, levels = c("Baseline", "increment"),
+                          labels = c("Baseline travel (M1)", "WC increment (M3 − M1)")))
+
+excess_colors <- c(
+  "Baseline travel (M1)"    = "#4393c3",
+  "WC increment (M3 − M1)"  = "#c0392b"
+)
+
+# ---- main panel ----
+fig3_excess_main <- ggplot(excess_long, aes(x = disease, y = value, fill = segment)) +
+  geom_col(width = 0.65, position = position_stack(reverse = TRUE)) +
+  geom_text(data = excess_wide,
+            aes(x = disease, y = `Schedule-driven`, label = pct_label),
+            inherit.aes = FALSE, vjust = -0.6, size = 5, color = "gray20") +
+  scale_fill_manual(values = excess_colors, name = NULL) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.14))) +
+  labs(x = "Disease", y = "Expected importations (Λ)") +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    legend.position   = "none",
+    axis.title.x      = element_text(size = 14)
+  )
+
+# ---- inset panel: zoomed measles bar (own y-scale) ----
+measles_row  <- excess_wide %>% filter(disease == "Measles")
+measles_long <- excess_long %>% filter(disease == "Measles")
+
+fig3_excess_inset <- ggplot(measles_long, aes(x = disease, y = value, fill = segment)) +
+  geom_col(width = 0.65, position = position_stack(reverse = TRUE)) +
+  scale_fill_manual(values = excess_colors, guide = "none") +
+  scale_y_continuous(limits = c(0, measles_row$`Schedule-driven` * 1.15),
+                      expand = expansion(mult = c(0, 0.05))) +
+  labs(x = NULL, y = NULL) +
+  theme_bw(base_size = 10) +
+  theme(
+    axis.text.x  = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid   = element_blank(),
+    plot.background = element_rect(color = "black", linewidth = 0.6)
+  )
+
+# Inset placed upper-right, dashed leader lines connect it back to the
+# (otherwise invisible) measles bar at the foot of the main panel.
+inset_xmin <- nlevels(excess_wide$disease) - 1.4
+inset_xmax <- nlevels(excess_wide$disease) + 0.6
+inset_ymin <- max(excess_wide$`Schedule-driven`) * 0.66
+inset_ymax <- max(excess_wide$`Schedule-driven`) * 0.90
+measles_x  <- which(levels(excess_wide$disease) == "Measles")
+
+fig3_excess_importation <- fig3_excess_main +
+  annotation_custom(
+    grob = ggplotGrob(fig3_excess_inset),
+    xmin = inset_xmin, xmax = inset_xmax,
+    ymin = inset_ymin, ymax = inset_ymax
+  ) +
+  annotate("segment", x = measles_x - 0.35, xend = inset_xmin,
+           y = measles_row$`Schedule-driven`, yend = inset_ymin,
+           linetype = "dashed", color = "gray30") +
+  annotate("segment", x = measles_x + 0.35, xend = inset_xmax,
+           y = measles_row$`Schedule-driven`, yend = inset_ymin,
+           linetype = "dashed", color = "gray30")
+
+ggsave(fig3_excess_importation,
+       file   = "Figures/fig3_excess_importation.png",
+       height = 6, width = 8, dpi = 300)
+print(fig3_excess_importation)
+
 # ---- 12e. FIGURE 4 — Source country drivers -----------------
 # Top 10 source countries per disease, colored by world region.
 # Built as 5 individual plots (so each has its own within-panel
@@ -2534,15 +2655,8 @@ message("Model outputs saved to Data/model_outputs.RData")
 #   Dengue  — ~201 detected (604 travel-assoc. Apr–Jun 2024 ÷ 3)
 #   Malaria — ~167 detected (~2,000 imported/year ÷ 12)
 #   Measles —  ~24 detected (285 total 2024 ÷ 12)
-
-total_lambda <- function(mc_obj) {
-  mc_obj %>%
-    summarise(
-      median = sum(lambda_median),
-      lo     = sum(lambda_lo),
-      hi     = sum(lambda_hi)
-    )
-}
+#
+# total_lambda() is defined in §12d-2 above (reused here).
 
 cdc_comparison <- bind_rows(
   total_lambda(dengue_mc_base)   %>% mutate(disease = "Dengue",  model = "Baseline (M1)"),
