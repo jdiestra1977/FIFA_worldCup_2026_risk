@@ -21,8 +21,27 @@
 #   Mechanism B — Diaspora convergence and return seeding
 #     Diaspora members from across the US travel to venue cities
 #     to watch their home country's games, then return home.
-#     Omega_B[c, v_home, d] = lambda[c, v_match, d] * D[c, v_home]
-#     Risk lands in diaspora hub cities, not the game venue.
+#     Formalized 2026-09-04 as a genuine Poisson-thinning quantity
+#     (previously: Omega_B = lambda[c,v_match,d] * kappa[c,v_home], a
+#     "relative index" that mixed international-arrival intensity at
+#     the match venue with a population fraction in a different city,
+#     with no mechanism connecting the two):
+#       Omega_B[c, v_home, d] =
+#         sum_{v_match} omega[c,v_match] * Omega_A[c,v_match,d] * kappa[c,v_home]
+#     where omega[c,v_match] is the schedule-driven share of c's
+#     matches played at v_match (recovered from the WC-fan stream),
+#     Omega_A[c,v_match,d] is Mechanism A's already-defined local
+#     co-national exposure hazard at the match venue, and
+#     kappa[c,v_home] re-weights that exposure by how concentrated the
+#     source-country community is in the home city. Every factor is
+#     bounded (omega<=1, kappa<=1) multiplying an already-sensible-
+#     scale rate (Omega_A) — the same discipline Mechanism A itself
+#     uses — so Omega_B cannot blow up the way a raw-headcount x
+#     attendance-probability design did in an earlier draft (see
+#     Section 4 for that discarded attempt and why it failed). This
+#     gives Omega_B real Poisson-count units and a valid probability
+#     P^B(>=1) = 1 - exp(-Omega_B), directly comparable to P^A(>=1),
+#     with no new free parameter.
 #
 # PREREQUISITES
 # -------------
@@ -236,36 +255,70 @@ omega_A <- lambda_city %>%
 # 4. MECHANISM B — DIASPORA CONVERGENCE AND RETURN SEEDING
 # ============================================================
 #
-# Normalized formula:
-#   Omega_B[c, v_match, v_home, d] =
-#       lambda[c, v_match, d] * (D[c, v_home] / FB[v_home])
+# Formula (see header comment for full derivation):
+#   Omega_B[c, v_home, d] =
+#     sum_v_match omega[c,v_match] * Omega_A[c,v_match,d] * kappa[c,v_home]
 #
-# Interpretation: the importation intensity at the match venue,
-# weighted by the concentration of the source-country diaspora
-# in the hub city they return to. A value of 0.02 means: "given
-# the expected infectious arrivals at the match venue, 2% of the
-# hub city's foreign-born community shares that national background
-# and could sustain onward transmission after fans return home."
+# Every factor is bounded (omega<=1, kappa<=1) multiplying an
+# already-sensible-scale rate (Omega_A, same scale as lambda) — the
+# same discipline Mechanism A itself uses (lambda * kappa). An
+# earlier draft of this fix multiplied a raw diaspora headcount by an
+# assumed attendance probability instead of kappa; that blew up to
+# Omega_B in the hundreds (P^B(>=1) saturated at 1.000 everywhere)
+# because it treated Omega_A — an expected CASE COUNT, O(1-5) — as if
+# it were a per-person infection PROBABILITY applied independently to
+# thousands of "attendees." Caught by test-running the script before
+# reporting results; discarded in favor of the formula above, which
+# needs no new free parameter at all.
+#
+# omega[c, v_match] — schedule-driven share of country c's matches
+# played at each US venue. Recovered from the WC-fan stream already
+# computed in the main pipeline (all_contributions$stream == "WC
+# fans") rather than re-reading the fixture list: the ratio of WC-fan
+# expected_imports across venues for a fixed country is exactly
+# omega[c,v] regardless of disease, because incidence/rho_d/p_d enter
+# as a common multiplier across all venues for a given (c,d). Derived
+# from Dengue's column as an arbitrary but valid representative.
+schedule_weight <- all_contributions %>%
+  filter(disease == "Dengue", stream == "WC fans") %>%
+  group_by(Country) %>%
+  mutate(omega_sched = expected_imports / sum(expected_imports)) %>%
+  ungroup() %>%
+  filter(omega_sched > 0) %>%
+  select(Country, match_venue = city, omega_sched)
 
-lambda_match <- all_contributions %>%
-  group_by(Country, city, disease) %>%
-  summarise(lambda_match = sum(expected_imports, na.rm = TRUE), .groups = "drop")
+# Omega_A[c, v_match, d] at the match venue (Mechanism A, computed
+# above) — the local co-national exposure hazard a visiting diaspora
+# member from v_home would encounter while attending the match.
+omega_A_match <- omega_A %>%
+  select(Country, match_venue = city, disease, omega_A_match = omega_A)
 
 diaspora_hub <- diaspora %>%
   select(Country, hub_city = venue_city, diaspora_conc_hub = diaspora_conc)
 
-omega_B <- lambda_match %>%
-  rename(match_venue = city) %>%
-  # cross join: every match-venue lambda against every hub-city diaspora
-  left_join(
-    diaspora_hub %>% rename(Country_hub = Country),
-    by = character()
-  ) %>%
-  filter(Country == Country_hub,       # same source country
-         match_venue != hub_city) %>%  # hub must differ from match venue
-  mutate(omega_B = lambda_match * diaspora_conc_hub) %>%
-  select(Country, match_venue, hub_city, disease,
-         lambda_match, diaspora_conc_hub, omega_B)
+# compute_omega_B(): shared by the venue-only hub set here and the
+# extended (venue + non-venue) hub set in Section 7, so both use an
+# identical formula. Works whether or not diaspora_hub_df carries a
+# hub_type column (added in Section 7).
+compute_omega_B <- function(diaspora_hub_df) {
+  group_cols <- c("Country", "hub_city", "disease", "diaspora_conc_hub",
+                   intersect("hub_type", names(diaspora_hub_df)))
+
+  omega_A_match %>%
+    inner_join(schedule_weight, by = c("Country", "match_venue")) %>%
+    # cross join: every match venue's Omega_A against every hub's diaspora
+    left_join(
+      diaspora_hub_df %>% rename(Country_hub = Country),
+      by = character()
+    ) %>%
+    filter(Country == Country_hub,       # same source country
+           match_venue != hub_city) %>%  # exclude self-seeding (Mechanism A already covers it)
+    mutate(omega_B_term = omega_sched * omega_A_match * diaspora_conc_hub) %>%
+    group_by(across(all_of(group_cols))) %>%
+    summarise(omega_B = sum(omega_B_term, na.rm = TRUE), .groups = "drop")
+}
+
+omega_B <- compute_omega_B(diaspora_hub)
 
 
 # ============================================================
@@ -293,6 +346,11 @@ omega_B_summary <- omega_B %>%
     omega_B = sum(omega_B, na.rm = TRUE),
     .groups = "drop"
   ) %>%
+  # prob_B: probability that at least one returning diaspora member
+  # is infected while attending a match and seeds the hub city — a
+  # genuine Poisson probability now that Omega_B has real count units
+  # (see Section 4), directly comparable to prob_A.
+  mutate(prob_B = 1 - exp(-omega_B)) %>%
   arrange(disease, desc(omega_B))
 
 print(omega_A_summary)
@@ -549,7 +607,8 @@ print(figA)
 # ---- 6b. FIGURE B — Omega_B bar chart (hub city secondary risk) --
 # Shows which hub cities face the highest secondary seeding risk
 # (Mechanism B: diaspora members attend WC games then return home).
-# Y-axis is Omega_B = lambda at match venue × diaspora_conc in hub.
+# Y-axis is Omega_B = D[hub] * tau * sum_match omega * Omega_A[match]
+# (see Section 4 for the full formula).
 
 figB_data <- omega_B_summary %>%
   mutate(
@@ -574,7 +633,7 @@ figB <- ggplot(figB_data,
   ) +
   labs(
     x        = "",
-    y        = "Expected importations at match venue\n× diaspora concentration in hub city",
+    y        = expression(Seeding~index~(Omega[B])),
     title    = "Expected secondary seeding risk in diaspora hub cities",
     subtitle = "Cities where diaspora members attend WC games then return home — risk lands here, not at the venue"
   ) +
@@ -819,22 +878,17 @@ diaspora_hub_ext <- bind_rows(
 diaspora_hub_ext %>% select(hub_city,hub_type) %>% unique() %>% print(n=26)
 
 # ---- 7d. Recompute Omega_B over all hub cities --------------
-# lambda_match (importation intensity at the match venue) is defined
-# in Section 4. The match_venue != hub_city guard still removes
-# self-seeding; hubs may now be non-venue metros.
-omega_B_ext <- lambda_match %>%
-  rename(match_venue = city) %>%
-  left_join(diaspora_hub_ext %>% rename(Country_hub = Country),
-            by = character()) %>%
-  filter(Country == Country_hub,
-         match_venue != hub_city) %>%
-  mutate(omega_B = lambda_match * diaspora_conc_hub) %>%
-  select(Country, match_venue, hub_city, hub_type, disease,
-         lambda_match, diaspora_conc_hub, omega_B)
+# Same compute_omega_B() formula as Section 4 (Omega_A at the match
+# venue x schedule weight x hub diaspora headcount x tau), applied to
+# the extended hub set; hubs may now be non-venue metros. The
+# match_venue != hub_city guard (inside compute_omega_B) still
+# excludes self-seeding.
+omega_B_ext <- compute_omega_B(diaspora_hub_ext)
 
 omega_B_ext_summary <- omega_B_ext %>%
   group_by(hub_city, hub_type, disease) %>%
   summarise(omega_B = sum(omega_B, na.rm = TRUE), .groups = "drop") %>%
+  mutate(prob_B = 1 - exp(-omega_B)) %>%
   arrange(disease, desc(omega_B))
 
 cat("\n===== MECHANISM B (extended): top hubs incl. non-venue =====\n")
@@ -994,5 +1048,6 @@ figS_mechB <- ggplot(figS_mechB_data,
 ggsave(figS_mechB,
        file   = "Figures/figS_mechB_country_drivers_IJID.png",
        height = 7, width = 13, dpi = 300)
+
 print(figS_mechB)
 

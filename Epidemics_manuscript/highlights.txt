@@ -1,0 +1,7 @@
+Highlights
+
+- A schedule-driven Poisson framework separates event risk from travel baseline.
+- Applied to WC2026: baseline travel caused 86-93% of importation risk, not the event.
+- Dengue and malaria dominated risk in Miami, New York, Houston, and Atlanta.
+- A diaspora extension flags co-national networks for targeted health outreach.
+- Uses only free, public data, so any health department can run it, low-budget or not.
