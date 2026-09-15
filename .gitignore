@@ -42,12 +42,28 @@ estimated_importations.png
 import_dengue.png
 temporal_arrivals_from_regions.png
 
-# ── Generated HTML from Rmd ─────────────────────────────────
-Importation_of_Influenza_WC2026/*.html
+# ── Superseded standalone notebook (not part of Code/ pipeline) ──
+Importation_of_Influenza_WC2026/
 
 # ── Copyrighted reference PDFs ──────────────────────────────
 # Do not commit copyrighted journal articles to a public repo
 References/
+
+# ── Manuscript drafts and journal submissions ───────────────
+# This repo is for code and data to reproduce the analysis only;
+# manuscript text/figures for any journal are kept out of GitHub.
+Epidemics_manuscript/
+Submission_IJID/
+Submission_Eurosurveillance/
+JournalOfInfectionAndPublicHealth/
+Manuscript/
+WC_collaborative/
+
+# ── Unrelated side-project ──────────────────────────────────
+OutbreakThreshold/
+
+# ── Stray root-level R/plot artifacts ───────────────────────
+Rplots.pdf
 
 # ── Claude Code project settings ───────────────────────────
 .claude/
