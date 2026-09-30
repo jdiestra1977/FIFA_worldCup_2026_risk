@@ -582,12 +582,9 @@ figA <- ggplot(figA_data, aes(x = city, y = disease, fill = prob_A)) +
     breaks  = c(0, 0.25, 0.5, 0.75, 1),
     labels  = c("0", "0.25", "0.50", "0.75", "1")
   ) +
-  labs(
-    x        = "",
-    y        = "",
-    title    = "Probability of at least one importation into local diaspora networks",
-    subtitle = "P(≥1) = 1 − exp(−Ωᴀ): same Poisson logic as Figure 1, applied to co-national sub-population at each city"
-  ) +
+  labs(x = "", y = "") +
+  # No title/subtitle baked into the plot: explanatory text belongs in
+  # the LaTeX caption, not duplicated in the image itself.
   theme_minimal(base_size = 13) +
   theme(
     axis.text.x       = element_text(angle = 35, hjust = 1, size = 10),
@@ -595,13 +592,15 @@ figA <- ggplot(figA_data, aes(x = city, y = disease, fill = prob_A)) +
     panel.grid        = element_blank(),
     legend.position   = "right",
     legend.key.height = unit(1.6, "cm"),
-    plot.title        = element_text(size = 13, face = "bold"),
-    plot.subtitle     = element_text(size = 9.5, color = "gray45")
+    # Top plot margin reserves room for the 3-line legend title, which
+    # ggplot2 stacks above the color key; without it, the title is
+    # clipped by the top edge of the device.
+    plot.margin       = margin(t = 34, r = 8, b = 5.5, l = 5.5)
   )
 
 ggsave(figA,
        file   = "Figures/figA_diaspora_local_mixing.png",
-       height = 4.5, width = 13, dpi = 300)
+       height = 4.9, width = 13, dpi = 300)
 print(figA)
 
 # ---- 6b. FIGURE B — Omega_B bar chart (hub city secondary risk) --
