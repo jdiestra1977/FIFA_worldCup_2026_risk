@@ -42,7 +42,13 @@ library(tidycensus)
 # ============================================================
 # 1. WORKING DIRECTORY + LOAD MODEL OUTPUTS
 # ============================================================
-setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
+# Run from the repository root: open FIFA_worldCup_2026_risk.Rproj in
+# RStudio (or setwd() to the folder containing Code/, Data/, Figures/).
+if (!dir.exists("Data") || !dir.exists("Code")) {
+  stop("Working directory must be the repository root ",
+       "(the folder containing Code/, Data/ and Figures/). ",
+       "Open FIFA_worldCup_2026_risk.Rproj in RStudio, or use setwd().")
+}
 
 load("Data/model_outputs.RData")
 # Loads: all_contributions, mc_all_sched, top_countries_ci,

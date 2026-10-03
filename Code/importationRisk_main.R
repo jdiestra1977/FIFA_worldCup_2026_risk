@@ -63,7 +63,13 @@ library(ggrepel)     # geom_label_repel() — overlap-free map labels
 # ============================================================
 # 1. WORKING DIRECTORY
 # ============================================================
-setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
+# Run from the repository root: open FIFA_worldCup_2026_risk.Rproj in
+# RStudio (or setwd() to the folder containing Code/, Data/, Figures/).
+if (!dir.exists("Data") || !dir.exists("Code")) {
+  stop("Working directory must be the repository root ",
+       "(the folder containing Code/, Data/ and Figures/). ",
+       "Open FIFA_worldCup_2026_risk.Rproj in RStudio, or use setwd().")
+}
 
 
 # ============================================================

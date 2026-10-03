@@ -1,79 +1,42 @@
-# ── macOS metadata ─────────────────────────────────────────
-.DS_Store
-**/.DS_Store
+# ============================================================
+# Allowlist: this public repository contains ONLY the files needed
+# to reproduce the paper's calculations and figures. Everything
+# else (manuscripts, submissions, screenshots, notes, archives,
+# side projects) is ignored by default and stays on the local disk.
+# ============================================================
 
-# ── R session files ─────────────────────────────────────────
+# Ignore everything at the top level...
+/*
+
+# ...except these
+!/.gitignore
+!/README.md
+!/LICENSE
+!/FIFA_worldCup_2026_risk.Rproj
+!/Code/
+!/Data/
+!/Figures/
+
+# Code: final R scripts only
+/Code/*
+!/Code/*.R
+
+# Figures: the paper's figures only (Figure1-4, FigureS1-S9)
+/Figures/*
+!/Figures/Figure[0-9]*.png
+!/Figures/Figure[0-9]*.pdf
+!/Figures/FigureS[0-9]*.png
+!/Figures/FigureS[0-9]*.pdf
+
+# Data: large, auto-downloaded, or local-only files
+# BTS T-100 raw files: download from https://www.transtats.bts.gov
+/Data/Data_BTS/
+# FluNet (~30 MB): downloaded automatically by Code/importationRisk_main.R
+/Data/flunet_viwfnt.csv
+/Data/Not_currently_used/
+
+# System and R session files, anywhere
+.DS_Store
 .Rhistory
 .RData
 .Rproj.user/
-
-# ── LaTeX build artifacts ───────────────────────────────────
-*.aux
-*.bbl
-*.blg
-*.fdb_latexmk
-*.fls
-*.log
-*.nav
-*.out
-*.snm
-*.synctex.gz
-*.toc
-
-# ── Large / auto-downloaded data ────────────────────────────
-# FluNet full dataset (~30 MB); auto-downloaded by importationRisk_main.R
-# if the file is missing — no need to commit it
-Data/flunet_viwfnt.csv
-
-# Raw BTS T-100 international segment files (~7 MB each)
-# Download from: https://www.transtats.bts.gov (Table T_T100I_SEGMENT_ALL_CARRIER)
-Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2023.csv
-Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2024.csv
-Data/Data_BTS/T_T100I_SEGMENT_ALL_CARRIER_2025.csv
-
-# ── Superseded / exploratory data ───────────────────────────
-Data/Not_currently_used/
-
-# ── Superseded figures ──────────────────────────────────────
-Figures/Not_currently_used/
-
-# ── Stray root-level output figures ────────────────────────
-estimated_importations.png
-import_dengue.png
-temporal_arrivals_from_regions.png
-
-# ── Superseded standalone notebook (not part of Code/ pipeline) ──
-Importation_of_Influenza_WC2026/
-
-# ── Copyrighted reference PDFs ──────────────────────────────
-# Do not commit copyrighted journal articles to a public repo
-References/
-
-# ── Manuscript drafts and journal submissions ───────────────
-# This repo is for code and data to reproduce the analysis only;
-# manuscript text/figures for any journal are kept out of GitHub.
-Epidemics_manuscript/
-Submission_IJID/
-Submission_Eurosurveillance/
-JournalOfInfectionAndPublicHealth/
-Manuscript/
-WC_collaborative/
-
-# ── Unrelated side-project ──────────────────────────────────
-OutbreakThreshold/
-
-# ── Stray root-level R/plot artifacts ───────────────────────
-Rplots.pdf
-
-# ── Claude Code project settings ───────────────────────────
-.claude/
-
-# ── Personal reminders (local calendar .ics files) ──────────
-Reminders_future/
-Data/Data_BTS/events.ics
-
-# Epidemics submission package (manuscript, figures)
-Epidemics_submission/
-
-# Retired code, data and figures from earlier analysis versions (kept locally)
-Archive_not_in_repo/

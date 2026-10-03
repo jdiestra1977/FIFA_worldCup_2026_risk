@@ -23,8 +23,10 @@ are not part of this repo.
 
 ## Pipeline
 
-Run in this order, in a single fresh R session (later scripts use objects
-created by earlier ones):
+Open `FIFA_worldCup_2026_risk.Rproj` in RStudio first, so the working directory
+is the repository root (or `setwd()` to the folder containing `Code/`, `Data/`
+and `Figures/`). Then run in this order, in a single fresh R session (later
+scripts use objects created by earlier ones):
 
 | # | Script | Produces |
 |---|---|---|
@@ -84,3 +86,8 @@ Census API key at <https://api.census.gov/data/key_signup.html> and run once:
 ```r
 tidycensus::census_api_key("YOUR_KEY_HERE", install = TRUE)
 ```
+
+## License
+
+The code is released under the MIT License (see `LICENSE`). Input data remain
+subject to the terms of their original providers, listed under Data sources.
