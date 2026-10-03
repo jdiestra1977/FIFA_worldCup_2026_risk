@@ -1,31 +1,22 @@
 # ============================================================
-# Empirical validation: dengue, full-year 2024 reconstruction
+# Model evaluation: dengue, full-year 2024 reconstruction (Table 2)
 # ============================================================
 #
 # PURPOSE
 # -------
-# Comment 3 from the senior collaborator: compare model estimates
-# against reported travel-associated cases for the same period.
-# This compares an independently-built ANNUAL 2024 estimate against
-# MMWR-published 2024 state-level travel-associated dengue totals.
+# Compares an annual 2024 dengue Lambda for the nine states containing
+# a host city with MMWR 2024 state-level travel-associated dengue
+# cases. Each month uses that month's arrivals and incidence, with
+# T_d = one month (365.25/12 days) for p_d (main script, Section 5g).
 #
-# WHY 2024, AND THE LIMITATION THIS INTRODUCES
-# -----------------------------------------------
-# This is NOT a clean held-out test like the June-2023 script.
-# June 2024 arrivals were used to build M1, and June 2024 incidence
-# contributed to the model's "June 2024-2025 average" disease
-# parameter. Of the 12 months reconstructed here, 1 (June) overlaps
-# with data already used elsewhere in the model; the other 11 do
-# not. This was chosen deliberately over further delay: MMWR already
-# publishes full 2024 state-level annual totals, so no new data
-# sourcing is required, unlike a genuinely clean held-out year
-# (e.g. 2023), for which state-level annual totals were not found
-# via public CDC pages in this session. STATE THIS LIMITATION
-# EXPLICITLY if this validation is used in the manuscript.
+# OVERLAP WITH THE MAIN MODEL
+# ---------------------------
+# June 2024 arrivals and incidence are also inputs to the main model,
+# so 1 of the 12 months reconstructed here is not independent of it.
 #
 # PREREQUISITE
 # ------------
-# Run importationRisk_main_with_uncertainty_rho_corrected.R first
+# Run importationRisk_main.R first
 # (through the point where arrivals_COR, t100_routing,
 # population_of_world, dengue_data_world_selected, under_rho_dengue,
 # p_travel_inf_dengue, compute_importation_country_level(), and
@@ -35,14 +26,9 @@
 # ---------------------
 # MMWR "Increase in Travel-Associated and Locally Acquired Dengue
 # Cases -- United States, 2024" (https://www.cdc.gov/mmwr/volumes/
-# 75/wr/mm7518a1.htm), Table 2. Two figure sets appeared during
-# sourcing (959/702/338/239/143 vs. 1044/720/338/241 for
-# FL/CA/NY/TX/MA) -- this was NOT a data error, they are two
-# different columns of the same table: 1,044 is Florida's COMBINED
-# total (travel-associated + locally acquired), 959 is the
-# travel-associated subset specifically. Since Lambda in this model
-# represents infected ARRIVALS (travel-associated), the
-# travel-associated column is the correct comparison and is what is
+# 75/wr/mm7518a1.htm), Table 2. The table reports both total cases
+# (e.g., Florida 1,044) and travel-associated cases (Florida 959).
+# Lambda counts infected arrivals, so the travel-associated column is
 # used below. Nationally, 97.2% of 2024 cases were travel-associated;
 # only FL (85 local), CA (18 local), and TX (2 local) had any
 # locally-acquired cases at all among these 9 states.
@@ -116,7 +102,7 @@ dengue_2024_annual_mc <- compute_mc_summary(
   dengue_2024_annual_central$imp_intensity,
   dengue_2024_annual_central$destination_city,
   under_rho_dengue, p_travel_inf_dengue,
-  0.06, 0.26, 0.30, 0.70,
+  0.06,  0.26,  p_min_dengue,  p_max_dengue,
   n_mc = 5000
 )
 
@@ -142,8 +128,7 @@ dengue_2024_by_state <- dengue_2024_annual_mc %>%
   arrange(desc(lambda_median))
 
 # ---- 5. Compare against MMWR 2024 state totals -----------------------
-# Source: MMWR mm7518a1, Table 2, travel-associated column (confirmed
-# directly from the live table; see header note).
+# Source: MMWR mm7518a1, Table 2, travel-associated column.
 reported_dengue_2024 <- tibble(
   state          = c("FL", "CA", "NY", "TX", "MA", "GA", "WA", "PA", "MO"),
   reported_cases = c(959,  702,  338,  239,  143,  56,   67,   66,   12)

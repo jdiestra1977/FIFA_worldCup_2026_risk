@@ -1,17 +1,12 @@
 # ============================================================
 # T-100 International Segment Data — Routing Fraction Prep
 # Author : Jose Herrera-Diestra
-# Updated: May 2026
 #
 # PURPOSE
 # -------
-# importationRisk_main.R originally used I-92 routing fractions to
-# allocate international travelers to specific US cities. I-92 covers
-# only 5 gateway cities (Boston, Dallas, Houston, Newark/NY, Philadelphia).
-# This script replaces those fractions with BTS T-100 International
-# Segment data, which covers ALL US airports, including the 6 remaining
-# US WC venue cities (Los Angeles, Atlanta, Kansas City, Miami, San
-# Francisco, Seattle).
+# Builds country-level routing fractions f_{c,v}: the share of country
+# c's US-bound nonstop passengers that land at each US host city, from
+# BTS T-100 International Segment data (all US airports).
 #
 # T-100 records nonstop international flight segments landing at US
 # airports. Passengers on connecting itineraries (e.g., São Paulo →
@@ -33,13 +28,13 @@
 #   Country          — country name in COR naming convention
 #   venue_city       — canonical WC venue city name
 #   routing_fraction — share of that country's US-bound passengers
-#                      landing at this city (mean June 2023–2025)
-#   years_observed   — number of June months averaged (1–3)
+#                      landing at this city (pooled June 2023–2025)
+#   years_observed   — number of June months with nonstop service to the city (1–3)
 #
 # USAGE
 # -----
-# Run this script ONCE before running importationRisk_main.R.
-# The output CSV is read in Section 3b of the main script.
+# Run once before importationRisk_main.R, which reads the output CSV
+# in its Section 3c.
 #
 # HOW TO GET THE DATA
 # -------------------
@@ -239,20 +234,26 @@ venue_passengers <- t100_venues %>%
   summarise(venue_passengers = sum(passengers, na.rm = TRUE),
             .groups = "drop")
 
-# ---- 3e. Mean June routing fractions (2023–2025) ------------
-# Average the routing fraction over all available June observations
-# before computing the mean (not divide-then-average) so that
-# fractions remain valid proportions within each year.
+# ---- 3e. Pooled June routing fractions (2023–2025) ----------
+# Pool passengers over all three Junes before dividing: the fraction
+# is (venue-city passengers summed over June 2023-2025) / (all-US
+# passengers summed over the same Junes). Pooling counts years without
+# service as zero and guarantees sum_v f <= 1 for every country.
+
+us_totals_pooled <- us_totals %>%
+  group_by(origin_country_name) %>%
+  summarise(total_us_passengers = sum(total_us_passengers, na.rm = TRUE),
+            .groups = "drop")
 
 routing_raw <- venue_passengers %>%
-  left_join(us_totals, by = c("year", "month", "origin_country_name")) %>%
-  mutate(yr_fraction = venue_passengers / total_us_passengers) %>%
   group_by(origin_country_name, venue_city) %>%
   summarise(
-    routing_fraction = mean(yr_fraction, na.rm = TRUE),
+    venue_passengers = sum(venue_passengers, na.rm = TRUE),
     years_observed   = n(),
     .groups = "drop"
   ) %>%
+  left_join(us_totals_pooled, by = "origin_country_name") %>%
+  mutate(routing_fraction = venue_passengers / total_us_passengers) %>%
   filter(!is.na(routing_fraction), routing_fraction > 0)
 
 
