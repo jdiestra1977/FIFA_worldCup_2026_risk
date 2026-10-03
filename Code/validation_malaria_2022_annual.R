@@ -1,12 +1,13 @@
 # ============================================================
-# Empirical validation: malaria, full-year 2022 reconstruction
+# Model evaluation: malaria, full-year 2022 reconstruction
 # ============================================================
 #
 # PURPOSE
 # -------
-# Comment 3 from the senior collaborator, same design as the dengue
-# 2024 validation: compare an independently-built annual malaria
-# Lambda against real reported US case counts for the same period.
+# Compares an annual 2022 malaria Lambda with reported state-level
+# cases. Reported in the Results text (not in Table 2): implied
+# detection fractions exceeded 100% in four states, so the comparison
+# was not used as an evaluation.
 #
 # WHY 2022
 # --------
@@ -14,8 +15,7 @@
 # data.csv) only covers 2022-2024, and the headline model uses 2024
 # specifically. 2022 is the earliest year available in that file and
 # the most recent year with a published CDC state-level malaria
-# table (NNDSS Table 2k) found this session -- no 2023/2024 state
-# table was located. 2022 arrivals and 2022 incidence are both
+# table (NNDSS Table 2k). 2022 arrivals and 2022 incidence are both
 # independent of the headline model's 2024-based construction.
 #
 # NOTE ON THE INCIDENCE METRIC
@@ -27,7 +27,8 @@
 # the headline model does (that /12 exists only to approximate a
 # monthly rate for pairing with June-only arrivals; here we are
 # matching a full year of arrivals to a full year of incidence, so
-# no monthly approximation is needed).
+# no monthly approximation is needed). p_d uses T_d = 365.25 days
+# (p_*_malaria_annual, main script Section 5g).
 #
 # 2022 COLUMN NAMING IN arrivals_COR
 # -------------------------------------
@@ -37,9 +38,9 @@
 #
 # PREREQUISITE
 # ------------
-# Run importationRisk_main_with_uncertainty_rho_corrected.R first
+# Run importationRisk_main.R first
 # (through the point where arrivals_COR, t100_routing,
-# population_of_world, under_rho_malaria, p_travel_inf_malaria,
+# population_of_world, under_rho_malaria, p_travel_inf_malaria_annual,
 # compute_importation_country_level(), and compute_mc_summary()
 # exist in the session).
 #
@@ -87,7 +88,7 @@ malaria_2022_country_inc <- malaria_data_raw %>%
 malaria_2022_results <- compute_importation_country_level(
   arrivals_df    = arrivals_2022,
   country_inc_df = malaria_2022_country_inc,
-  p_travel_inf   = p_travel_inf_malaria,
+  p_travel_inf   = p_travel_inf_malaria_annual,  # annual run: p_d = D_d / 365.25
   title_text     = "Malaria importation intensity -- annual 2022 (validation)"
 )
 
@@ -95,8 +96,8 @@ malaria_2022_results <- compute_importation_country_level(
 malaria_2022_mc <- compute_mc_summary(
   malaria_2022_results$importation$imp_intensity,
   malaria_2022_results$importation$destination_city,
-  under_rho_malaria, p_travel_inf_malaria,
-  0.10, 0.35, 0.10, 0.50,
+  under_rho_malaria, p_travel_inf_malaria_annual,
+  0.10,  0.35,  p_min_malaria_annual,  p_max_malaria_annual,
   n_mc = 5000
 )
 

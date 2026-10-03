@@ -71,3 +71,9 @@ Rplots.pdf
 # ── Personal reminders (local calendar .ics files) ──────────
 Reminders_future/
 Data/Data_BTS/events.ics
+
+# Epidemics submission package (manuscript, figures)
+Epidemics_submission/
+
+# Retired code, data and figures from earlier analysis versions (kept locally)
+Archive_not_in_repo/

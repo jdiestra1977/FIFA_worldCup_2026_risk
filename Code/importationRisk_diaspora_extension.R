@@ -1,55 +1,33 @@
 # ============================================================
 # FIFA World Cup 2026 — Diaspora-Adjusted Importation Risk
-#
+# Exploratory extension (Appendix B)
 # Author : Jose Herrera-Diestra
-# Created: June 2026
 #
 # PURPOSE
 # -------
-# Extends the three-model importation framework from
-# importationRisk_main_with_uncertainty.R by incorporating
-# US diaspora population data (Census ACS 2020-2024) to estimate
-# community-weighted importation risk at each WC venue city.
+# Extends the importation model with US diaspora data (Census ACS
+# 5-year, Table B05006) to estimate how much importation risk lands in
+# co-national communities.
 #
-# Two mechanisms are modelled:
+#   Mechanism A — local mixing at the venue city
+#     Omega_A[c, v, d] = lambda[c, v, d] * kappa[c, v]
+#     kappa[c, v] = share of city v's foreign-born population born in
+#     country c;  P^A(>=1) = 1 - exp(-Omega_A).
 #
-#   Mechanism A — Local social mixing at the venue city
-#     Omega_A[c, v, d] = lambda[c, v, d] * D[c, v]
-#     An imported case lands inside a socially connected local
-#     diaspora community from the same source country.
-#
-#   Mechanism B — Diaspora convergence and return seeding
-#     Diaspora members from across the US travel to venue cities
-#     to watch their home country's games, then return home.
-#     Formalized 2026-09-04 as a genuine Poisson-thinning quantity
-#     (previously: Omega_B = lambda[c,v_match,d] * kappa[c,v_home], a
-#     "relative index" that mixed international-arrival intensity at
-#     the match venue with a population fraction in a different city,
-#     with no mechanism connecting the two):
-#       Omega_B[c, v_home, d] =
-#         sum_{v_match} omega[c,v_match] * Omega_A[c,v_match,d] * kappa[c,v_home]
-#     where omega[c,v_match] is the schedule-driven share of c's
-#     matches played at v_match (recovered from the WC-fan stream),
-#     Omega_A[c,v_match,d] is Mechanism A's already-defined local
-#     co-national exposure hazard at the match venue, and
-#     kappa[c,v_home] re-weights that exposure by how concentrated the
-#     source-country community is in the home city. Every factor is
-#     bounded (omega<=1, kappa<=1) multiplying an already-sensible-
-#     scale rate (Omega_A) — the same discipline Mechanism A itself
-#     uses — so Omega_B cannot blow up the way a raw-headcount x
-#     attendance-probability design did in an earlier draft (see
-#     Section 4 for that discarded attempt and why it failed). This
-#     gives Omega_B real Poisson-count units and a valid probability
-#     P^B(>=1) = 1 - exp(-Omega_B), directly comparable to P^A(>=1),
-#     with no new free parameter.
+#   Mechanism B — return seeding of diaspora hub cities
+#     Omega_B[c, v_home, d] =
+#       sum_{v_match != v_home} omega[c, v_match] * Omega_A[c, v_match, d] * kappa[c, v_home]
+#     omega[c, v_match] = share of country c's matches played at v_match.
+#     Omega_B is reported as a relative index of secondary seeding, not
+#     as a probability (Appendix B).
 #
 # PREREQUISITES
 # -------------
-# 1. Run importationRisk_main_with_uncertainty.R (through Section 13)
-#    to generate Data/model_outputs.RData.
-# 2. Get a free Census API key at https://api.census.gov/data/key_signup.html
-#    and run: census_api_key("YOUR_KEY_HERE", install = TRUE)
-#    Section 2 downloads ACS table B05006 automatically and caches it.
+# 1. Run importationRisk_main.R first;
+#    it writes Data/model_outputs.RData, loaded below.
+# 2. A free Census API key (https://api.census.gov/data/key_signup.html),
+#    installed once with census_api_key("YOUR_KEY_HERE", install = TRUE).
+#    ACS data are downloaded on the first run and cached in Data/.
 # ============================================================
 
 
@@ -67,9 +45,9 @@ library(tidycensus)
 setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 
 load("Data/model_outputs.RData")
-# Loads: all_contributions, mc_all_sched, comparison_all,
-#        top_countries_ci, city_order_main, disease_colors,
-#        region_colors, mc_ranges, assign_region
+# Loads: all_contributions, mc_all_sched, top_countries_ci,
+#        city_order_main, disease_colors, region_colors, mc_ranges,
+#        mc_country_scales, assign_region
 
 
 # ============================================================
@@ -237,9 +215,15 @@ if (!file.exists(diaspora_cache)) {
 # but discounts it when the diaspora network is small and amplifies
 # it when the network is large relative to the immigrant community.
 
+# all_contributions holds central lambda (at the reference rho_c, p_c);
+# rescale to the Monte Carlo median so Omega values are on the same scale
+# as the main results (mc_country_scales comes from the main pipeline).
 lambda_city <- all_contributions %>%
   group_by(Country, city, disease) %>%
-  summarise(lambda = sum(expected_imports, na.rm = TRUE), .groups = "drop")
+  summarise(lambda = sum(expected_imports, na.rm = TRUE), .groups = "drop") %>%
+  left_join(select(mc_country_scales, disease, scale_mid), by = "disease") %>%
+  mutate(lambda = lambda * scale_mid) %>%   # central -> Monte Carlo median
+  select(-scale_mid)
 
 omega_A <- lambda_city %>%
   left_join(
@@ -255,21 +239,9 @@ omega_A <- lambda_city %>%
 # 4. MECHANISM B — DIASPORA CONVERGENCE AND RETURN SEEDING
 # ============================================================
 #
-# Formula (see header comment for full derivation):
+# Formula (see header):
 #   Omega_B[c, v_home, d] =
 #     sum_v_match omega[c,v_match] * Omega_A[c,v_match,d] * kappa[c,v_home]
-#
-# Every factor is bounded (omega<=1, kappa<=1) multiplying an
-# already-sensible-scale rate (Omega_A, same scale as lambda) — the
-# same discipline Mechanism A itself uses (lambda * kappa). An
-# earlier draft of this fix multiplied a raw diaspora headcount by an
-# assumed attendance probability instead of kappa; that blew up to
-# Omega_B in the hundreds (P^B(>=1) saturated at 1.000 everywhere)
-# because it treated Omega_A — an expected CASE COUNT, O(1-5) — as if
-# it were a per-person infection PROBABILITY applied independently to
-# thousands of "attendees." Caught by test-running the script before
-# reporting results; discarded in favor of the formula above, which
-# needs no new free parameter at all.
 #
 # omega[c, v_match] — schedule-driven share of country c's matches
 # played at each US venue. Recovered from the WC-fan stream already
@@ -293,13 +265,9 @@ schedule_weight <- all_contributions %>%
 omega_A_match <- omega_A %>%
   select(Country, match_venue = city, disease, omega_A_match = omega_A)
 
-diaspora_hub <- diaspora %>%
-  select(Country, hub_city = venue_city, diaspora_conc_hub = diaspora_conc)
-
-# compute_omega_B(): shared by the venue-only hub set here and the
-# extended (venue + non-venue) hub set in Section 7, so both use an
-# identical formula. Works whether or not diaspora_hub_df carries a
-# hub_type column (added in Section 7).
+# compute_omega_B(): applied in Section 7 to the hub set of venue and
+# non-venue metros. Works whether or not diaspora_hub_df carries a
+# hub_type column.
 compute_omega_B <- function(diaspora_hub_df) {
   group_cols <- c("Country", "hub_city", "disease", "diaspora_conc_hub",
                    intersect("hub_type", names(diaspora_hub_df)))
@@ -317,8 +285,6 @@ compute_omega_B <- function(diaspora_hub_df) {
     group_by(across(all_of(group_cols))) %>%
     summarise(omega_B = sum(omega_B_term, na.rm = TRUE), .groups = "drop")
 }
-
-omega_B <- compute_omega_B(diaspora_hub)
 
 
 # ============================================================
@@ -339,221 +305,14 @@ omega_A_summary <- omega_A %>%
   mutate(prob_A = 1 - exp(-omega_A)) %>%
   arrange(disease, desc(omega_A))
 
-# --- 5b. Top hub cities at secondary risk (Mechanism B) ------
-omega_B_summary <- omega_B %>%
-  group_by(hub_city, disease) %>%
-  summarise(
-    omega_B = sum(omega_B, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  # prob_B: probability that at least one returning diaspora member
-  # is infected while attending a match and seeds the hub city — a
-  # genuine Poisson probability now that Omega_B has real count units
-  # (see Section 4), directly comparable to prob_A.
-  mutate(prob_B = 1 - exp(-omega_B)) %>%
-  arrange(disease, desc(omega_B))
-
 print(omega_A_summary)
-print(omega_B_summary)
 
-
-# ============================================================
-# 7. VISUALIZATION COMPARISON — three candidate designs for
-#    the diaspora extension figure
-#
-#  Option 1 — Rank-shift slopegraph
-#    Shows how city rankings change from raw importation risk (λ)
-#    to community-weighted risk (Ω^A) for each disease.
-#    Blue lines = cities that rise in rank; red = fall; gray = same.
-#
-#  Option 2 — Diaspora concentration heatmap (κ only)
-#    Shows the share of each city's foreign-born population from
-#    each WC source country (top 15 by total λ). Pure demographics,
-#    no λ scaling. Values are percentages.
-#
-#  Option 3 — Top country × city pairs by Ω^A
-#    Bar charts of the top 8 source-country → venue-city pairs per
-#    disease by Ω^A (expected importations into diaspora network).
-#    Focuses on specific pairs rather than city aggregates.
-# ============================================================
-
-# ---- 7a. OPTION 1 — Rank-shift slopegraph -------------------
-
-slope_data <- omega_A_summary %>%
-  group_by(disease) %>%
-  mutate(
-    rank_lambda  = rank(-lambda,  ties.method = "first"),
-    rank_omegaA  = rank(-omega_A, ties.method = "first"),
-    rank_change  = rank_lambda - rank_omegaA,
-    direction    = case_when(
-      rank_change > 0 ~ "Rises",
-      rank_change < 0 ~ "Falls",
-      TRUE            ~ "No change"
-    )
-  ) %>%
-  ungroup()
-
-make_slope_panel <- function(dis) {
-  d <- slope_data %>% filter(disease == dis)
-
-  ggplot(d) +
-    geom_segment(
-      aes(x = 0, xend = 1,
-          y = rank_lambda, yend = rank_omegaA,
-          color = direction),
-      linewidth = 1.3, alpha = 0.85
-    ) +
-    geom_point(aes(x = 0, y = rank_lambda,  color = direction), size = 2.8) +
-    geom_point(aes(x = 1, y = rank_omegaA, color = direction), size = 2.8) +
-    geom_text(aes(x = -0.04, y = rank_lambda,  label = city),
-              hjust = 1, size = 2.6, color = "gray20") +
-    geom_text(aes(x =  1.04, y = rank_omegaA, label = city),
-              hjust = 0, size = 2.6, color = "gray20") +
-    scale_y_reverse(breaks = 1:11, limits = c(11.5, 0.5)) +
-    scale_x_continuous(
-      limits = c(-1.1, 2.1),
-      breaks = c(0, 1),
-      labels = c("Raw risk\n(λ)", "Community\nrisk (Ω^A)")
-    ) +
-    scale_color_manual(
-      values = c("Rises" = "#2166AC", "Falls" = "#D6604D", "No change" = "gray60"),
-      guide  = "none"
-    ) +
-    labs(title = dis, x = "", y = "City rank") +
-    theme_minimal(base_size = 9) +
-    theme(
-      panel.grid.major.x = element_blank(),
-      panel.grid.minor   = element_blank(),
-      axis.text.x  = element_text(size = 8, face = "bold"),
-      axis.text.y  = element_text(size = 7.5),
-      axis.title.y = element_text(size = 8),
-      plot.title   = element_text(face = "bold", hjust = 0.5, size = 10)
-    )
-}
-
-figOpt1 <- cowplot::plot_grid(
-  make_slope_panel("Dengue"),
-  make_slope_panel("Influenza"),
-  make_slope_panel("Pertussis"),
-  make_slope_panel("Malaria"),
-  make_slope_panel("Measles"),
-  nrow = 1
-)
-
-# ---- 7b. OPTION 2 — Diaspora concentration heatmap (κ) ------
-
-top_countries_list <- lambda_city %>%
-  group_by(Country) %>%
-  summarise(total_lambda = sum(lambda, na.rm = TRUE), .groups = "drop") %>%
-  slice_max(total_lambda, n = 15) %>%
-  pull(Country)
-
-kappa_data <- diaspora %>%
-  rename(city = venue_city) %>%
-  filter(Country %in% top_countries_list) %>%
-  mutate(
-    city    = factor(city, levels = city_order_main),
-    Country = reorder(Country, diaspora_conc, FUN = max),
-    pct     = diaspora_conc * 100,
-    label   = sprintf("%.1f", pct),
-    text_col = if_else(pct > 4, "white", "gray15")
-  )
-
-figOpt2 <- ggplot(kappa_data,
-                  aes(x = city, y = Country, fill = pct)) +
-  geom_tile(color = "white", linewidth = 0.6) +
-  geom_text(aes(label = label, color = text_col), size = 2.6) +
-  scale_color_identity() +
-  scale_fill_viridis_c(
-    option = "plasma",
-    name   = "% of city's\nforeign-born",
-    breaks = c(0, 2, 5, 8),
-    labels = c("0%", "2%", "5%", "8%")
-  ) +
-  labs(
-    x        = "",
-    y        = "",
-    title    = "Option 2: Diaspora concentration (κ)",
-    subtitle = "% of each city's foreign-born population from each WC source country (top 15 by λ)"
-  ) +
-  theme_minimal(base_size = 9.5) +
-  theme(
-    axis.text.x       = element_text(angle = 35, hjust = 1, size = 8.5),
-    axis.text.y       = element_text(size = 8.5),
-    panel.grid        = element_blank(),
-    legend.position   = "right",
-    legend.key.height = unit(1.2, "cm"),
-    plot.title        = element_text(face = "bold", size = 11),
-    plot.subtitle     = element_text(size = 8, color = "gray45")
-  )
-
-# ---- 7c. OPTION 3 — Top country × city pairs by Ω^A ---------
-
-top_pairs <- omega_A %>%
-  mutate(pair_label = paste0(Country, " → ", city)) %>%
-  group_by(disease) %>%
-  slice_max(omega_A, n = 8, with_ties = FALSE) %>%
-  ungroup() %>%
-  mutate(
-    disease = factor(disease,
-                     levels = c("Dengue","Influenza","Pertussis","Malaria","Measles"))
-  )
-
-figOpt3 <- ggplot(top_pairs,
-                  aes(x = reorder(pair_label, omega_A),
-                      y = omega_A, fill = disease)) +
-  geom_col(alpha = 0.85, width = 0.75) +
-  coord_flip() +
-  facet_wrap(~ disease, scales = "free", ncol = 3) +
-  scale_fill_manual(values = disease_colors, guide = "none") +
-  scale_y_continuous(
-    expand = expansion(mult = c(0, 0.18)),
-    labels = scales::number_format(accuracy = 0.001, drop0trailing = TRUE)
-  ) +
-  labs(
-    x        = "",
-    y        = "Expected importations into diaspora network (Ω^A)",
-    title    = "Option 3: Top source-country → venue-city pairs by Ωᴀ",
-    subtitle = "Top 8 country → city combinations per disease (schedule-driven model)"
-  ) +
-  theme_minimal(base_size = 9.5) +
-  theme(
-    strip.text         = element_text(face = "bold", size = 10),
-    strip.background   = element_rect(fill = "gray96", color = NA),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor   = element_blank(),
-    plot.title         = element_text(face = "bold", size = 11),
-    plot.subtitle      = element_text(size = 8, color = "gray45")
-  )
-
-# ---- 7d. Combine all three options --------------------------
-
-fig_comparison <- cowplot::plot_grid(
-  cowplot::plot_grid(
-    cowplot::ggdraw() +
-      cowplot::draw_label("Option 1: City rank shifts (raw λ  →  community-weighted Ω^A)",
-                          fontface = "bold", size = 11, x = 0.02, hjust = 0),
-    figOpt1,
-    ncol = 1, rel_heights = c(0.06, 1)
-  ),
-  figOpt2,
-  figOpt3,
-  ncol    = 1,
-  labels  = c("A", "B", "C"),
-  label_size = 13,
-  rel_heights = c(1.1, 1.0, 1.2)
-)
-
-ggsave(fig_comparison,
-       file   = "Figures/fig_diaspora_comparison.png",
-       height = 22, width = 18, dpi = 300)
-message("Saved Figures/fig_diaspora_comparison.png")
 
 # ============================================================
 # 6. FIGURES
 # ============================================================
 
-# ---- 6a. FIGURE A — Diaspora importation probability heatmap --
+# ---- 6a. FIGURE S7 — P^A(>=1) heatmap (Mechanism A) ---------
 # Each cell shows P^A(>=1) = 1 - exp(-Omega_A_v_d), the probability
 # that at least one imported case enters the co-national diaspora
 # network in that city — directly comparable to Figure 1 (P>=1 for
@@ -599,64 +358,20 @@ figA <- ggplot(figA_data, aes(x = city, y = disease, fill = prob_A)) +
   )
 
 ggsave(figA,
-       file   = "Figures/figA_diaspora_local_mixing.png",
+       file   = "Figures/FigureS7.png",
        height = 4.9, width = 13, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(figA,
+       file   = "Figures/FigureS7.pdf",
+       height = 4.9, width = 13, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
 print(figA)
 
-# ---- 6b. FIGURE B — Omega_B bar chart (hub city secondary risk) --
-# Shows which hub cities face the highest secondary seeding risk
-# (Mechanism B: diaspora members attend WC games then return home).
-# Y-axis is Omega_B = D[hub] * tau * sum_match omega * Omega_A[match]
-# (see Section 4 for the full formula).
-
-figB_data <- omega_B_summary %>%
-  mutate(
-    disease = factor(disease, levels = c("Dengue","Influenza",
-                                          "Pertussis","Malaria","Measles"))
-  ) %>%
-  group_by(disease) %>%
-  slice_max(omega_B, n = 8, with_ties = FALSE) %>%
-  ungroup()
-
-figB <- ggplot(figB_data,
-               aes(x = reorder(hub_city, omega_B),
-                   y = omega_B,
-                   fill = disease)) +
-  geom_col(alpha = 0.85, width = 0.75) +
-  coord_flip() +
-  facet_wrap(~ disease, scales = "free_x", ncol = 3) +
-  scale_fill_manual(values = disease_colors, guide = "none") +
-  scale_y_continuous(
-    expand = expansion(mult = c(0, 0.15)),
-    labels = scales::number_format(accuracy = 0.0001, drop0trailing = TRUE)
-  ) +
-  labs(
-    x        = "",
-    y        = expression(Seeding~index~(Omega[B])),
-    title    = "Expected secondary seeding risk in diaspora hub cities",
-    subtitle = "Cities where diaspora members attend WC games then return home — risk lands here, not at the venue"
-  ) +
-  theme_minimal(base_size = 12) +
-  theme(
-    strip.text         = element_text(face = "bold", size = 11),
-    strip.background   = element_rect(fill = "gray96", color = NA),
-    panel.grid.major.y = element_blank(),
-    panel.grid.minor   = element_blank(),
-    plot.title         = element_text(size = 13, face = "bold"),
-    plot.subtitle      = element_text(size = 10, color = "gray45")
-  )
-
-ggsave(figB,
-       file   = "Figures/figB_diaspora_hub_seeding.png",
-       height = 8, width = 13, dpi = 300)
-print(figB)
-
-# ---- 6c. FIGURE C — Country contributions to diaspora-weighted risk --
+# ---- 6c. FIGURE S6 — Source countries ranked by Omega_A -----
 # Top 10 source countries per disease ranked by expected importations
 # into diaspora networks (summed across all venue cities).
-# Colored by world region, same palette as Fig 4 in the main paper.
+# Colored by world region, same palette as Figure 4.
 #
-# Compare with Fig 4: countries whose rank rises here have high diaspora
+# Compared with Figure 4, countries whose rank rises here have high diaspora
 # concentration relative to their arrival volume. Countries whose rank
 # falls send many travelers but into cities where few co-nationals live.
 
@@ -730,16 +445,19 @@ figC <- cowplot::plot_grid(
 )
 
 ggsave(figC,
-       file   = "Figures/figC_country_drivers_omegaA.png",
+       file   = "Figures/FigureS6.png",
        height = 13, width = 15, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(figC,
+       file   = "Figures/FigureS6.pdf",
+       height = 13, width = 15, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
 print(figC)
 
 
 # ============================================================
-# DIAGNOSTIC: diaspora drivers per host city (for manuscript text)
+# DIAGNOSTIC: diaspora drivers per host city (Appendix B.5)
 # Prints top diaspora source communities (with kappa = diaspora_conc)
-# and P^A(>=1) per city, to keep the Figure 6 narrative accurate.
-# Safe to comment out once the text is finalized.
+# and P^A(>=1) per city.
 # ============================================================
 cat("\n===== DENGUE: top 3 diaspora drivers per host city =====\n")
 omega_A %>%
@@ -783,9 +501,8 @@ omega_A_summary %>%
 # host matches. The base analysis (Section 4) pulled ACS diaspora
 # data only for the 11 venue metros, so hub_city was restricted to
 # venues. Here we add major non-venue diaspora metros, pull the same
-# B05006 country-of-birth data for them, and recompute Omega_B over
-# the full set of hub cities (venue + non-venue). The original
-# venue-only objects (omega_B, omega_B_summary) are left untouched.
+# B05006 country-of-birth data for them, and compute Omega_B over
+# the full set of hub cities (venue + non-venue).
 #
 # NOTE: requires a Census API key (same as the venue pull). The
 # non-venue pull is cached to Data/census_diaspora_nonvenue_cities.csv.
@@ -876,10 +593,9 @@ diaspora_hub_ext <- bind_rows(
 
 diaspora_hub_ext %>% select(hub_city,hub_type) %>% unique() %>% print(n=26)
 
-# ---- 7d. Recompute Omega_B over all hub cities --------------
-# Same compute_omega_B() formula as Section 4 (Omega_A at the match
-# venue x schedule weight x hub diaspora headcount x tau), applied to
-# the extended hub set; hubs may now be non-venue metros. The
+# ---- 7d. Omega_B over all hub cities ------------------------
+# compute_omega_B() from Section 4 (Omega_A at the match venue x
+# schedule weight x hub kappa), applied to venue and non-venue hubs. The
 # match_venue != hub_city guard (inside compute_omega_B) still
 # excludes self-seeding.
 omega_B_ext <- compute_omega_B(diaspora_hub_ext)
@@ -887,7 +603,6 @@ omega_B_ext <- compute_omega_B(diaspora_hub_ext)
 omega_B_ext_summary <- omega_B_ext %>%
   group_by(hub_city, hub_type, disease) %>%
   summarise(omega_B = sum(omega_B, na.rm = TRUE), .groups = "drop") %>%
-  mutate(prob_B = 1 - exp(-omega_B)) %>%
   arrange(disease, desc(omega_B))
 
 cat("\n===== MECHANISM B (extended): top hubs incl. non-venue =====\n")
@@ -899,7 +614,7 @@ omega_B_ext_summary %>%
   mutate(omega_B = round(omega_B, 4)) %>%
   print(n = 40)
 
-# ---- 7e. Top diaspora drivers per hub city (for manuscript) -
+# ---- 7e. Top diaspora drivers per hub city (Appendix B.5) --
 # For the top 8 hubs per disease, show the source countries that
 # contribute most to Omega_B (summed across all match venues), with
 # kappa (diaspora_conc_hub) = the hub's diaspora concentration.
@@ -926,10 +641,9 @@ omega_B_ext %>%
   print(n = 40)
 
 
-# ---- 7f. Figure S5 (extended): all-disease Mechanism B ------
-# Rebuilds the supplementary Mechanism B figure on the extended hub
-# set (venue + non-venue), shaded by hub type, for all five diseases.
-# Used by the IJID figure script as figS5. reorder_within orders bars
+# ---- 7f. FIGURE S5 — Omega_B by hub city, all diseases -------
+# Hub cities (venue + non-venue), shaded by hub type, for all five
+# diseases. reorder_within orders bars
 # within each facet (defined in the main pipeline; redefined here so
 # this section also works if the diaspora script is run standalone).
 if (!exists("reorder_within")) {
@@ -939,6 +653,19 @@ if (!exists("reorder_within")) {
 }
 
 hub_type_colors <- c("Venue" = "#0072B2", "Non-venue" = "#D55E00")  # CB-safe
+
+# Axis labels that stay readable when a facet's values are tiny
+# (measles Omega_B is ~1e-8, which a fixed 4-decimal format shows as 0)
+label_small <- function(x) {
+  big <- suppressWarnings(max(abs(x), na.rm = TRUE))
+  out <- if (is.finite(big) && big > 0 && big < 1e-3) {
+    format(x, scientific = TRUE, digits = 2)
+  } else {
+    format(x, scientific = FALSE, drop0trailing = TRUE, trim = TRUE)
+  }
+  out[!is.na(x) & x == 0] <- "0"
+  out
+}
 
 figB_ext_data <- omega_B_ext_summary %>%
   mutate(
@@ -961,7 +688,7 @@ figB_ext <- ggplot(figB_ext_data,
   scale_fill_manual(values = hub_type_colors, name = NULL) +
   scale_y_continuous(
     expand = expansion(mult = c(0, 0.15)),
-    labels = scales::number_format(accuracy = 0.0001, drop0trailing = TRUE)
+    labels = label_small
   ) +
   labs(x = "", y = expression(Seeding~index~(Omega[B]))) +
   theme_minimal(base_size = 12) +
@@ -970,19 +697,23 @@ figB_ext <- ggplot(figB_ext_data,
     strip.background   = element_rect(fill = "gray96", color = NA),
     panel.grid.major.y = element_blank(),
     panel.grid.minor   = element_blank(),
-    legend.position    = c(0.8,0.3)
+    legend.position    = c(0.8,0.3),
+    plot.margin        = margin(5.5, 22, 5.5, 5.5)  # room for the last axis label
   )
 
 ggsave(figB_ext,
-       file   = "Figures/figB_diaspora_hub_seeding_extended.png",
+       file   = "Figures/FigureS5.png",
        height = 8, width = 13, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(figB_ext,
+       file   = "Figures/FigureS5.pdf",
+       height = 8, width = 13, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(figB_ext)
 
 
-# ---- 7g. Figure S[new]: Source-country drivers of Mechanism B ---------------
-# Stacked bar chart showing which source countries contribute most to Omega_B
-# at the top hub cities, for dengue and malaria. Directly supports the
-# manuscript claim that secondary seeding reflects Nigerian and Indian diaspora
-# communities for malaria, and Mexican diaspora for dengue.
+# ---- 7g. FIGURE S8 — Source-country drivers of Omega_B -------
+# Stacked bar chart showing which source countries contribute most to
+# Omega_B at the top hub cities, for dengue and malaria.
 # Top 10 hub cities per disease; top 3 source countries per hub shown.
 
 top_n_hubs_B <- 10
@@ -1045,8 +776,12 @@ figS_mechB <- ggplot(figS_mechB_data,
   )
 
 ggsave(figS_mechB,
-       file   = "Figures/figS_mechB_country_drivers_IJID.png",
+       file   = "Figures/FigureS8.png",
        height = 7, width = 13, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(figS_mechB,
+       file   = "Figures/FigureS8.pdf",
+       height = 7, width = 13, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
 
 print(figS_mechB)
 

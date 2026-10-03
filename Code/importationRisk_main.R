@@ -1,53 +1,50 @@
 # ============================================================
 # FIFA World Cup 2026 — Infectious Disease Importation Risk
+# Main model with Monte Carlo uncertainty intervals
 # Author : Jose Herrera-Diestra
-# Updated: May 2026
 #
 # OVERVIEW
 # --------
-# This script estimates the probability of at least one imported case
-# of dengue, malaria, measles, pertussis, and influenza reaching each
-# US host city during June 2026. Three nested models of increasing
-# spatial resolution are built and compared:
+# Estimates expected imported infections (Lambda) and the probability
+# of at least one imported infection, P(>=1), for dengue, malaria,
+# measles, pertussis, and influenza at the 11 US host cities during
+# June 2026. Model tiers:
 #
-#   Model 1 — Baseline
-#     Travel:    COR June 2024 × BTS T-100 routing fractions (no WC adjustment)
-#     Incidence: Country-level (same precision as Models 2–3)
-#     Cities:    All 11 US WC venue cities covered by T-100
+#   M2 — WC-adjusted: June 2026 projected arrivals (COR June 2024 x
+#        growth factors), routed to cities by BTS T-100 fractions.
+#   M3 — Schedule-driven: the same arrivals split into a background
+#        stream (routed by T-100) and a World Cup fan stream (routed by
+#        the group-stage match schedule).
+#   M1 — Baseline, 2026 travel without the World Cup: the M3
+#        background stream routed by T-100, computed in
+#        model1_baseline_2026.R from objects created here.
 #
-#   Model 2 — WC-adjusted
-#     Travel:    Country-level June 2026 projections (NTTO + COR × phi_c)
-#     Incidence: Country-level (same as Model 1)
-#     Cities:    All 11 US WC venue cities covered by T-100
+# Importation model (Eq. 1 in the manuscript):
+#   lambda_{c,v,d} = N_{c,v} * C_{c,d} / (P_c * rho_d) * p_d
+#   Lambda_{v,d}   = sum_c lambda_{c,v,d},   P(>=1) = 1 - exp(-Lambda)
+# N = arrivals from country c to city v, C = reported cases,
+# P = population, rho_d = reporting fraction, and p_d = D_d / T_d, the
+# probability that an infected person travels while infected (5g).
 #
-#   Model 3 — Schedule-driven
-#     Travel:    2026 projections decomposed into WC-fan and background
-#                streams; WC fans routed by match schedule
-#     Incidence: Country-level (same as Models 1–2)
-#     Cities:    11 US WC venue cities (results restricted to US)
-#
-# The importation framework is a Poisson model (Eq. 1 in manuscript):
-#   P(X >= 1) = 1 - exp(-Lambda)
-#   Lambda     = sum_s [ arrivals(s,h) * incidence(s,d) * p_d ]
-#
-# where s = origin unit (region or country), h = host city, d = disease,
-# and p_d = probability of travelling while infectious.
+# Uncertainty: 5,000 Monte Carlo draws from Uniform ranges of rho_d and
+# p_d (Table 1); results are the median and 95% uncertainty interval.
 #
 # Sections:
 #   0.  Packages
 #   1.  Working directory
-#   2.  Reference data (population, COR arrivals, region mapping)
-#   3.  Travel volume — T-100 routing fractions + COR June 2024 baseline
-#   4.  Disease data (dengue, malaria, measles, pertussis, influenza)
-#   5.  Model functions (Poisson core + plot helper)
-#   6.  Baseline importation estimates (Model 1)
-#   7.  Combined baseline panel figure
-#   8.  WC-adjusted importation model (Model 2)
-#   9.  Schedule-driven venue routing model (Model 3)
-#  10.  Three-model comparison plots
-#  11.  Country-level importation contributions
-#  12.  Sensitivity analysis (rho and p_travel_inf ± 50 %)
-#  13.  Monte Carlo uncertainty analysis (5,000 draws, 95% CI on Lambda and P)
+#   2.  Reference data (population, COR arrivals, venue map = Figure S4)
+#   3.  Travel data (COR June 2024, T-100 routing fractions)
+#   4.  Disease data
+#   5.  Model functions, Monte Carlo settings, p_d (5g)
+#   6.  rho_d and country-level incidence tables
+#   7.  Shared plot aesthetics
+#   8.  M2 — WC-adjusted model
+#   9.  M3 — Schedule-driven model
+#  11.  Country-level contributions; Figure S3 (CI asymmetry)
+#  12.  Figures 1, 2, 4 and S2 (Figures 3 and S1: figure3_figureS1.R)
+#  13.  Save outputs for downstream scripts
+#
+# Run order for the full pipeline: see README.md.
 # ============================================================
 
 
@@ -73,10 +70,10 @@ setwd("~/Documents/GitHub/FIFA_worldCup_2026_risk/")
 # 2. REFERENCE DATA
 # ============================================================
 
-# --- 2a. Country populations (2020 census baseline) ---------
-# Used as the denominator when converting raw case counts to
-# per-capita incidence (Eq. 3 and Eq. 6 in manuscript).
-population_of_world <- read_csv("Data/population2020.csv") %>%
+# --- 2a. Country populations (2026 Worldometers projections) ---
+# Denominator P_c in Eq. 1.
+# Source: Worldometers, population by country (2026), accessed June 2026.
+population_of_world <- read_csv("Data/population2026.csv") %>%
   rename(Country = COUNTRY, population_country = POPULATION) %>%
   # Harmonise the DRC name to match the disease and arrivals datasets.
   # The COR dataset uses the older "Zaire" convention; we propagate
@@ -87,14 +84,14 @@ population_of_world <- read_csv("Data/population2020.csv") %>%
 # Source: CBP I-94 Monthly Arrivals by Country of Residence
 # (https://travel.trade.gov). Used to (i) build the country-to-
 # region correspondence table and (ii) extract June 2024 volumes
-# for the WC-adjusted and schedule-driven models (Section 8).
+# for the M2 and M3 models (Section 8).
 arrivals_COR <- read_csv("Data/Monthly_Arrivals_Country_of_Residence_COR_1.csv")
 
 # --- 2c. Country → broad world region mapping ---------------
 # Derived from the COR dataset (which carries a World_region field).
 # Two structural choices:
 #   (1) Western Europe + Eastern Europe → "Europe": keeps region counts
-#       manageable and aligns with I-92 regional aggregation.
+#       manageable.
 #   (2) Mexico and Canada kept as own regions: both are co-host nations
 #       with volumes and disease profiles distinct from their neighbours.
 correspondence_country_region <- arrivals_COR %>%
@@ -118,17 +115,7 @@ correspondence_country_region <- arrivals_COR %>%
     TRUE ~ new_region
   ))
 
-# --- 2d. Regional population totals -------------------------
-# Aggregate national populations to the broad region level.
-# No longer used in any active model tier (all three models use
-# country-level data via T-100 + COR). Retained because it is
-# referenced in the preserved I-92 regional baseline blocks.
-population_by_region <- correspondence_country_region %>%
-  select(new_region, population_country) %>%
-  group_by(new_region) %>%
-  summarise(popu_region = sum(population_country), .groups = "drop")
-
-# --- 2e. WC 2026 venue map -----------------------------------
+# --- 2e. WC 2026 venue map (Figure S4) ----------------------
 # Reads stadium coordinates and produces a North America map
 # with colour-coded circles (USA / Canada / Mexico) and
 # ggrepel labels to avoid overlap on the East Coast and
@@ -178,6 +165,7 @@ venue_map <- ggplot() +
     max.overlaps  = Inf,
     segment.size  = 0.3,
     segment.color = "gray50",
+    seed          = 2026,   # fixed label layout across reruns
     show.legend   = FALSE
   ) +
   coord_fixed(xlim = c(-130, -60), ylim = c(14, 57), ratio = 1.3) +
@@ -185,171 +173,43 @@ venue_map <- ggplot() +
     name   = "Host nation",
     values = c("USA" = "#1a6faf", "Canada" = "#c0392b", "Mexico" = "#27ae60")
   ) +
-  labs(
-    title    = "FIFA World Cup 2026 — Venue Stadiums",
-    subtitle = "16 venues across USA (11), Canada (2), and Mexico (3)",
-    x = NULL, y = NULL
-  ) +
+  labs(x = NULL, y = NULL) +
+  # No title/subtitle baked into the plot: explanatory text belongs in
+  # the LaTeX caption, not duplicated in the image itself.
   theme_bw() +
   theme(
     panel.grid      = element_blank(),
     axis.text       = element_blank(),
     axis.ticks      = element_blank(),
     panel.border    = element_rect(color = "gray70"),
-    legend.position = "bottom",
-    plot.title      = element_text(size = 14, face = "bold"),
-    plot.subtitle   = element_text(size = 11)
+    legend.position = "bottom"
   )
 
 ggsave(venue_map,
-       file   = "Figures/wc2026_venue_map.png",
+       file   = "Figures/FigureS4.png",
        height = 8, width = 12, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(venue_map,
+       file   = "Figures/FigureS4.pdf",
+       height = 8, width = 12, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(venue_map)
 
 # ============================================================
-# 3. TRAVEL VOLUME — T-100 ROUTING FRACTIONS + COR JUNE 2024
+# 3. TRAVEL DATA — COR JUNE 2024 + T-100 ROUTING FRACTIONS
 # ============================================================
-#
-# WHY BTS T-100 INSTEAD OF I-92
-# ------------------------------
-# The US International Air Travel Statistics (I-92 programme) was
-# previously used to supply routing fractions — the share of arrivals
-# from each world region that land at a specific US gateway city. I-92
-# covers only 5 gateway cities (Boston, Dallas, Houston, Newark/New York,
-# Philadelphia), leaving 6 of the 11 US WC venue cities (Atlanta, Kansas
-# City, Los Angeles, Miami, San Francisco, Seattle) with no data.
-#
-# The BTS T-100 International Segment (Form 41 Traffic — All Carriers)
-# provides nonstop international flight segment counts for EVERY US
-# airport with scheduled international service. From T-100 we derive
-# country-level routing fractions:
-#
-#   f_{c,v}^{T100} = N_{c,v,y}^{June} / N_{c,US,y}^{June}
-#
-# averaged over June 2023–2025 for stability. These fractions cover all
-# 11 US venue cities, giving a consistent spatial basis across all three
-# model tiers.
-#
-# For Model 1 (baseline), COR June 2024 arrivals are used WITHOUT any
-# World Cup growth adjustment. This is the pre-tournament counterfactual:
-#   N_{c,v}^{baseline} = COR_{c,June2024} × f_{c,v}^{T100}
-#
-# NOTE: The original I-92 data loading code is preserved below for
-# reference (commented out). It is not used in the current analysis.
+# Country-level arrivals come from the CBP I-94 Country of Residence
+# (COR) series; June 2024 is the base year for all growth factors.
+# Arrivals are allocated to US cities with BTS T-100 International
+# Segment routing fractions: nonstop passengers from country c landing
+# at city v, pooled over June 2023–2025, divided by passengers from c
+# landing at any US airport (Appendix A.1–A.2):
+#   f_{c,v} = sum_y N_{c,v,y} / sum_y N_{c,US,y}
 # ============================================================
 
-
-# ============================================================
-# ===== BEGIN: ORIGINAL I-92 APPROACH — PRESERVED FOR REFERENCE =====
-# ============================================================
-# The I-92 programme provides monthly air arrivals by region of origin
-# to five specific US gateway cities. This block reads those files,
-# computes mean June arrivals, and builds routing fractions at the
-# region level. It was replaced by BTS T-100 data (§3b below) because
-# T-100 covers all 11 US WC venue cities at country (not region) level.
-#
-# Source: US International Air Travel Statistics (I-92 programme),
-# Bureau of Transportation Statistics / US Dept of Commerce.
-# https://www.trade.gov/us-international-air-travel-statistics-i-92-data
-
-# files <- Sys.glob("Data/Selected_cities_and_origins/*.xlsx")
-#
-# # Helper: parse the region and destination city from the file name,
-# # then read the sheet, standardising column names via clean_names().
-# # The date_year filter drops any BTS footnote rows (non-numeric years).
-# read_arrivals_file <- function(f) {
-#   name <- basename(f)
-#   region <- name %>%
-#     str_extract("data_(.*)_to_") %>%
-#     str_remove("^data_") %>%
-#     str_remove("_to_$") %>%
-#     str_replace_all("_", " ") %>%
-#     str_to_title()
-#   destination <- name %>%
-#     str_extract("to_.*\\.xlsx") %>%
-#     str_remove("^to_") %>%
-#     str_remove("\\.xlsx$") %>%
-#     str_replace_all("_", " ") %>%
-#     str_to_title()
-#   read_excel(f) %>%
-#     clean_names() %>%
-#     mutate(region_origin = region, destination_city = destination) %>%
-#     filter(str_detect(as.character(date_year), "^(19|20)\\d{2}$"))
-# }
-#
-# data_all <- map_dfr(files, read_arrivals_file)
-#
-# # Shading rectangles for May–July (the WC window) used in time-series
-# # plots. Built from the full date range in the I-92 data.
-# shade_df <- data_all %>%
-#   mutate(year_month = as.Date(paste(date_year, month_number, 1, sep = "-"))) %>%
-#   distinct(year_month) %>%
-#   filter(month(year_month) %in% c(5, 6, 7)) %>%
-#   mutate(xmin = year_month, xmax = year_month + months(1))
-#
-# definite_data_arrivals <- data_all %>%
-#   mutate(
-#     all_arrivals = foreign_originating + foreign_returning + u_s_citizen_returning,
-#     year_month   = as.Date(paste(date_year, month_number, 1, sep = "-"))
-#   ) %>%
-#   select(date_year, month_number, date_month, region_origin,
-#          destination_city, all_arrivals, year_month) %>%
-#   drop_na() %>%
-#   filter(!destination_city %in% c("Austin")) %>%
-#   filter(!region_origin   %in% c("Oceania", "World"))
-#
-# usa_arrivals <- definite_data_arrivals %>%
-#   filter(destination_city == "Usa") %>%
-#   select(region_origin, year_month, all_arrivals) %>%
-#   rename(all_arrivals_usa = all_arrivals)
-#
-# definite_data_arrivals <- definite_data_arrivals %>%
-#   left_join(usa_arrivals, by = c("region_origin", "year_month")) %>%
-#   filter(destination_city != "Usa")
-#
-# # Diagnostic time-series plot (May–July shaded)
-# arrivals_time_plot <- definite_data_arrivals %>%
-#   ggplot(aes(x = year_month, y = all_arrivals,
-#              color = destination_city, group = destination_city)) +
-#   theme_bw() +
-#   geom_rect(data = shade_df, inherit.aes = FALSE,
-#     aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
-#     fill = "gray80", alpha = 0.5) +
-#   geom_line() +
-#   facet_wrap(~region_origin, scales = "free_y")
-# print(arrivals_time_plot)
-# ggsave(filename = "Figures/temporal_arrivals_from_regions.png",
-#        plot = arrivals_time_plot, height = 6, width = 10)
-#
-# # Mean June arrivals (2023–2025) per region × city.
-# arrivals_only_june <- definite_data_arrivals %>%
-#   filter(month_number == 6, as.numeric(date_year) >= 2023) %>%
-#   group_by(region_origin, destination_city) %>%
-#   summarise(arrivals_June = mean(all_arrivals, na.rm = TRUE), .groups = "drop")
-#
-# # Mean June US-total arrivals per region (2023–2025).
-# mean_arrivals_all_usa_june <- definite_data_arrivals %>%
-#   filter(month_number == 6, as.numeric(date_year) >= 2023) %>%
-#   group_by(region_origin) %>%
-#   summarise(mean_all_usa_June = mean(all_arrivals_usa, na.rm = TRUE), .groups = "drop")
-# ============================================================
-# ===== END: ORIGINAL I-92 APPROACH =====
-# ============================================================
-
-
-# ---- 3a. Shading helper for diagnostic plots ----------------
-# May–July rectangles used in dengue time-series (Section 4).
-# No longer derived from I-92 data; computed directly from a fixed range.
-shade_df <- tibble(start_year = 2019:2025) %>%
-  mutate(
-    xmin = as.Date(paste(start_year, "05", "01", sep = "-")),
-    xmax = as.Date(paste(start_year, "07", "31", sep = "-"))
-  )
 
 # ---- 3b. COR June 2024 country-level arrivals ---------------
-# Extract June 2024 from the COR/I-94 dataset. This is the baseline
-# travel volume (no WC adjustment) used in Model 1, and the base year
-# for the growth factors applied in Models 2 and 3. Extracting it here
-# makes it available to all downstream sections.
+# Extract June 2024 from the COR/I-94 dataset: the base year for the
+# growth factors applied in Section 8.
 cor_june_2024 <- arrivals_COR %>%
   select(Country, World_region, `2024-06`) %>%
   mutate(june_2024 = readr::parse_number(as.character(`2024-06`))) %>%
@@ -357,36 +217,11 @@ cor_june_2024 <- arrivals_COR %>%
   drop_na()
 
 # ---- 3c. T-100 country-level routing fractions --------------
-# Pre-computed by Code/t100_routing_prep.R. Run that script once to
-# regenerate Data/t100_routing_fractions.csv from the BTS downloads.
-#
-# WHY T-100 IS THE RIGHT CHOICE FOR ALL THREE MODELS
-# ---------------------------------------------------
-# T-100 records actual nonstop international passenger segments landing
-# at each US airport. From these counts we compute:
-#
-#   f_{c,v}^{T100} = N_{c,v,y}^{June} / N_{c,US,y}^{June}
-#
-# averaged over June 2023–2025. Key advantages over I-92:
-#
-#   (1) Country-level resolution: every source country gets its own
-#       routing fraction based on its actual direct flight patterns,
-#       rather than inheriting its broad region's average.
-#
-#   (2) Complete US WC city coverage: T-100 covers all 11 US host
-#       cities — including Los Angeles, Atlanta, Kansas City, Miami,
-#       San Francisco, and Seattle, which have zero coverage in I-92.
-#
-#   (3) Connecting-itinerary interpretation: T-100 records the
-#       international segment entry point. A traveller flying
-#       São Paulo → Miami → Kansas City appears under Miami, not
-#       Kansas City. Kansas City's near-zero routing fractions for
-#       most countries thus correctly reflect its limited direct
-#       international service; WC fans travelling there are captured
-#       by the schedule-driven fan stream (Model 3).
-#
-# All three model tiers use these fractions, giving a consistent
-# spatial basis for the three-way comparison.
+# Built by Code/t100_routing_prep.R. T-100 records the US entry airport
+# of each international segment: a traveller flying São Paulo → Miami →
+# Kansas City is counted at Miami. Kansas City therefore has near-zero
+# background routing for most countries; its World Cup traffic comes
+# from the fan stream in M3.
 t100_routing <- read_csv("Data/t100_routing_fractions.csv",
                          show_col_types = FALSE)
 
@@ -400,9 +235,8 @@ message("T-100 routing fractions loaded: ",
 
 # ---- 4a. Dengue (monthly WHO data) -------------------------
 # Source: WHO Global Dengue Surveillance dataset (accessed Dec 2025).
-# Data are monthly country-level reported case counts. We use
-# June 2024–2025 (two most recent complete Junes) for both the
-# regional baseline and the country-level WC-adjusted estimates.
+# Data are monthly country-level reported case counts; June 2024 and
+# June 2025 are averaged (Section 6b).
 dengue_data_world <- read_xlsx("Data/dengue-global-data-2025-12-10.xlsx")
 
 dengue_data_world_selected <- dengue_data_world %>%
@@ -417,46 +251,10 @@ dengue_data_world_selected <- dengue_data_world %>%
   left_join(correspondence_country_region %>%
               select(country = Country, new_region), by = "country")
 
-# Diagnostic: dengue seasonality by region (2019 onwards).
-# Canada and Europe are excluded — dengue is not endemic there and
-# any reported cases are themselves importations.
-dengue_time_plot <- dengue_data_world_selected %>%
-  select(date, new_region, cases) %>%
-  mutate(cases = replace_na(cases, 0)) %>%
-  drop_na() %>%
-  group_by(date, new_region) %>%
-  summarise(total_cases = sum(cases), .groups = "drop") %>%
-  filter(date > as.Date("2018-12-31"),
-         !new_region %in% c("Canada", "Europe")) %>%
-  ggplot(aes(x = date, y = total_cases)) +
-  geom_col() + theme_bw() +
-  geom_rect(data = shade_df, inherit.aes = FALSE,
-    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
-    fill = "gray80", alpha = 0.5) +
-  facet_wrap(~new_region, scales = "free_y")
-
-print(dengue_time_plot)
-
-# Mean regional dengue burden in June (2024–2025).
-# Two June months are available for averaging. Using 2024+ avoids
-# the anomalous 2023 dengue season (unusually high in several regions)
-# and gives the most recent signal before the tournament.
-mean_dengue_cases_regions_june <- dengue_data_world_selected %>%
-  filter(month(date) == 6, year(date) > 2023) %>%
-  drop_na() %>%
-  select(date, new_region, cases) %>%
-  group_by(date, new_region) %>%
-  summarise(cases_region = sum(cases), .groups = "drop") %>%
-  group_by(new_region) %>%
-  summarise(mean_cases_june = mean(cases_region, na.rm = TRUE), .groups = "drop") %>%
-  # "Middle East" → "Mideast": match the shorter label used in the
-  # I-92 data files so the join in Section 6 succeeds.
-  mutate(new_region = if_else(new_region == "Middle East", "Mideast", new_region))
-
 # ---- 4b. Malaria (annual incidence per 1,000, 2024) --------
 # Source: WHO Global Malaria Programme — National Unit Data.
 # Metric used: "Incidence Rate" (cases per 1,000 population, 2024).
-# Divided by 12 in Section 6 to approximate a monthly rate.
+# Divided by 12 in Section 6b to approximate a monthly rate.
 malaria_data_raw <- read_csv("Data/Malaria_National_Unit_data.csv")
 
 malaria_cases <- malaria_data_raw %>%
@@ -555,66 +353,17 @@ plot_importation <- function(df, title_text) {
     theme_bw() + theme(text = element_text(size = 26),axis.text.x = element_text(angle=45,hjust = 1))
 }
 
-# ---- 5b. Core Poisson importation model (region-level) -----
-# Preserved for reference; not used in current analysis (all three
-# models now use country-level routing and incidence via §5c below).
-#
-# Implements Equations 4–5 from the manuscript at region level:
-#
-#   lambda[r, h] = N_{r,h} * I_{r,d} * p_d
-#   Lambda[h]    = sum_r lambda[r, h]
-#   P(>=1)       = 1 - exp(-Lambda[h])
-#
-# Arguments:
-#   arrivals_df         — region_origin, destination_city, arrivals_June
-#   region_incidence_df — region_origin, total_inc
-#                         (total_inc = rho_d * cases / population)
-#   p_travel_inf        — scalar p_d: probability of travelling while
-#                         infectious (disease-specific, see Table 1)
-#   title_text          — plot title
-#
-# Returns a list:
-#   $expected_imports — full region × city contribution table
-#   $importation      — city-level Lambda and P(>=1)
-#   $plot             — bar chart
-compute_importation_from_region_incidence <- function(arrivals_df,
-                                                      region_incidence_df,
-                                                      p_travel_inf = 1,
-                                                      title_text   = "Estimated importation intensity") {
-  expected_imports <- region_incidence_df %>%
-    left_join(arrivals_df, by = "region_origin") %>%
-    drop_na() %>%
-    mutate(expected_c_to_h = arrivals_June * total_inc * p_travel_inf)
-
-  importation_df <- expected_imports %>%
-    group_by(destination_city) %>%
-    summarise(imp_intensity = sum(expected_c_to_h, na.rm = TRUE), .groups = "drop") %>%
-    mutate(prob_at_least_one = 1 - exp(-imp_intensity))
-
-  list(
-    expected_imports = expected_imports,
-    importation      = importation_df,
-    plot             = plot_importation(importation_df, title_text)
-  )
-}
-
-# ---- 5c. Core Poisson importation model (country-level) ----
-#
-# Used by all three model tiers (§6 Baseline, §8 WC-adjusted, §9
-# Schedule-driven). Implements the same Poisson logic as §5b but
-# at country granularity and using T-100-routed arrivals:
-#
-#   lambda[c, v] = N_{c,v} * I_{c,d} * p_d
+# ---- 5c. Poisson importation model (country level) ----------
+# Used for M2 (Section 8), for M1 in model1_baseline_2026.R,
+# and by the evaluation scripts:
+#   lambda[c, v] = N_{c,v} * I_{c,d} * p_d,   I_{c,d} = C_{c,d} / (P_c * rho_d)
 #   Lambda[v]    = sum_c lambda[c, v]
 #   P(>=1)       = 1 - exp(-Lambda[v])
 #
 # Arguments:
 #   arrivals_df    — Country, destination_city, arrivals_june_2026
-#                    (the column name arrivals_june_2026 is used for
-#                     all tiers, even the baseline; it just holds
-#                     COR 2024 values with no growth factor there)
-#   country_inc_df — Country, total_inc
-#                    (total_inc = rho_d * incidence_metric)
+#                    (column name shared by every caller, whatever the period)
+#   country_inc_df — Country, total_inc (= reported incidence / rho_d)
 #   p_travel_inf   — scalar p_d
 #   title_text     — plot title
 #
@@ -639,101 +388,165 @@ compute_importation_country_level <- function(arrivals_df,
   )
 }
 
-# ============================================================
-# 6. BASELINE IMPORTATION ESTIMATES (MODEL 1 — T-100 BASELINE)
-# ============================================================
+# ---- 5d. Monte Carlo uncertainty helper ----------------------
 #
-# WHY T-100 + COR 2024 FOR THE BASELINE
-# --------------------------------------
-# Model 1 establishes the pre-tournament importation risk — what we
-# would expect in a typical June without the World Cup effect. Using
-# T-100 routing fractions with COR June 2024 arrivals (no growth
-# factor) achieves three things:
+# Given a vector of central Lambda values (one per city) and the
+# literature ranges for rho and p, draws n_mc (rho, p) pairs,
+# rescales Lambda for each draw, and returns median + 95% uncertainty
+# intervals.
 #
-#   (1) All 11 US venue cities are represented. The old I-92 baseline
-#       produced zero risk for Atlanta, Kansas City, Los Angeles, Miami,
-#       San Francisco, and Seattle — not because those cities are safe,
-#       but because I-92 simply didn't cover them. T-100 fixes this.
+# Because Lambda = (p / rho) × (constant city factor), the MC reduces
+# to a scalar rescaling: Lambda_i = (p_i/rho_i)/(p_c/rho_c) × Lambda_c.
+# This is implemented as a vectorised outer product — no loop needed.
 #
-#   (2) Country-level precision. T-100 routing fractions are country-
-#       specific, giving each source nation its own city-allocation
-#       share rather than its entire world region's average.
+# Arguments:
+#   lambda_central_vec — numeric vector of central Lambda per city
+#   city_names         — character vector matching lambda_central_vec
+#   rho_c, p_c         — central values (used as scale denominators)
+#   rho_min, rho_max   — literature range for rho
+#   p_min, p_max       — literature range for p
+#   n_mc               — number of MC draws (default: 5,000)
 #
-#   (3) Consistent spatial basis across all three models. Models 2 and
-#       3 both use T-100 fractions; Model 1 now does too. The three-way
-#       comparison therefore isolates exactly one change at each step:
-#         Model 1 → Model 2: WC travel surge (phi_c growth factors)
-#         Model 2 → Model 3: schedule-based fan routing
-#
-# ---- 6a. Disease parameters (shared across §6, §8, §9) ------
-# Parameters are defined once here and reused in all downstream
-# sections. See Table 1 in the manuscript for derivation rationale.
+# Returns a tibble: destination_city, lambda_median/lo/hi, prob_median/lo/hi
 
-# Dengue:
-# rho = 0.10: literature puts global detection at 6-26% of symptomatic
-#             cases (expansion factor ~4-20; mean ~8 in SE Asia).
-#             Undurraga et al. 2013 (PLOS NTD) and Bhatt et al. 2013
-#             (Nature) support values of 0.06-0.15 for mixed-income
-#             source countries. We use 0.10 (conservative upper end
-#             for global endemic regions).
-# p   = 0.50: early viraemic phase is often mild; ~40% of dengue
-#             travellers are viremic on arrival in Europe (empirical).
-#             Liebman & Wilder-Smith 2018; Tatem et al. 2012.
+compute_mc_summary <- function(lambda_central_vec, city_names,
+                                rho_c, p_c,
+                                rho_min, rho_max, p_min, p_max,
+                                n_mc = 5000) {
+
+  # Common random numbers: every call for the same disease (identified by
+  # its rho/p ranges) reuses the same fixed seed, so M1, M2, M3 and the
+  # validation runs share identical draws. This makes results independent
+  # of script run order, and makes tier comparisons (e.g. M3 vs M1) exact,
+  # since Lambda scales by the same p/rho factor in every tier.
+  # Seeds follow from the ranges in Section 5g (e.g. dengue 133056);
+  # the annual evaluation ranges get their own fixed seeds.
+  mc_seed <- 2026 + 7 * round(1e4 * rho_min) + 11 * round(1e4 * rho_max) +
+                   13 * round(1e4 * p_min)   + 17 * round(1e4 * p_max)
+  set.seed(mc_seed)
+
+  rho_draws <- runif(n_mc, rho_min, rho_max)
+  p_draws   <- runif(n_mc, p_min,   p_max)
+
+  scales   <- (p_draws / rho_draws) / (p_c / rho_c)
+  imp_mat  <- outer(scales, lambda_central_vec)   # n_mc × n_cities
+  prob_mat <- 1 - exp(-imp_mat)
+
+  tibble(
+    destination_city = city_names,
+    lambda_median    = apply(imp_mat,  2, median),
+    lambda_lo        = apply(imp_mat,  2, quantile, probs = 0.025),
+    lambda_hi        = apply(imp_mat,  2, quantile, probs = 0.975),
+    prob_median      = apply(prob_mat, 2, median),
+    prob_lo          = apply(prob_mat, 2, quantile, probs = 0.025),
+    prob_hi          = apply(prob_mat, 2, quantile, probs = 0.975)
+  )
+}
+
+# ---- 5f. MC global settings ----------------------------------
+set.seed(2026)
+n_mc <- 5000
+
+# ---- 5g. p_d as a travel-window share ------------------------
+# p_d = D_d / T_d is the probability that a person infected during the
+# incidence reporting period is still infected AND able to travel at
+# the moment they travel. D_d is the travel-eligible window (days):
+# lower bound = incubation period (every infected person can travel
+# while incubating); upper bound = incubation + duration of infection
+# (as if every infection stayed mild enough to travel through).
+# T_d is the length of the period over which incidence C is counted.
+#   dengue    6-13 d : intrinsic incubation mean 5.9 d, 95% 3-10 d
+#                      (Chan & Johansson 2012, PLoS ONE 7:e50972) +
+#                      viremia ~7 d (CDC Yellow Book, Dengue)
+#   malaria   6-30 d : P. falciparum incubation 6-30 d (CDC Yellow Book,
+#                      Post-Travel Evaluation). Restricted to the incubation window,
+#                      i.e. infections that can become clinical after
+#                      arrival; chronic asymptomatic carriage lasting
+#                      hundreds of days (Ashley & White 2014, Malar J
+#                      13:500) is deliberately excluded.
+#   measles  11-14 d : 11-12 d from exposure to prodrome, rash ~14 d
+#                      after exposure (CDC Yellow Book, Measles)
+#   pertussis 7-24 d : incubation 7-10 d (range 4-21) + catarrhal stage
+#                      1-2 weeks (CDC Pink Book, Pertussis)
+#   influenza 1.4-6.2 d : incubation median 1.4 d, influenza A (Lessler
+#                      et al. 2009, Lancet Infect Dis) + viral shedding
+#                      4.80 d (Carrat et al. 2008, Am J Epidemiol)
+# Periods: June = 365.25/12 d; influenza June = 35 d (FluNet ISO weeks
+# 22-26 summed); annual evaluation runs (measles, malaria, pertussis
+# 2022) = 365.25 d. Central p_d = midpoint of its range.
+days_june     <- 365.25 / 12
+days_flu_june <- 35
+days_year     <- 365.25
+
+D_min_dengue    <- 6;   D_max_dengue    <- 13
+D_min_malaria   <- 6;   D_max_malaria   <- 30
+D_min_measles   <- 11;  D_max_measles   <- 14
+D_min_pertussis <- 7;   D_max_pertussis <- 24
+D_min_influenza <- 1.4; D_max_influenza <- 6.2
+
+# June model (all tiers) and the monthly dengue evaluation
+p_min_dengue    <- D_min_dengue    / days_june;     p_max_dengue    <- D_max_dengue    / days_june
+p_min_malaria   <- D_min_malaria   / days_june;     p_max_malaria   <- D_max_malaria   / days_june
+p_min_measles   <- D_min_measles   / days_june;     p_max_measles   <- D_max_measles   / days_june
+p_min_pertussis <- D_min_pertussis / days_june;     p_max_pertussis <- D_max_pertussis / days_june
+p_min_influenza <- D_min_influenza / days_flu_june; p_max_influenza <- D_max_influenza / days_flu_june
+
+p_travel_inf_dengue    <- (p_min_dengue    + p_max_dengue)    / 2
+p_travel_inf_malaria   <- (p_min_malaria   + p_max_malaria)   / 2
+p_travel_inf_measles   <- (p_min_measles   + p_max_measles)   / 2
+p_travel_inf_pertussis <- (p_min_pertussis + p_max_pertussis) / 2
+p_travel_inf_influenza <- (p_min_influenza + p_max_influenza) / 2
+
+# Annual evaluation runs (annual arrivals x annual incidence)
+p_min_malaria_annual   <- D_min_malaria   / days_year; p_max_malaria_annual   <- D_max_malaria   / days_year
+p_min_measles_annual   <- D_min_measles   / days_year; p_max_measles_annual   <- D_max_measles   / days_year
+p_min_pertussis_annual <- D_min_pertussis / days_year; p_max_pertussis_annual <- D_max_pertussis / days_year
+p_travel_inf_malaria_annual   <- (p_min_malaria_annual   + p_max_malaria_annual)   / 2
+p_travel_inf_measles_annual   <- (p_min_measles_annual   + p_max_measles_annual)   / 2
+p_travel_inf_pertussis_annual <- (p_min_pertussis_annual + p_max_pertussis_annual) / 2
+
+# Parameter ranges (Uniform bounds; see Table 1)
+mc_ranges <- tribble(
+  ~disease,    ~rho_min, ~rho_max, ~p_min,          ~p_max,
+  "Dengue",    0.06,     0.26,     p_min_dengue,    p_max_dengue,
+  "Malaria",   0.10,     0.35,     p_min_malaria,   p_max_malaria,
+  "Measles",   0.40,     0.80,     p_min_measles,   p_max_measles,
+  "Pertussis", 0.01,     0.10,     p_min_pertussis, p_max_pertussis,
+  "Influenza", 0.01,     0.10,     p_min_influenza, p_max_influenza
+)
+
+# ============================================================
+# 6. rho_d AND COUNTRY-LEVEL INCIDENCE TABLES
+# ============================================================
+# ---- 6a. Central rho_d values --------------------------------
+# The central values set the deterministic Lambda that the Monte Carlo
+# rescales. Each draw is scaled by (p/rho)/(p_c/rho_c), so reported
+# medians and intervals depend only on the Uniform ranges in mc_ranges
+# (Table 1), not on these central values. p_d is defined in Section 5g.
+
+# Dengue: range 0.06-0.26 (Bhatt et al. 2013; Undurraga et al. 2013)
 under_rho_dengue    <- 0.10
-p_travel_inf_dengue <- 0.5
 
-# Malaria:
-# rho = 0.20: WHO World Malaria Report methodology implies ~11% detection
-#             in Africa (EF ~9); Americas/SE Asia ~28-55%. Global mean
-#             of 0.20 is well-calibrated (WHO WMR 2022-2024 Annex).
-# p   = 0.30: significant illness; long incubation (7-14 d) means most
-#             travellers develop illness post-return. VFR travellers who
-#             return home febrile push the estimate to ~0.3.
+# Malaria: range 0.10-0.35 (WHO World Malaria Report 2024)
 under_rho_malaria    <- 0.2
-p_travel_inf_malaria <- 0.3
 
-# Measles:
-# rho = 0.60: notifiable disease; detection ~40-80% in middle/high-income
-#             source countries (Simons et al. 2012, Lancet). Appropriate
-#             for the mix of WC source nations.
-# p   = 0.05: prostrating illness (high fever, rash); ambulatory only
-#             during short pre-rash prodrome. Well-supported.
+# Measles: range 0.40-0.80 (Simons et al. 2012)
 under_rho_measles    <- 0.6
-p_travel_inf_measles <- 0.05
 
-# Pertussis:
-# rho = 0.10: massively under-reported. McLaughlin et al. 2016 found
-#             adult detection ~1-3% (EF 42-93x). Crowcroft et al. 2018
-#             gives 2-68% by age group. We use 0.10 as a conservative
-#             upper bound consistent with the upper tail of the literature.
-# p   = 0.70: catarrhal stage mimics a common cold; fully ambulatory;
-#             diagnosis typically delayed weeks. GeoSentinel data confirm
-#             routine travel during the most infectious phase.
+# Pertussis: range 0.01-0.10 (Chen et al. 2016)
 under_rho_pertussis    <- 0.10
-p_travel_inf_pertussis <- 0.7
 
-# Influenza:
-# rho = 0.10: FluNet reports laboratory-confirmed specimens; large
-#             fraction of community influenza goes untested. ILI-based
-#             studies (WHO GISRS, Iuliano et al. 2018 Lancet) estimate
-#             true incidence ~10-30x confirmed counts; we use 0.10 as a
-#             conservative upper bound for the positive-specimen proxy.
-# p   = 0.50: influenza illness is moderate; many travellers continue
-#             journeys during early illness (2-3 day incubation + 1-2 day
-#             prodrome). GeoSentinel and sentinel surveillance data support
-#             ~0.4-0.6 for seasonal influenza. June = Southern Hemisphere
-#             peak season (Brazil, Argentina, Australia) amplifying risk.
-under_rho_influenza    <- 0.10
-p_travel_inf_influenza <- 0.50
+# Influenza: range 0.01-0.10 (McCarthy et al. 2020; Hayward et al. 2014)
+under_rho_influenza    <- 0.055
 
 # ---- 6b. Country-level disease incidence tables ---------------
-# These tables are computed once here and used in §6, §8, and §9.
-# total_inc[c] = rho_d * (disease metric for country c)
-# The metric varies by data source:
+# Used by every model tier and the evaluation scripts.
+# total_inc[c] = (disease metric for country c) / rho_d, where the metric is:
 #   dengue   — mean June cases (2024–2025) / national population
 #   malaria  — annual incidence per 1,000 / (12 × 1,000)
 #   measles  — annual incidence per 1,000,000 / (12 × 1e6)
 #   pertussis— annual incidence per 1,000,000 / (12 × 1e6)
+#   influenza— mean June positive specimens (2023–2025) / national population
 
 dengue_june_country <- dengue_data_world_selected %>%
   filter(month(date) == 6, year(date) > 2023) %>%
@@ -748,25 +561,25 @@ dengue_june_country <- dengue_data_world_selected %>%
     "United Republic of Tanzania"        = "Tanzania")) %>%
   left_join(population_of_world, by = "Country") %>%
   drop_na() %>%
-  mutate(total_inc = under_rho_dengue * mean_june_cases / population_country) %>%
+  mutate(total_inc = mean_june_cases / (population_country * under_rho_dengue)) %>%
   select(Country, total_inc)
 
 malaria_country_inc <- malaria_cases %>%
   mutate(Country = recode(Country,
     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-  mutate(total_inc = under_rho_malaria * cases_per1K / (12 * 1000)) %>%
+  mutate(total_inc = cases_per1K / (12 * 1000 * under_rho_malaria)) %>%
   select(Country, total_inc)
 
 measles_country_inc <- measles_incidence %>%
   mutate(Country = recode(Country,
     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-  mutate(total_inc = under_rho_measles * incidence_per1M / (12 * 1e6)) %>%
+  mutate(total_inc = incidence_per1M / (12 * 1e6 * under_rho_measles)) %>%
   select(Country, total_inc)
 
 pertussis_country_inc <- pertussis_incidence %>%
   mutate(Country = recode(Country,
     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-  mutate(total_inc = under_rho_pertussis * incidence_per1M / (12 * 1e6)) %>%
+  mutate(total_inc = incidence_per1M / (12 * 1e6 * under_rho_pertussis)) %>%
   select(Country, total_inc)
 
 # Influenza: mean June positive specimens (2023–2025) / national population
@@ -775,216 +588,60 @@ influenza_june_country <- influenza_june_specimens %>%
   left_join(population_of_world, by = "Country") %>%
   drop_na(population_country) %>%
   filter(mean_june_inf > 0) %>%
-  mutate(total_inc = under_rho_influenza * mean_june_inf / population_country) %>%
+  mutate(total_inc = mean_june_inf / (population_country * under_rho_influenza)) %>%
   select(Country, total_inc)
 
-# ---- 6c. Baseline arrivals: COR June 2024 × T-100 routing ----
-# N_{c,v}^{baseline} = COR_{c,June2024} × f_{c,v}^{T100}
-# No growth factor — this is the no-WC counterfactual.
-# The column is named arrivals_june_2026 for compatibility with
-# compute_importation_country_level() which is shared across tiers.
-arrivals_baseline <- cor_june_2024 %>%
-  left_join(t100_routing, by = "Country") %>%
-  drop_na(venue_city) %>%
-  mutate(
-    arrivals_june_2026 = june_2024 * routing_fraction,
-    destination_city   = venue_city
-  ) %>%
-  select(Country, destination_city, arrivals_june_2026)
-
-# ---- 6d. Baseline estimates for all five diseases ------------
-dengue_results <- compute_importation_country_level(
-  arrivals_df    = arrivals_baseline,
-  country_inc_df = dengue_june_country,
-  p_travel_inf   = p_travel_inf_dengue,
-  title_text     = "Dengue importation intensity — Baseline"
-)
-print(dengue_results$importation)
-print(dengue_results$plot)
-
-malaria_results <- compute_importation_country_level(
-  arrivals_df    = arrivals_baseline,
-  country_inc_df = malaria_country_inc,
-  p_travel_inf   = p_travel_inf_malaria,
-  title_text     = "Malaria importation intensity — Baseline"
-)
-print(malaria_results$importation)
-print(malaria_results$plot)
-
-measles_results <- compute_importation_country_level(
-  arrivals_df    = arrivals_baseline,
-  country_inc_df = measles_country_inc,
-  p_travel_inf   = p_travel_inf_measles,
-  title_text     = "Measles importation intensity — Baseline"
-)
-print(measles_results$importation)
-print(measles_results$plot)
-
-pertussis_results <- compute_importation_country_level(
-  arrivals_df    = arrivals_baseline,
-  country_inc_df = pertussis_country_inc,
-  p_travel_inf   = p_travel_inf_pertussis,
-  title_text     = "Pertussis importation intensity — Baseline"
-)
-print(pertussis_results$importation)
-print(pertussis_results$plot)
-
-influenza_results <- compute_importation_country_level(
-  arrivals_df    = arrivals_baseline,
-  country_inc_df = influenza_june_country,
-  p_travel_inf   = p_travel_inf_influenza,
-  title_text     = "Influenza importation intensity — Baseline"
-)
-print(influenza_results$importation)
-print(influenza_results$plot)
 
 # ============================================================
-# ===== BEGIN: ORIGINAL I-92 BASELINE (MODEL 1) — PRESERVED FOR REFERENCE =====
-# ============================================================
-# The original baseline used I-92 regional arrivals (arrivals_only_june)
-# with broad-region incidence aggregates. It only covered 5 cities and
-# used region-level disease aggregates. Replaced by §6 above, which uses
-# T-100 routing + COR June 2024 + country-level incidence for all 11 US
-# WC venue cities.
-
-# # ---- Original 6a. Dengue (I-92 regional) --------------------
-# dengue_region_incidence <- mean_dengue_cases_regions_june %>%
-#   rename(region_origin = new_region) %>%
-#   left_join(
-#     population_by_region %>%
-#       mutate(new_region = if_else(new_region == "Middle East", "Mideast", new_region)) %>%
-#       rename(region_origin = new_region),
-#     by = "region_origin"
-#   ) %>%
-#   mutate(total_inc = under_rho_dengue * mean_cases_june / popu_region) %>%
-#   select(region_origin, total_inc)
-#
-# dengue_results <- compute_importation_from_region_incidence(
-#   arrivals_df         = arrivals_only_june,
-#   region_incidence_df = dengue_region_incidence,
-#   p_travel_inf        = p_travel_inf_dengue,
-#   title_text          = "Estimated dengue importation intensity by destination city"
-# )
-# print(dengue_results$importation)
-# print(dengue_results$plot)
-#
-# # ---- Original 6b. Malaria (I-92 regional) -------------------
-# malaria_region_incidence <- malaria_cases %>%
-#   mutate(Country = recode(Country,
-#     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-#   left_join(correspondence_country_region %>%
-#               select(Country, region_origin = new_region), by = "Country") %>%
-#   drop_na() %>%
-#   mutate(Incidence = under_rho_malaria * cases_per1K / (12 * 1000)) %>%
-#   group_by(region_origin) %>%
-#   summarise(total_inc = sum(Incidence, na.rm = TRUE), .groups = "drop")
-#
-# malaria_results <- compute_importation_from_region_incidence(
-#   arrivals_df         = arrivals_only_june,
-#   region_incidence_df = malaria_region_incidence,
-#   p_travel_inf        = p_travel_inf_malaria,
-#   title_text          = "Estimated malaria importation intensity by destination city"
-# )
-# print(malaria_results$importation)
-# print(malaria_results$plot)
-#
-# # ---- Original 6c. Measles (I-92 regional) -------------------
-# measles_region_incidence <- measles_incidence %>%
-#   mutate(Country = recode(Country,
-#     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-#   left_join(correspondence_country_region %>%
-#               select(Country, region_origin = new_region), by = "Country") %>%
-#   drop_na() %>%
-#   mutate(Incidence = under_rho_measles * incidence_per1M / (12 * 1000000)) %>%
-#   group_by(region_origin) %>%
-#   summarise(total_inc = sum(Incidence, na.rm = TRUE), .groups = "drop")
-#
-# measles_results <- compute_importation_from_region_incidence(
-#   arrivals_df         = arrivals_only_june,
-#   region_incidence_df = measles_region_incidence,
-#   p_travel_inf        = p_travel_inf_measles,
-#   title_text          = "Estimated measles importation intensity by destination city"
-# )
-# print(measles_results$importation)
-# print(measles_results$plot)
-#
-# # ---- Original 6d. Pertussis (I-92 regional) -----------------
-# pertussis_region_incidence <- pertussis_incidence %>%
-#   mutate(Country = recode(Country,
-#     "Democratic Republic of the Congo" = "Zaire (formerly DRC)")) %>%
-#   left_join(correspondence_country_region %>%
-#               select(Country, region_origin = new_region), by = "Country") %>%
-#   drop_na() %>%
-#   mutate(Incidence = under_rho_pertussis * incidence_per1M / (12 * 1000000)) %>%
-#   group_by(region_origin) %>%
-#   summarise(total_inc = sum(Incidence, na.rm = TRUE), .groups = "drop")
-#
-# pertussis_results <- compute_importation_from_region_incidence(
-#   arrivals_df         = arrivals_only_june,
-#   region_incidence_df = pertussis_region_incidence,
-#   p_travel_inf        = p_travel_inf_pertussis,
-#   title_text          = "Estimated pertussis importation intensity by destination city"
-# )
-# print(pertussis_results$importation)
-# print(pertussis_results$plot)
-# ============================================================
-# ===== END: ORIGINAL I-92 BASELINE =====
+# 7. SHARED AESTHETICS — used by all narrative figures (§12)
 # ============================================================
 
-# ============================================================
-# 7. COMBINED BASELINE PANEL FIGURE
-# ============================================================
-panel_results_plots <- plot_grid(
-  dengue_results$plot,
-  malaria_results$plot,
-  measles_results$plot,
-  pertussis_results$plot,
-  influenza_results$plot,
-  ncol = 2
+disease_colors <- c(
+  "Dengue"    = "#C0392B",
+  "Influenza" = "#2980B9",
+  "Pertussis" = "#8E44AD",
+  "Malaria"   = "#E67E22",
+  "Measles"   = "#27AE60"
 )
 
-ggsave(panel_results_plots,
-       file   = "Figures/estimated_importations.png",
-       height = 21, width = 20)
+region_colors <- c(
+  "Africa"        = "#D4691E",
+  "Latin America" = "#2D9E4C",
+  "Caribbean"     = "#1A8F61",
+  "Europe"        = "#3A5FA5",
+  "Asia"          = "#9C5BC4",
+  "Mexico"        = "#C0392B",
+  "Canada"        = "#96281B",
+  "Mideast"       = "#D4AC0D",
+  "Middle East"   = "#D4AC0D",
+  "Oceania"       = "#17A589",
+  "Other"         = "#95A5A6"
+)
+
+# Within-facet reorder helper (tidytext::reorder_within equivalent)
+reorder_within <- function(x, by, within, fun = mean, sep = "___") {
+  new_x <- paste(x, within, sep = sep)
+  stats::reorder(new_x, by, FUN = fun)
+}
+scale_y_reordered <- function(..., sep = "___") {
+  reg <- paste0(sep, ".+$")
+  ggplot2::scale_y_discrete(labels = function(x) gsub(reg, "", x), ...)
+}
 
 # ============================================================
-# 8. WC-ADJUSTED IMPORTATION MODEL (MODEL 2)
+# 8. M2 — WC-ADJUSTED IMPORTATION MODEL
 # ============================================================
-#
-# MOTIVATION
-# ----------
-# The baseline model (§6) uses COR June 2024 volumes without any World
-# Cup adjustment, representing normal tourist patterns. Model 2 adds
-# the WC-driven travel surge by projecting June 2026 arrivals using
-# growth factors derived from official forecasts.
-#
-# TWO-SOURCE TRAVEL VOLUME STRATEGY
-# ----------------------------------
-# Tier 1 — NTTO country-specific projections (12 source markets):
-#   Official 2026 estimates from the National Travel and Tourism Office
-#   (NTTO 2025 Forecast Report, trade.gov). These already incorporate
-#   the WC tourism effect — do NOT add WC visitors on top.
-#   Growth factor: phi_c = V_{c,2026} / V_{c,2024}
-#
-# Tier 2 — COR June 2024 scaled by global growth factors:
-#   WC-qualified countries not in Tier 1:
-#     phi_WC = 85,017 / 72,390 = 1.174 (NTTO total; includes WC uplift)
-#   Non-qualified countries:
-#     phi_base = 1.134 (~6.5 % annual growth × 2 years, no WC effect)
-#
-# CITY ROUTING
-# ------------
-# All models use BTS T-100 country-level routing fractions (§3c):
-#   f_{c,v}^{T100} = mean June direct passengers from c to v / total to US
-# This gives each source country its own city-allocation share and
-# covers all 11 US venue cities.
-#
-# DISEASE BURDEN
-# --------------
-# Country-level incidence tables (dengue_june_country, etc.) were
-# computed in §6b and are reused here unchanged. The same rho and p
-# parameters ensure that Model 1 → Model 2 differences are driven
-# entirely by the WC travel surge, not by incidence assumptions.
+# June 2026 arrivals are projected from COR June 2024 with a growth
+# factor phi_c assigned in three tiers (Appendix A.3):
+#   Tier 1 — the 12 NTTO markets: phi_c = NTTO 2026 forecast / 2024
+#            arrivals (NTTO 2025 forecast tables; includes any World
+#            Cup effect).
+#   Tier 2 — other World Cup-qualified countries: phi_WC = 85,017 /
+#            72,390 = 1.174, NTTO's forecast of total 2026 arrivals over
+#            2024 arrivals.
+#   Tier 3 — all other countries: phi_base, the background growth
+#            estimated from COR and T-100 data (Section 8b; 1.077).
+# Projected arrivals are routed to cities with T-100 fractions.
 # ============================================================
 
 # ---- 8a. Load supporting data (NTTO projections + WC teams) --
@@ -1003,9 +660,9 @@ wc_teams <- read_csv("Data/wc2026_qualified_teams.csv", show_col_types = FALSE)
 
 # ---- 8b. Data-driven baseline growth factor (phi_base) --------
 #
-# phi_base is the 2024→2026 growth factor for non-WC-qualified
-# countries, representing background growth in US inbound travel
-# independent of the tournament.
+# phi_base is the 2024→2026 background growth of US inbound travel:
+# the growth factor for Tier 3 countries, and the background trend
+# subtracted from phi_c to define the World Cup increment (Section 9b).
 #
 # DERIVATION
 # ----------
@@ -1067,7 +724,7 @@ growth_wc_total  <- 85017 / 72390  # 1.174
 # Assign a growth factor to every country using the three-tier hierarchy:
 #   Priority 1: NTTO country-specific factor (most accurate; 12 countries)
 #   Priority 2: WC global factor for all other WC-qualified countries
-#   Priority 3: Baseline factor for non-qualified countries
+#   Priority 3: Baseline factor for all other countries
 travel_volume_june_2026 <- cor_june_2024 %>%
   left_join(
     ntto_2026 %>% select(country_cor, growth_factor_2024_2026),
@@ -1087,31 +744,8 @@ travel_volume_june_2026 <- cor_june_2024 %>%
   ) %>%
   select(Country, World_region, june_2024, growth_factor, june_2026)
 
-# ============================================================
-# ===== BEGIN: ORIGINAL I-92 ROUTING FRACTIONS — PRESERVED FOR REFERENCE =====
-# ============================================================
-# Previously used by the baseline model (Model 1) to allocate regional
-# arrivals to the 5 I-92 gateway cities. Replaced by T-100 routing
-# fractions (§3c), which cover all 11 US venue cities at country level.
-# f_{r, h} = mean_June_arrivals(region r, city h) / mean_June_arrivals(region r, USA)
-
-# routing_fractions <- arrivals_only_june %>%
-#   left_join(mean_arrivals_all_usa_june, by = "region_origin") %>%
-#   mutate(routing_fraction = arrivals_June / mean_all_usa_June) %>%
-#   select(region_origin, destination_city, routing_fraction)
-# ============================================================
-# ===== END: ORIGINAL I-92 ROUTING FRACTIONS =====
-# ============================================================
-
 # ---- 8d. Country × city arrivals matrix (T-100 routing) ------
-# Replaces the I-92 region-level routing used in the original version.
-#
-# N_{c,h}^{2026} = june_2026[c] × f_{c, h}^{T100}   (Eq. 5 in manuscript)
-#
-# Two improvements over the prior I-92-based version:
-#   (1) Country-level routing: each country gets its own fraction
-#       instead of inheriting its broad region's average.
-#   (2) All 11 US WC venue cities are covered (not just 5 I-92 gateways).
+# N_{c,v}^{2026} = june_2026[c] × f_{c,v}^{T100}
 #
 # Countries with no T-100 routing data (e.g., North Korea, some small
 # island nations with no direct US service) are silently dropped via
@@ -1125,21 +759,11 @@ arrivals_country_city_2026 <- travel_volume_june_2026 %>%
   ) %>%
   select(Country, destination_city, arrivals_june_2026)
 
-# ---- 8e. Country-level disease incidence tables --------------
-# All four incidence tables (dengue_june_country, malaria_country_inc,
-# measles_country_inc, pertussis_country_inc) were computed in §6b,
-# along with the disease parameters (under_rho_*, p_travel_inf_*).
-# They are shared across §6 (Model 1), §8 (Model 2), and §9 (Model 3)
-# to ensure the three-way comparison isolates travel volume differences,
-# not incidence assumptions.
-
-# ---- 8f. WC-adjusted model function -------------------------
-# compute_importation_country_level() was moved to §5c so it is
-# available to all three model tiers (§6, §8, §9). See §5c for the
-# full function definition and documentation.
+# Incidence tables and parameters (rho_d, p_d) come from Sections 5g
+# and 6, unchanged, so the model tiers differ only in travel volume and
+# routing.
 
 # ---- 8g. WC-adjusted estimates for all five diseases --------
-# Parameters are identical to Section 6 to allow direct comparison.
 
 dengue_wc_results <- compute_importation_country_level(
   arrivals_df    = arrivals_country_city_2026,
@@ -1147,8 +771,6 @@ dengue_wc_results <- compute_importation_country_level(
   p_travel_inf   = p_travel_inf_dengue,
   title_text     = "Dengue importation intensity — WC-adjusted (June 2026)"
 )
-print(dengue_wc_results$importation)
-print(dengue_wc_results$plot)
 
 malaria_wc_results <- compute_importation_country_level(
   arrivals_df    = arrivals_country_city_2026,
@@ -1156,8 +778,6 @@ malaria_wc_results <- compute_importation_country_level(
   p_travel_inf   = p_travel_inf_malaria,
   title_text     = "Malaria importation intensity — WC-adjusted (June 2026)"
 )
-print(malaria_wc_results$importation)
-print(malaria_wc_results$plot)
 
 measles_wc_results <- compute_importation_country_level(
   arrivals_df    = arrivals_country_city_2026,
@@ -1165,8 +785,6 @@ measles_wc_results <- compute_importation_country_level(
   p_travel_inf   = p_travel_inf_measles,
   title_text     = "Measles importation intensity — WC-adjusted (June 2026)"
 )
-print(measles_wc_results$importation)
-print(measles_wc_results$plot)
 
 pertussis_wc_results <- compute_importation_country_level(
   arrivals_df    = arrivals_country_city_2026,
@@ -1174,8 +792,6 @@ pertussis_wc_results <- compute_importation_country_level(
   p_travel_inf   = p_travel_inf_pertussis,
   title_text     = "Pertussis importation intensity — WC-adjusted (June 2026)"
 )
-print(pertussis_wc_results$importation)
-print(pertussis_wc_results$plot)
 
 influenza_wc_results <- compute_importation_country_level(
   arrivals_df    = arrivals_country_city_2026,
@@ -1183,23 +799,13 @@ influenza_wc_results <- compute_importation_country_level(
   p_travel_inf   = p_travel_inf_influenza,
   title_text     = "Influenza importation intensity — WC-adjusted (June 2026)"
 )
-print(influenza_wc_results$importation)
-print(influenza_wc_results$plot)
 
-# ---- 8h. Combined WC-adjusted panel -------------------------
-panel_wc_adjusted <- plot_grid(
-  dengue_wc_results$plot,
-  malaria_wc_results$plot,
-  measles_wc_results$plot,
-  pertussis_wc_results$plot,
-  influenza_wc_results$plot,
-  ncol = 2,
-  labels = "AUTO", label_size = 20
-)
-
-ggsave(panel_wc_adjusted,
-       file   = "Figures/estimated_importations_wc_adjusted.png",
-       height = 21, width = 20)
+# ---- 8h. MC summaries — WC-adjusted (Model 2) ---------------
+dengue_mc_wc    <- compute_mc_summary(dengue_wc_results$importation$imp_intensity,    dengue_wc_results$importation$destination_city,    under_rho_dengue,    p_travel_inf_dengue,    0.06,   0.26,   p_min_dengue,  p_max_dengue, n_mc)
+malaria_mc_wc   <- compute_mc_summary(malaria_wc_results$importation$imp_intensity,   malaria_wc_results$importation$destination_city,   under_rho_malaria,   p_travel_inf_malaria,   0.10,   0.35,   p_min_malaria,  p_max_malaria, n_mc)
+measles_mc_wc   <- compute_mc_summary(measles_wc_results$importation$imp_intensity,   measles_wc_results$importation$destination_city,   under_rho_measles,   p_travel_inf_measles,   0.40,   0.80,   p_min_measles,  p_max_measles, n_mc)
+pertussis_mc_wc <- compute_mc_summary(pertussis_wc_results$importation$imp_intensity, pertussis_wc_results$importation$destination_city, under_rho_pertussis, p_travel_inf_pertussis, 0.01,   0.10,   p_min_pertussis,  p_max_pertussis, n_mc)
+influenza_mc_wc <- compute_mc_summary(influenza_wc_results$importation$imp_intensity, influenza_wc_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.01,   0.10,   p_min_influenza,  p_max_influenza, n_mc)
 
 # ============================================================
 # 9. SCHEDULE-DRIVEN VENUE ROUTING MODEL (MODEL 3)
@@ -1215,7 +821,7 @@ ggsave(panel_wc_adjusted,
 # as a regular tourist. Model 3 captures this by decomposing travel:
 #
 #   (1) WC-FAN STREAM
-#       The marginal increment above the no-WC counterfactual (phi_base):
+#       The increment above background growth (phi_base):
 #         N_c^WC = N_{c,2024}^COR * max(0, phi_c - phi_base)
 #       Fans are routed to venue cities in proportion to their team's
 #       matches there:  omega_{c,v} = g_{c,v} / G_c
@@ -1226,22 +832,23 @@ ggsave(panel_wc_adjusted,
 #       These use T-100 country-level routing fractions, consistent
 #       with Models 1 and 2.
 #
-# For NTTO countries where phi_c < phi_base (e.g., UK at 1.107), the
-# WC fan increment is zero; all UK travel is treated as background.
+# The fan increment is computed for every country with phi_c >
+# phi_base. Countries with no matches in the schedule (non-qualified
+# countries, including the NTTO markets China, India, and Italy, and the
+# playoff qualifiers listed as TBD in the schedule template) have no fan
+# routing, so their increment is counted in M2 but not in M3 (Appendix
+# A.5; main text, Limitations).
 #
-# CITY COVERAGE
-# -------------
-# The schedule-driven model covers all 16 host venues (11 US + 5
-# Canada/Mexico). All 11 US cities receive contributions from both
-# streams (WC fans + T-100 background). The 5 non-US venues receive
-# only the WC-fan stream — T-100 covers US airports only.
+# Fans of matches played in Canada or Mexico drop out of the US totals;
+# results are kept for the 11 US host cities only.
 # ============================================================
 
 # ---- 9a. Parse match schedule --------------------------------
 # One row per match → pivot to one row per team per match so both
 # participating nations generate fan travel to the same venue.
-# TBD entries (unresolved knockout opponents) are dropped because we
-# cannot predict which fans will travel for those matches.
+# The schedule file is the group-stage template released before the
+# playoffs: TBD entries (the six playoff qualifiers) are dropped, and
+# Mexico's three matches are not listed.
 games_schedule <- read_excel("Data/WorldCup2026_games_template.xlsx") %>%
   clean_names() %>%
   pivot_longer(
@@ -1302,7 +909,7 @@ total_games_per_team <- team_venue_games %>%
   group_by(team) %>%
   summarise(total_games = sum(n_games), .groups = "drop")
 
-# Schedule-based WC fan routing fraction (Eq. 7 in manuscript):
+# Schedule-based WC fan routing fraction:
 #   omega_{c,v} = g_{c,v} / G_c
 schedule_routing <- team_venue_games %>%
   left_join(total_games_per_team, by = "team") %>%
@@ -1310,7 +917,7 @@ schedule_routing <- team_venue_games %>%
   select(team, venue_city, wc_routing)
 
 # ---- 9b. Decompose June 2026 travel into WC-fan vs. background ---
-# Uses travel_volume_june_2026 from Section 8b (columns: Country,
+# Uses travel_volume_june_2026 from Section 8c (columns: Country,
 # june_2024, growth_factor, june_2026).
 #
 #   N_c^WC  = june_2024 * max(0, phi_c - phi_base)    [WC increment]
@@ -1324,8 +931,8 @@ travel_decomposed <- travel_volume_june_2026 %>%
 
 # ---- 9c. WC-fan stream: country × venue-city arrival matrix ----
 # N_{c,v}^WC = june_wc[c] * omega_{c,v}
-# Non-qualified countries have no row in schedule_routing, so the
-# left_join produces NA → filtered out (correct: no WC fans).
+# Countries with no matches in the schedule have no row in
+# schedule_routing and are dropped here (see Section 9 header).
 # Results are restricted to the 11 US venue cities; non-US venues
 # (Toronto, Vancouver, Mexico City, Monterrey, Guadalajara) are excluded.
 us_venue_cities <- c("New York", "Dallas", "Houston", "Philadelphia",
@@ -1355,11 +962,11 @@ arrivals_bg_city <- travel_decomposed %>%
 
 # ---- 9e. Schedule-driven importation model function ----------
 #
-# Implements Eq. 9 in the manuscript. Processes both travel streams
+# Processes both travel streams
 # through the Poisson framework and combines them:
 #
 #   Lambda[v, d] = sum_{c in Q} (arrivals_wc[c,v] * I_{c,d} * p_d)   [WC fans]
-#               + sum_c         (arrivals_bg[c,h]  * I_{c,d} * p_d)   [background]
+#               + sum_c         (arrivals_bg[c,v]  * I_{c,d} * p_d)   [background]
 #
 # Also returns per-country contributions (needed by Section 11).
 #
@@ -1421,7 +1028,6 @@ compute_importation_schedule <- function(arrivals_wc_df,
 }
 
 # ---- 9f. Schedule-driven estimates for all five diseases -----
-# Parameters identical to Sections 6 and 8 for direct comparability.
 
 dengue_sched_results <- compute_importation_schedule(
   arrivals_wc_df  = arrivals_wc_venue,
@@ -1463,179 +1069,27 @@ influenza_sched_results <- compute_importation_schedule(
   title_text      = "Influenza importation intensity — schedule-driven (June 2026)"
 )
 
-print(dengue_sched_results$importation)
-print(dengue_sched_results$plot)
 
-# ---- 9g. Combined schedule-driven panel ----------------------
-panel_schedule_driven <- plot_grid(
-  dengue_sched_results$plot,
-  malaria_sched_results$plot,
-  measles_sched_results$plot,
-  pertussis_sched_results$plot,
-  influenza_sched_results$plot,
-  ncol = 2,
-  labels = "AUTO", label_size = 20
-)
+# ---- 9g. MC summaries — Schedule-driven (Model 3) -----------
+# This is the primary uncertainty result used in the main paper.
+dengue_mc_sched    <- compute_mc_summary(dengue_sched_results$importation$imp_intensity,    dengue_sched_results$importation$destination_city,    under_rho_dengue,    p_travel_inf_dengue,    0.06,   0.26,   p_min_dengue,  p_max_dengue, n_mc)
+malaria_mc_sched   <- compute_mc_summary(malaria_sched_results$importation$imp_intensity,   malaria_sched_results$importation$destination_city,   under_rho_malaria,   p_travel_inf_malaria,   0.10,   0.35,   p_min_malaria,  p_max_malaria, n_mc)
+measles_mc_sched   <- compute_mc_summary(measles_sched_results$importation$imp_intensity,   measles_sched_results$importation$destination_city,   under_rho_measles,   p_travel_inf_measles,   0.40,   0.80,   p_min_measles,  p_max_measles, n_mc)
+pertussis_mc_sched <- compute_mc_summary(pertussis_sched_results$importation$imp_intensity, pertussis_sched_results$importation$destination_city, under_rho_pertussis, p_travel_inf_pertussis, 0.01,   0.10,   p_min_pertussis,  p_max_pertussis, n_mc)
+influenza_mc_sched <- compute_mc_summary(influenza_sched_results$importation$imp_intensity, influenza_sched_results$importation$destination_city, under_rho_influenza, p_travel_inf_influenza, 0.01,   0.10,   p_min_influenza,  p_max_influenza, n_mc)
 
-ggsave(panel_schedule_driven,
-       file   = "Figures/estimated_importations_schedule_driven.png",
-       height = 21, width = 20)
-
-# ============================================================
-# 10. THREE-MODEL COMPARISON
-# ============================================================
-#
-# The three models form a nested hierarchy where each step adds one
-# layer of resolution, while holding disease parameters fixed:
-#
-#   Model 1 → Model 2: effect of WC travel surge (phi_c growth factors
-#                       applied to COR June 2024 base volumes)
-#   Model 2 → Model 3: effect of schedule-based fan routing
-#                       (WC fans directed to specific match venues)
-#
-# All three models use T-100 routing fractions and country-level
-# incidence, so the comparisons isolate travel volume differences.
-#
-# Two metrics are compared (see Sections 10c and 10d):
-#   P(>=1): useful for communication but saturates to 1 at high risk
-#   Lambda: stays on a linear scale; quantitatively more informative
-# ============================================================
-
-# ============================================================
-# ===== BEGIN: recode_i92_city() — PRESERVED FOR REFERENCE =====
-# ============================================================
-# This helper was used when Model 1 (baseline) relied on I-92 city
-# names ("Ny", "Newark"). Now that all three models use T-100 canonical
-# venue city names (str_to_title(destination_city) is sufficient),
-# this function is no longer needed but is kept for reference.
-
-# recode_i92_city <- function(df) {
-#   df %>%
-#     mutate(city = case_when(
-#       destination_city == "Newark"       ~ "New York",
-#       destination_city == "Ny"           ~ "New York",
-#       destination_city == "Boston"       ~ "Boston",
-#       destination_city == "Dallas"       ~ "Dallas",
-#       destination_city == "Houston"      ~ "Houston",
-#       destination_city == "Philadelphia" ~ "Philadelphia",
-#       TRUE                               ~ str_to_title(destination_city)
-#     )) %>%
-#     group_by(city) %>%
-#     summarise(imp_intensity = sum(imp_intensity, na.rm = TRUE), .groups = "drop") %>%
-#     mutate(prob_at_least_one = 1 - exp(-imp_intensity))
-# }
-# ============================================================
-# ===== END: recode_i92_city() =====
-# ============================================================
-
-# ---- 10b. Assemble the three-model comparison table ----------
-# All three models now use T-100 canonical venue city names, so no
-# special recoding is needed for the baseline. The same str_to_title()
-# + select() pattern is applied uniformly across all three tiers.
-build_comparison <- function(baseline_res, wc_res, sched_res, disease_name) {
-  bind_rows(
-    # Model 1: T-100 baseline — canonical venue city names
-    baseline_res$importation %>%
-      mutate(city = str_to_title(destination_city)) %>%
-      select(city, imp_intensity, prob_at_least_one) %>%
-      mutate(model = "Baseline"),
-    # Model 2: WC-adjusted — same T-100 canonical names
-    wc_res$importation %>%
-      mutate(city = str_to_title(destination_city)) %>%
-      select(city, imp_intensity, prob_at_least_one) %>%
-      mutate(model = "WC-adjusted"),
-    # Model 3: schedule-driven — city column already canonical
-    sched_res$importation %>%
-      mutate(city = str_to_title(city)) %>%
-      select(city, imp_intensity, prob_at_least_one) %>%
-      mutate(model = "Schedule-driven")
-  ) %>%
-    mutate(disease = disease_name)
+# ---- COMPARISON TABLE: 11-city totals (schedule-driven, MC) ----
+for (dis in c("dengue", "malaria", "measles")) {
+  obj <- get(paste0(dis, "_mc_sched"))
+  tot <- obj %>%
+    summarise(
+      med = sum(lambda_median),
+      lo  = sum(lambda_lo),
+      hi  = sum(lambda_hi)
+    )
+  cat(sprintf("%-10s  median = %5.1f   95%% CI: %5.1f – %5.1f\n",
+              dis, tot$med, tot$lo, tot$hi))
 }
-
-comparison_all <- bind_rows(
-  build_comparison(dengue_results,    dengue_wc_results,    dengue_sched_results,    "Dengue"),
-  build_comparison(malaria_results,   malaria_wc_results,   malaria_sched_results,   "Malaria"),
-  build_comparison(measles_results,   measles_wc_results,   measles_sched_results,   "Measles"),
-  build_comparison(pertussis_results, pertussis_wc_results, pertussis_sched_results, "Pertussis"),
-  build_comparison(influenza_results, influenza_wc_results, influenza_sched_results, "Influenza")
-)
-
-# Consistent colour palette across all comparison plots
-model_colors <- c(
-  "Baseline"        = "#4393c3",
-  "WC-adjusted"     = "#d6604d",
-  "Schedule-driven" = "#74c476"
-)
-
-# Order x-axis by descending schedule-driven total importation intensity
-# across all diseases — most-at-risk cities appear first.
-city_order <- comparison_all %>%
-  filter(model == "Schedule-driven") %>%
-  group_by(city) %>%
-  summarise(total_imp = sum(imp_intensity, na.rm = TRUE), .groups = "drop") %>%
-  arrange(desc(total_imp)) %>%
-  pull(city)
-
-# ---- 10c. Comparison plot: P(>=1) by city and model ----------
-# All three models cover the same 11 US venue cities via T-100 routing.
-# Model 3 adds 5 non-US venues (Toronto, Vancouver, Guadalajara,
-# Mexico City, Monterrey) that show non-zero values for Model 3 only.
-prob_comparison_plot <- comparison_all %>%
-  mutate(
-    city  = factor(city, levels = city_order),
-    model = factor(model, levels = c("Baseline", "WC-adjusted", "Schedule-driven"))
-  ) %>%
-  ggplot(aes(x = city, y = prob_at_least_one, fill = model)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
-  facet_wrap(~disease, scales = "free_y", ncol = 2) +
-  scale_fill_manual(values = model_colors) +
-  labs(
-    x     = "",
-    y     = expression(P(X >= 1)),
-    fill  = "Model",
-    title = "Probability of at least one importation — three-model comparison"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x  = element_text(angle = 45, hjust = 1, size = 18),
-    text         = element_text(size = 20),
-    legend.position = "bottom"
-  )
-
-ggsave(prob_comparison_plot,
-       file   = "Figures/model_comparison_probability.png",
-       height = 12, width = 18)
-
-# ---- 10d. Comparison plot: expected importation intensity (lambda) --
-# Lambda remains informative when P(>=1) → 1 (it does not saturate),
-# making it the preferred metric for quantifying relative risk between
-# high-burden cities and across models.
-intensity_comparison_plot <- comparison_all %>%
-  mutate(
-    city  = factor(city, levels = city_order),
-    model = factor(model, levels = c("Baseline", "WC-adjusted", "Schedule-driven"))
-  ) %>%
-  ggplot(aes(x = city, y = imp_intensity, fill = model)) +
-  geom_col(position = position_dodge(width = 0.8), width = 0.75) +
-  facet_wrap(~disease, scales = "free", ncol = 2) +
-  scale_fill_manual(values = model_colors) +
-  labs(
-    x     = "",
-    y     = expression(lambda ~ "(expected importations)"),
-    fill  = "Model",
-    title = "Expected importation intensity (λ) — three-model comparison"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x  = element_text(angle = 45, hjust = 1, size = 18),
-    text         = element_text(size = 20),
-    legend.position = "bottom"
-  )
-
-ggsave(intensity_comparison_plot,
-       file   = "Figures/model_comparison_intensity.png",
-       height = 12, width = 18)
 
 # ============================================================
 # 11. COUNTRY-LEVEL IMPORTATION CONTRIBUTIONS
@@ -1645,12 +1099,9 @@ ggsave(intensity_comparison_plot,
 #   Lambda[v, d] = sum_c lambda[c, v, d]
 #
 # compute_importation_schedule() stores per-country, per-city,
-# per-stream contributions in $country_contributions. This section
-# uses those to produce three summaries (Figs 5–8 in manuscript):
-#
-#   (a) Country importation ranking — top 15 by total lambda
-#   (b) WC-fan vs. background stream breakdown — all five diseases
-#   (c) Country × city heatmaps — all five diseases
+# per-stream contributions in $country_contributions. These feed
+# Figure 4 (Section 12e) and the diaspora extension (saved in
+# Section 13).
 # ============================================================
 
 # ---- 11a. Aggregate contributions across all five diseases ---
@@ -1672,588 +1123,468 @@ top_countries <- all_contributions %>%
   slice_max(total_imports, n = 15, with_ties = FALSE) %>%
   ungroup()
 
-country_ranking_plot <- top_countries %>%
-  mutate(disease = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza"))) %>%
-  ggplot(aes(x = reorder(Country, total_imports),
-             y = total_imports,
-             fill = disease)) +
-  geom_col(show.legend = FALSE) +
-  coord_flip() +
-  facet_wrap(~disease, scales = "free", ncol = 2) +
-  labs(
-    x     = "",
-    y     = expression(lambda ~ "(expected importations)"),
-    title = "Top 15 source countries by expected importation — schedule-driven model"
-  ) +
-  theme_bw() +
-  theme(text = element_text(size = 20))
+# Monte Carlo uncertainty for country-level contributions. Country
+# lambda is proportional to p_d / rho_d, so every country of a disease
+# shares the same multiplicative factor (same seeded draws as the main
+# model). Bars use the Monte Carlo median and error bars the 2.5th and
+# 97.5th percentiles, consistent with Figures 1-3.
+mc_country_scales <- tibble(
+  disease = c("Dengue", "Malaria", "Measles", "Pertussis", "Influenza"),
+  sc = list(
+    compute_mc_summary(1, "s", under_rho_dengue,    p_travel_inf_dengue,    0.06, 0.26, p_min_dengue,    p_max_dengue),
+    compute_mc_summary(1, "s", under_rho_malaria,   p_travel_inf_malaria,   0.10, 0.35, p_min_malaria,   p_max_malaria),
+    compute_mc_summary(1, "s", under_rho_measles,   p_travel_inf_measles,   0.40, 0.80, p_min_measles,   p_max_measles),
+    compute_mc_summary(1, "s", under_rho_pertussis, p_travel_inf_pertussis, 0.01, 0.10, p_min_pertussis, p_max_pertussis),
+    compute_mc_summary(1, "s", under_rho_influenza, p_travel_inf_influenza, 0.01, 0.10, p_min_influenza, p_max_influenza)
+  )
+) %>%
+  mutate(scale_mid = map_dbl(sc, "lambda_median"),
+         scale_lo  = map_dbl(sc, "lambda_lo"),
+         scale_hi  = map_dbl(sc, "lambda_hi")) %>%
+  select(disease, scale_mid, scale_lo, scale_hi)
 
-ggsave(country_ranking_plot,
-       file   = "Figures/country_importation_ranking.png",
-       height = 12, width = 16)
-
-# ---- 11c. WC-fan vs. background stream breakdown (all diseases) --
-# For each disease, shows the fraction of importation risk attributable
-# to WC-specific fan travel vs. routine background tourism for the
-# top 20 contributing countries.
-# WC-qualified countries show a non-zero WC-fan component; non-qualified
-# countries show background travel only.
-#
-# NOTE: Previously this section covered dengue only. Extended here to
-# all five diseases to provide a complete picture of stream attribution.
-
-make_stream_plot <- function(disease_name, n_top = 20) {
-
-  # Identify the top-n countries for this disease
-  top_c <- all_contributions %>%
-    filter(disease == disease_name) %>%
-    group_by(Country) %>%
-    summarise(s = sum(expected_imports), .groups = "drop") %>%
-    slice_max(s, n = n_top, with_ties = FALSE) %>%
-    pull(Country)
-
-  stream_data <- all_contributions %>%
-    filter(disease == disease_name, Country %in% top_c) %>%
-    group_by(Country, stream) %>%
-    summarise(total_imports = sum(expected_imports, na.rm = TRUE), .groups = "drop") %>%
-    group_by(Country) %>%
-    mutate(country_total = sum(total_imports)) %>%
-    ungroup()
-
-  stream_data %>%
-    ggplot(aes(x = reorder(Country, country_total),
-               y = total_imports,
-               fill = stream)) +
-    geom_col() +
-    coord_flip() +
-    scale_fill_manual(values = c("WC fans" = "#e6550d", "Background" = "#3182bd")) +
-    labs(
-      x     = "",
-      y     = expression(lambda ~ "(expected importations)"),
-      fill  = "Travel stream",
-      title = paste0(disease_name,
-                     ": importation by travel stream — top ", n_top, " source countries")
-    ) +
-    theme_bw() +
-    theme(text = element_text(size = 15),legend.position = c(0.7,0.3))
-}
-
-stream_plot_dengue    <- make_stream_plot("Dengue")
-stream_plot_malaria   <- make_stream_plot("Malaria")
-stream_plot_measles   <- make_stream_plot("Measles")
-stream_plot_pertussis <- make_stream_plot("Pertussis")
-stream_plot_influenza <- make_stream_plot("Influenza")
-
-ggsave(stream_plot_dengue,
-       file = "Figures/stream_breakdown_dengue.png",    height = 9, width = 13)
-ggsave(stream_plot_malaria,
-       file = "Figures/stream_breakdown_malaria.png",   height = 9, width = 13)
-ggsave(stream_plot_measles,
-       file = "Figures/stream_breakdown_measles.png",   height = 9, width = 13)
-ggsave(stream_plot_pertussis,
-       file = "Figures/stream_breakdown_pertussis.png", height = 9, width = 13)
-ggsave(stream_plot_influenza,
-       file = "Figures/stream_breakdown_influenza.png", height = 9, width = 13)
-
-# Combined stream panel for the supplement
-panel_stream <- plot_grid(
-  stream_plot_dengue, stream_plot_malaria,
-  stream_plot_measles, stream_plot_pertussis,
-  stream_plot_influenza,
-  ncol = 2,
-  labels = "AUTO", label_size = 16
-)
-ggsave(panel_stream,
-       file   = "Figures/stream_breakdown_panel.png",
-       height = 20, width = 22)
-
-# ---- 11d. Country × city importation heatmaps ---------------
-# A matrix of expected importations by source country (rows, ordered
-# by total burden) and destination city (columns). WC-qualified
-# countries show risk concentrated at specific match venues; non-WC
-# countries show diffuse contributions spread across I-92 gateways.
-make_heatmap <- function(disease_name, n_countries = 20) {
-
-  dat <- all_contributions %>%
-    filter(disease == disease_name) %>%
-    group_by(Country, city) %>%
-    summarise(imports = sum(expected_imports, na.rm = TRUE), .groups = "drop")
-
-  top_c <- dat %>%
-    group_by(Country) %>%
-    summarise(country_total = sum(imports), .groups = "drop") %>%
-    slice_max(country_total, n = n_countries, with_ties = FALSE)
-
-  dat %>%
-    inner_join(top_c, by = "Country") %>%
-    mutate(city = str_to_title(city)) %>%
-    ggplot(aes(x = city,
-               y = reorder(Country, country_total),
-               fill = imports)) +
-    geom_tile(color = "white", linewidth = 0.3) +
-    scale_fill_viridis_c(option = "plasma", name = "Expected\nimportations") +
-    labs(
-      x     = "Destination city",
-      y     = "Source country",
-      title = paste0(disease_name, " importation matrix: country × city (schedule-driven)")
-    ) +
-    theme_bw() +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
-      text        = element_text(size = 14)
-    )
-}
-
-heatmap_dengue    <- make_heatmap("Dengue")
-heatmap_malaria   <- make_heatmap("Malaria")
-heatmap_measles   <- make_heatmap("Measles")
-heatmap_pertussis <- make_heatmap("Pertussis")
-heatmap_influenza <- make_heatmap("Influenza")
-
-ggsave(heatmap_dengue,    file = "Figures/heatmap_dengue.png",    height = 9, width = 13)
-ggsave(heatmap_malaria,   file = "Figures/heatmap_malaria.png",   height = 9, width = 13)
-ggsave(heatmap_measles,   file = "Figures/heatmap_measles.png",   height = 9, width = 13)
-ggsave(heatmap_pertussis, file = "Figures/heatmap_pertussis.png", height = 9, width = 13)
-ggsave(heatmap_influenza, file = "Figures/heatmap_influenza.png", height = 9, width = 13)
-
-# ============================================================
-# 12. SENSITIVITY ANALYSIS
-# ============================================================
-#
-# rho_d and p_d are the two most uncertain parameters in the model.
-# Neither has strong empirical constraints for a mass sporting-event
-# context. This section varies each parameter independently over a
-# ±50 % range around its central estimate while holding the other
-# fixed, using the schedule-driven model (Section 9) as the reference.
-#
-# For each combination (disease × parameter × multiplier):
-#   - Recompute total_inc with the perturbed parameter
-#   - Call compute_importation_schedule()
-#   - Extract city-level Lambda values
-#
-# Output: a tidy data frame (sensitivity_results) and a faceted plot
-# showing how Lambda at each city responds to parameter uncertainty.
-# Relative sensitivity (ratio of perturbed to central Lambda) is also
-# computed to identify which cities and diseases are most affected.
-# ============================================================
-
-# Multipliers representing ±50 % of the central value (6 levels)
-sensitivity_multipliers <- c(0.50, 0.75, 1.00, 1.25, 1.50)
-
-# Central parameters (must match Sections 6 and 9)
-central_params <- tibble(
-  disease       = c("Dengue",            "Malaria",            "Measles",            "Pertussis",            "Influenza"),
-  under_rho     = c(under_rho_dengue,    under_rho_malaria,    under_rho_measles,    under_rho_pertussis,    under_rho_influenza),
-  p_travel      = c(p_travel_inf_dengue, p_travel_inf_malaria, p_travel_inf_measles, p_travel_inf_pertussis, p_travel_inf_influenza),
-  country_inc   = list(dengue_june_country, malaria_country_inc, measles_country_inc, pertussis_country_inc, influenza_june_country)
-)
-
-# Helper: run schedule-driven model with a scaled rho or p
-run_sensitivity <- function(disease_name, base_inc_df, base_rho, base_p,
-                             param, multiplier) {
-
-  if (param == "rho") {
-    # Scale total_inc proportionally to rho (linear relationship)
-    scaled_inc <- base_inc_df %>%
-      mutate(total_inc = total_inc * multiplier)
-    p_use <- base_p
-  } else {
-    scaled_inc <- base_inc_df
-    p_use      <- base_p * multiplier
-  }
-
-  res <- compute_importation_schedule(
-    arrivals_wc_df  = arrivals_wc_venue,
-    arrivals_bg_df  = arrivals_bg_city,
-    country_inc_df  = scaled_inc,
-    p_travel_inf    = p_use,
-    title_text      = ""
+top_countries_ci <- top_countries %>%
+  left_join(mc_country_scales, by = "disease") %>%
+  mutate(
+    imports_lo    = total_imports * scale_lo,
+    imports_hi    = total_imports * scale_hi,
+    total_imports = total_imports * scale_mid   # bar = Monte Carlo median
   )
 
-  res$importation %>%
-    select(city, imp_intensity) %>%
-    mutate(
-      disease    = disease_name,
-      param      = param,
-      multiplier = multiplier
-    )
-}
+# ============================================================
+# 11e. FIGURE S3 — CI ASYMMETRY
+# ============================================================
+# For each disease × city, compares the upside ratio
+# Lambda_hi / Lambda_median with the downside ratio
+# Lambda_median / Lambda_lo. Because Lambda scales with p_d / rho_d,
+# both ratios are the same for every city of a disease and are set by
+# the Uniform ranges of rho_d and p_d.
 
-# Run all combinations: 5 diseases × 2 parameters × 5 multipliers = 50 runs
-sensitivity_results <- pmap_dfr(
-  crossing(
-    central_params %>% select(disease, under_rho, p_travel, country_inc),
-    param      = c("rho", "p"),
-    multiplier = sensitivity_multipliers
-  ),
-  function(disease, under_rho, p_travel, country_inc, param, multiplier) {
-    run_sensitivity(
-      disease_name = disease,
-      base_inc_df  = country_inc,
-      base_rho     = under_rho,
-      base_p       = p_travel,
-      param        = param,
-      multiplier   = multiplier
-    )
-  }
-)
-
-# Add P(>=1) alongside Lambda for every run
-sensitivity_results <- sensitivity_results %>%
-  mutate(prob = 1 - exp(-imp_intensity))
-
-# Compute relative Lambda and relative P(>=1): perturbed / central
-central_vals <- sensitivity_results %>%
-  filter(multiplier == 1.00) %>%
-  select(disease, param, city,
-         lambda_central = imp_intensity,
-         prob_central   = prob)
-
-sensitivity_relative <- sensitivity_results %>%
-  left_join(central_vals, by = c("disease", "param", "city")) %>%
+mc_asym_data <- bind_rows(
+  dengue_mc_sched    %>% mutate(disease = "Dengue"),
+  malaria_mc_sched   %>% mutate(disease = "Malaria"),
+  measles_mc_sched   %>% mutate(disease = "Measles"),
+  pertussis_mc_sched %>% mutate(disease = "Pertussis"),
+  influenza_mc_sched %>% mutate(disease = "Influenza")
+) %>%
   mutate(
-    relative_lambda = imp_intensity / lambda_central,
-    # Use absolute difference for prob so near-saturated cities don't
-    # collapse to ratio ≈ 1 artificially; keep ratio too for reference
-    relative_prob   = prob / prob_central,
-    delta_prob      = prob - prob_central
+    disease    = factor(disease,
+                        levels = c("Dengue","Influenza","Pertussis","Malaria","Measles")),
+    city_clean = str_to_title(destination_city),
+    upside     = lambda_hi     / lambda_median,
+    downside   = lambda_median / lambda_lo,
+    skewness   = (lambda_hi - lambda_median) / (lambda_median - lambda_lo)
   )
 
-# ---- Sensitivity plot: absolute Lambda ----------------------
-sensitivity_plot_abs <- sensitivity_results %>%
-  mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
-    param_lab  = if_else(param == "rho",
-                          "Varying ρ (under-reporting factor)",
-                          "Varying p (travel-while-infectious probability)"),
-    multiplier = factor(multiplier)
-  ) %>%
-  ggplot(aes(x = reorder(city, -imp_intensity), y = imp_intensity,
-             color = multiplier, group = multiplier)) +
-  geom_line() + geom_point(size = 2) +
-  facet_grid(disease ~ param_lab, scales = "free_y") +
-  scale_color_brewer(palette = "RdYlBu", name = "Multiplier\n(× central)") +
-  labs(
-    x     = "Destination city",
-    y     = expression(lambda ~ "(expected importations)"),
-    title = "Sensitivity of importation intensity to parameter uncertainty (±50%)"
-  ) +
-  theme_bw() +
+ci_asymmetry_plot <- mc_asym_data %>%
+  ggplot(aes(x = downside, y = upside, color = disease, label = city_clean)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed",
+              color = "gray60", linewidth = 0.7) +
+  geom_point(size = 3, alpha = 0.85) +
+  annotate("text", x = 1.4, y = 1.1, label = "Interval extends\nfurther below median",
+           size = 3.2, color = "gray40", hjust = 0) +
+  annotate("text", x = 1.1, y = 3.2, label = "Interval extends\nfurther above median",
+           size = 3.2, color = "gray40", hjust = 0) +
+  scale_color_manual(values = disease_colors, name = "") +
+  scale_x_continuous(name = expression("Downside ratio  " *
+                                       (Lambda[median] / Lambda[lo])),
+                     limits = c(1, NA)) +
+  scale_y_continuous(name = expression("Upside ratio  " *
+                                       (Lambda[hi] / Lambda[median])),
+                     limits = c(1, NA)) +
+  # No title/subtitle baked into the plot: explanatory text belongs in
+  # the LaTeX caption, not duplicated in the image itself. The
+  # annotate() calls above already label the upper/lower bound
+  # regions directly on the plot.
+  theme_minimal(base_size = 12) +
   theme(
-    axis.text.x     = element_text(angle = 45, hjust = 1, size = 12),
-    text            = element_text(size = 15),
-    legend.position = "right"
+    legend.position = "right",
+    panel.grid.minor = element_blank()
   )
 
-ggsave(sensitivity_plot_abs,
-       file   = "Figures/sensitivity_analysis_lambda.png",
-       height = 17, width = 18)
+ggsave(ci_asymmetry_plot,
+       file   = "Figures/FigureS3.png",
+       height = 6, width = 9, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(ci_asymmetry_plot,
+       file   = "Figures/FigureS3.pdf",
+       height = 6, width = 9, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(ci_asymmetry_plot)
 
-# ---- Sensitivity plot: relative P(>=1) ----------------------
-# Plotting relative Lambda is uninformative here because both rho
-# and p enter Lambda linearly, so Lambda_perturbed / Lambda_central
-# = multiplier for every city (flat lines). The Poisson probability
-# P(>=1) = 1 - exp(-Lambda) is nonlinear, so its relative change
-# *does* vary across cities: high-Lambda (near-saturated) cities are
-# insensitive to perturbations; low-Lambda cities show large shifts.
-# We show BOTH the ratio P_perturbed/P_central (relative) and the
-# absolute shift delta_P = P_perturbed - P_central in two panels.
-
-# --- Panel A: ratio P(>=1)_perturbed / P(>=1)_central -----------
-sensitivity_plot_rel <- sensitivity_relative %>%
-  filter(multiplier != 1.00) %>%
-  mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
-    param_lab  = if_else(param == "rho", "Varying ρ", "Varying p"),
-    multiplier = factor(multiplier)
-  ) %>%
-  ggplot(aes(x = reorder(city, -relative_prob), y = relative_prob,
-             color = multiplier, group = multiplier)) +
-  geom_hline(yintercept = 1, linetype = "dashed", color = "gray50") +
-  geom_line() + geom_point(size = 2) +
-  facet_grid(disease ~ param_lab, scales = "free_y") +
-  scale_color_brewer(palette = "RdYlBu", name = "Multiplier\n(× central)") +
-  labs(
-    x     = "Destination city",
-    y     = expression(P("">=1)[perturbed] / P("">=1)[central]),
-    title = "Relative sensitivity of P(≥1 importation) to parameter uncertainty"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x     = element_text(angle = 45, hjust = 1, size = 12),
-    text            = element_text(size = 15),
-    legend.position = "right"
-  )
-
-ggsave(sensitivity_plot_rel,
-       file   = "Figures/sensitivity_analysis_relative.png",
-       height = 17, width = 18)
-
-# --- Panel B: absolute shift delta_P = P_perturbed - P_central ---
-sensitivity_plot_delta <- sensitivity_relative %>%
-  filter(multiplier != 1.00) %>%
-  mutate(
-    disease    = factor(disease, levels = c("Dengue","Malaria","Measles","Pertussis","Influenza")),
-    param_lab  = if_else(param == "rho", "Varying ρ", "Varying p"),
-    multiplier = factor(multiplier)
-  ) %>%
-  ggplot(aes(x = reorder(city, -abs(delta_prob)), y = delta_prob,
-             color = multiplier, group = multiplier)) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
-  geom_line() + geom_point(size = 2) +
-  facet_grid(disease ~ param_lab, scales = "free_y") +
-  scale_color_brewer(palette = "RdYlBu", name = "Multiplier\n(× central)") +
-  labs(
-    x     = "Destination city",
-    y     = expression(Delta * P("">=1)),
-    title = "Absolute change in P(≥1 importation) under parameter uncertainty"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x     = element_text(angle = 45, hjust = 1, size = 12),
-    text            = element_text(size = 15),
-    legend.position = "right"
-  )
-
-ggsave(sensitivity_plot_delta,
-       file   = "Figures/sensitivity_analysis_delta_prob.png",
-       height = 17, width = 18)
-
-# Summary table: range of P(>=1) and delta_P across multipliers
-sensitivity_summary <- sensitivity_relative %>%
-  filter(multiplier != 1.00) %>%
-  group_by(disease, city, param) %>%
-  summarise(
-    prob_central   = first(prob_central),
-    prob_min       = min(prob,       na.rm = TRUE),
-    prob_max       = max(prob,       na.rm = TRUE),
-    delta_prob_min = min(delta_prob, na.rm = TRUE),
-    delta_prob_max = max(delta_prob, na.rm = TRUE),
-    .groups        = "drop"
-  ) %>%
-  arrange(disease, param, desc(prob_central))
-
-print(sensitivity_summary)
 
 # ============================================================
-# 13. MONTE CARLO UNCERTAINTY ANALYSIS
+# 12. MAIN AND SUPPLEMENTARY FIGURES
 # ============================================================
-#
-# Propagates joint parameter uncertainty through the Poisson
-# importation model using 5,000 Monte Carlo draws applied to
-# the schedule-driven (Model 3) estimates.
-#
-# Uncertain inputs per disease (sampled independently):
-#   rho_d — under-reporting factor: Uniform(min, max)
-#   p_d   — travel-while-infectious probability: Uniform(min, max)
-#
-# Ranges are taken directly from the literature ranges in Table 1.
-# Uniform distributions are used for transparency; they make no
-# assumption about the shape of uncertainty within the range.
-#
-# Because Lambda is linear in (rho × p), the distribution of Lambda
-# under the MC reduces to rescaling the central estimate:
-#
-#   Lambda_i[v] = (rho_i × p_i) / (rho_c × p_c) × Lambda_central[v]
-#
-# This is implemented as a vectorized outer product — no iteration
-# over simulations is needed, making the full 5,000 × 5-disease run
-# essentially instantaneous.
-#
-# NOTE ON ASYMMETRY: For diseases where the central rho is the upper
-# bound of the literature range (pertussis: rho_c = rho_max = 0.10),
-# the MC distribution is left-skewed — the current point estimate is
-# at the top of the plausible range. For diseases where rho_c is near
-# the lower bound (dengue: rho_c = 0.10, range 0.06–0.26), the MC
-# mean exceeds the central estimate.
+#  Figure 1  — fig1_risk_heatmap:   P(>=1) by disease and city (M3)
+#  Figure 2  — fig2_lambda_ci:      Lambda, median and 95% UI (M3)
+#  Figure 4  — fig4_country_drivers: top 10 source countries per disease
+#  Figure S2 — fig1_heatmap_wc:     P(>=1) heatmap under M2
+# Figure 3 and Figure S1 need the M1 baseline and are built in
+# figure3_figureS1.R.
 # ============================================================
 
-set.seed(2026)
-n_mc <- 5000
+# ---- 12a. Shared data: all schedule-driven MC results -------
 
-# ---- 13a. Parameter ranges (literature-informed) --------------------
-# Each row defines one disease's sampling space. Columns rho_c and p_c
-# are the central values used in the point-estimate sections above.
-mc_params <- tribble(
-  ~disease,    ~rho_c,               ~p_c,                   ~rho_min, ~rho_max, ~p_min, ~p_max,
-  "Dengue",    under_rho_dengue,     p_travel_inf_dengue,    0.06,     0.26,     0.30,   0.70,
-  "Malaria",   under_rho_malaria,    p_travel_inf_malaria,   0.10,     0.35,     0.10,   0.50,
-  "Measles",   under_rho_measles,    p_travel_inf_measles,   0.40,     0.80,     0.02,   0.10,
-  "Pertussis", under_rho_pertussis,  p_travel_inf_pertussis, 0.01,     0.10,     0.50,   0.90,
-  "Influenza", under_rho_influenza,  p_travel_inf_influenza, 0.033,    0.20,     0.30,   0.70
-)
-
-# ---- 13b. Central Lambda values (Model 3 schedule-driven) ----------
-central_lambda_mc <- bind_rows(
-  dengue_sched_results$importation    %>% select(city, lambda_c = imp_intensity) %>% mutate(disease = "Dengue"),
-  malaria_sched_results$importation   %>% select(city, lambda_c = imp_intensity) %>% mutate(disease = "Malaria"),
-  measles_sched_results$importation   %>% select(city, lambda_c = imp_intensity) %>% mutate(disease = "Measles"),
-  pertussis_sched_results$importation %>% select(city, lambda_c = imp_intensity) %>% mutate(disease = "Pertussis"),
-  influenza_sched_results$importation %>% select(city, lambda_c = imp_intensity) %>% mutate(disease = "Influenza")
-)
-
-# ---- 13c. Vectorised MC draws --------------------------------------
-# For each disease: draw n_mc (rho, p) pairs → compute scale vector →
-# outer product with city Lambda vector → long-format tibble.
-# Total rows: n_mc × n_cities × n_diseases = 5,000 × 11 × 5 = 275,000.
-
-message("Running Monte Carlo uncertainty analysis (", n_mc, " iterations × 5 diseases)...")
-
-mc_raw <- pmap_dfr(mc_params, function(disease, rho_c, p_c,
-                                        rho_min, rho_max, p_min, p_max) {
-  dis <- disease   # local alias to avoid dplyr column-name collision
-
-  rho_s  <- runif(n_mc, rho_min, rho_max)
-  p_s    <- runif(n_mc, p_min,   p_max)
-  scales <- (rho_s * p_s) / (rho_c * p_c)   # length-n_mc rescaling factors
-
-  lc <- central_lambda_mc %>%
-    filter(disease == dis) %>%
-    arrange(city)
-
-  cities  <- lc$city
-  lambdas <- lc$lambda_c
-
-  # Outer product: scale_i × lambda_j → (n_mc × n_cities) matrix.
-  # Column j = all n_mc realisations of Lambda at city j.
-  imp_mat <- outer(scales, lambdas)   # n_mc rows × n_cities cols
-
-  tibble(
-    disease       = dis,
-    city          = rep(cities, each = n_mc),         # column-major order
-    imp_intensity = as.vector(imp_mat)                # matches city ordering
-  )
-})
-
-message("Monte Carlo complete.")
-
-# ---- 13d. Summarise: median and 95% uncertainty interval -----------
-mc_summary <- mc_raw %>%
-  mutate(prob_at_least_one = 1 - exp(-imp_intensity)) %>%
-  group_by(disease, city) %>%
-  summarise(
-    lambda_median = median(imp_intensity),
-    lambda_lo     = quantile(imp_intensity, 0.025),
-    lambda_hi     = quantile(imp_intensity, 0.975),
-    prob_median   = median(prob_at_least_one),
-    prob_lo       = quantile(prob_at_least_one, 0.025),
-    prob_hi       = quantile(prob_at_least_one, 0.975),
-    .groups       = "drop"
-  )
-
-# City order: descending total Lambda (same as point-estimate sections)
-city_order_mc <- central_lambda_mc %>%
-  group_by(city) %>%
-  summarise(total = sum(lambda_c), .groups = "drop") %>%
-  arrange(desc(total)) %>%
-  pull(city)
-
-disease_levels_mc <- c("Dengue", "Malaria", "Measles", "Pertussis", "Influenza")
-
-# ---- 13e. Figure: Lambda with 95% CI --------------------------------
-mc_lambda_plot <- mc_summary %>%
+mc_all_sched <- bind_rows(
+  dengue_mc_sched    %>% mutate(disease = "Dengue"),
+  malaria_mc_sched   %>% mutate(disease = "Malaria"),
+  measles_mc_sched   %>% mutate(disease = "Measles"),
+  pertussis_mc_sched %>% mutate(disease = "Pertussis"),
+  influenza_mc_sched %>% mutate(disease = "Influenza")
+) %>%
   mutate(
-    city    = factor(city,    levels = city_order_mc),
-    disease = factor(disease, levels = disease_levels_mc)
-  ) %>%
-  ggplot(aes(x = city, y = lambda_median)) +
-  geom_col(fill = "steelblue", alpha = 0.85, width = 0.7) +
-  geom_errorbar(aes(ymin = lambda_lo, ymax = lambda_hi),
-                width = 0.35, linewidth = 0.7, color = "gray20") +
-  scale_y_continuous(expand = expansion(mult = c(0, 0.20))) +
-  facet_wrap(~disease, scales = "free_y", ncol = 2) +
-  labs(
-    x     = "",
-    y     = expression(Lambda ~ " (median  ±  95% CI)"),
-    title = "Importation intensity — Monte Carlo 95% uncertainty intervals\n(Schedule-driven model, 5,000 draws)"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
-    text        = element_text(size = 16),
-    strip.text  = element_text(size = 15, face = "bold")
+    disease    = factor(disease,
+                        levels = c("Dengue","Influenza","Pertussis","Malaria","Measles")),
+    city_clean = str_to_title(destination_city)
   )
 
-ggsave(mc_lambda_plot,
-       file   = "Figures/mc_uncertainty_lambda.png",
-       height = 14, width = 18)
+# Canonical city order: highest aggregate Lambda first
+city_order_main <- mc_all_sched %>%
+  group_by(city_clean) %>%
+  summarise(total_lambda = sum(lambda_median), .groups = "drop") %>%
+  arrange(desc(total_lambda)) %>%
+  pull(city_clean)
 
-# ---- 13f. Figure: P(>=1) with 95% CI --------------------------------
-mc_prob_plot <- mc_summary %>%
+# ---- 12b. FIGURE 1 — Risk overview heatmap ------------------
+# Disease rows × city columns. Fill = P(≥1) under schedule-driven
+# model (MC median). Annotated with the exact probability value.
+#
+# Text contrast rule:
+#   plasma palette is dark (blue/purple) at LOW values and bright
+#   (orange/yellow) at HIGH values.  White text is needed on dark tiles
+#   (low prob); dark text on bright tiles (high prob).
+#   Crossover at ~0.55 on the plasma scale.
+#
+# Legend key height (1.75 cm) keeps the "1.00" label inside the plot.
+
+fig1_data <- mc_all_sched %>%
   mutate(
-    city    = factor(city,    levels = city_order_mc),
-    disease = factor(disease, levels = disease_levels_mc)
-  ) %>%
-  ggplot(aes(x = city, y = prob_median)) +
-  geom_col(fill = "coral3", alpha = 0.85, width = 0.7) +
-  geom_errorbar(aes(ymin = prob_lo, ymax = prob_hi),
-                width = 0.35, linewidth = 0.7, color = "gray20") +
-  scale_y_continuous(
-    labels = scales::percent_format(accuracy = 1),
-    expand = expansion(mult = c(0, 0.10))
-  ) +
-  facet_wrap(~disease, scales = "free_y", ncol = 2) +
-  labs(
-    x     = "",
-    y     = expression(P(X >= 1) ~ " (median  ±  95% CI)"),
-    title = "Importation probability — Monte Carlo 95% uncertainty intervals\n(Schedule-driven model, 5,000 draws)"
-  ) +
-  theme_bw() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
-    text        = element_text(size = 16),
-    strip.text  = element_text(size = 15, face = "bold")
+    city_clean = factor(city_clean, levels = city_order_main),
+    prob_label = case_when(
+      prob_median >= 0.995 ~ ">0.99",
+      prob_median  < 0.005 ~ "<0.01",
+      TRUE                 ~ sprintf("%.2f", prob_median)
+    ),
+    text_col = if_else(prob_median > 0.55, "gray15", "white")
   )
 
-ggsave(mc_prob_plot,
-       file   = "Figures/mc_uncertainty_prob.png",
-       height = 14, width = 18)
-
-# ---- 13g. Coefficient of variation heatmap --------------------------
-# Highlights which disease × city combinations carry the most
-# parameter uncertainty. High CV = estimates most sensitive to the
-# assumed rho and p values; these are priority targets for better data.
-mc_cv_plot <- mc_raw %>%
-  group_by(disease, city) %>%
-  summarise(
-    cv = sd(imp_intensity) / mean(imp_intensity),
-    .groups = "drop"
-  ) %>%
-  mutate(
-    city    = factor(city,    levels = city_order_mc),
-    disease = factor(disease, levels = rev(disease_levels_mc))
-  ) %>%
-  ggplot(aes(x = city, y = disease, fill = cv)) +
-  geom_tile(color = "white", linewidth = 0.6) +
+fig1_risk_heatmap <- ggplot(fig1_data,
+    aes(x = city_clean, y = disease, fill = prob_median)) +
+  geom_tile(color = "white", linewidth = 0.9) +
+  geom_text(aes(label = prob_label, color = text_col),
+            size = 4, fontface = "bold") +
   scale_fill_viridis_c(
-    name   = "CV",
+    name   = expression(P(X >= 1)),
     option = "plasma",
-    labels = scales::number_format(accuracy = 0.01)
+    limits = c(0, 1),
+    breaks = c(0, 0.25, 0.5, 0.75, 1),
+    labels = c("0.00", "0.25", "0.50", "0.75", "1.00")
   ) +
-  labs(
-    x     = "Destination city",
-    y     = "",
-    title = "Parameter uncertainty: coefficient of variation in Λ"
-  ) +
-  theme_bw() +
+  scale_color_identity() +
+  labs(x = "", y = "") +
+  # No title/subtitle baked into the plot: explanatory text belongs in
+  # the LaTeX caption, not duplicated in the image itself.
+  theme_minimal(base_size = 13) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
-    text        = element_text(size = 16)
+    axis.text.x       = element_text(angle = 35, hjust = 1, size = 11),
+    axis.text.y       = element_text(size = 12, face = "italic"),
+    panel.grid        = element_blank(),
+    legend.position   = "right",
+    legend.key.height = unit(1.75, "cm"),
+    legend.margin     = margin(t = 0, r = 4, b = 0, l = 4),
+    # Top plot margin reserves room for the legend title, which ggplot2
+    # stacks above the color key; without it, the title is clipped by
+    # the top edge of the device.
+    plot.margin       = margin(t = 20, r = 8, b = 5.5, l = 5.5)
   )
 
-ggsave(mc_cv_plot,
-       file   = "Figures/mc_cv_heatmap.png",
-       height = 6, width = 14)
+ggsave(fig1_risk_heatmap,
+       file   = "Figures/Figure1.png",
+       height = 4.8, width = 12.5, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(fig1_risk_heatmap,
+       file   = "Figures/Figure1.pdf",
+       height = 4.8, width = 12.5, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(fig1_risk_heatmap)
 
-# ---- 13h. Summary table ----------------------------------------
-cat("\n--- Monte Carlo 95% uncertainty intervals (Schedule-driven model) ---\n")
-mc_summary %>%
-  arrange(disease, desc(lambda_median)) %>%
+# ---- 12b-extra. FIGURE S2 — M2 heatmap ----------------------
+# Same layout as Figure 1, with the city order fixed to
+# city_order_main. make_heatmap() is reused for Figure S1 (M1) in
+# figure3_figureS1.R.
+
+mc_all_wc <- bind_rows(
+  dengue_mc_wc    %>% mutate(disease = "Dengue"),
+  malaria_mc_wc   %>% mutate(disease = "Malaria"),
+  measles_mc_wc   %>% mutate(disease = "Measles"),
+  pertussis_mc_wc %>% mutate(disease = "Pertussis"),
+  influenza_mc_wc %>% mutate(disease = "Influenza")
+) %>%
   mutate(
-    `Lambda (95% CI)`  = sprintf("%.3f  (%.3f – %.3f)", lambda_median, lambda_lo, lambda_hi),
-    `P(>=1) (95% CI)`  = sprintf("%.3f  (%.3f – %.3f)", prob_median,   prob_lo,   prob_hi)
-  ) %>%
-  select(Disease = disease, City = city, `Lambda (95% CI)`, `P(>=1) (95% CI)`) %>%
-  print(n = Inf)
+    disease    = factor(disease,
+                        levels = c("Dengue","Influenza","Pertussis","Malaria","Measles")),
+    city_clean = str_to_title(destination_city)
+  )
 
-message("Section 13 complete — figures saved to Figures/mc_uncertainty_*.png and Figures/mc_cv_heatmap.png")
+make_heatmap <- function(mc_data) {
+  dat <- mc_data %>%
+    filter(city_clean %in% city_order_main) %>%
+    mutate(
+      city_clean = factor(city_clean, levels = city_order_main),
+      prob_label = case_when(
+        prob_median >= 0.995 ~ ">0.99",
+        prob_median  < 0.005 ~ "<0.01",
+        TRUE                 ~ sprintf("%.2f", prob_median)
+      ),
+      text_col = if_else(prob_median > 0.55, "gray15", "white")
+    )
+
+  ggplot(dat, aes(x = city_clean, y = disease, fill = prob_median)) +
+    geom_tile(color = "white", linewidth = 0.9) +
+    geom_text(aes(label = prob_label, color = text_col),
+              size = 4, fontface = "bold") +
+    scale_fill_viridis_c(
+      name   = expression(P(X >= 1)),
+      option = "plasma",
+      limits = c(0, 1),
+      breaks = c(0, 0.25, 0.5, 0.75, 1),
+      labels = c("0.00", "0.25", "0.50", "0.75", "1.00")
+    ) +
+    scale_color_identity() +
+    labs(x = "", y = "") +
+    # No title/subtitle baked into the plot: explanatory text belongs
+    # in the LaTeX caption, not duplicated in the image itself.
+    theme_minimal(base_size = 13) +
+    theme(
+      axis.text.x       = element_text(angle = 35, hjust = 1, size = 11),
+      axis.text.y       = element_text(size = 12, face = "italic"),
+      panel.grid        = element_blank(),
+      legend.position   = "right",
+      legend.key.height = unit(1.75, "cm"),
+      legend.margin     = margin(t = 0, r = 4, b = 0, l = 4),
+      # Top plot margin reserves room for the legend title, which ggplot2
+      # stacks above the color key; without it, the title is clipped by
+      # the top edge of the device.
+      plot.margin       = margin(t = 20, r = 8, b = 5.5, l = 5.5)
+    )
+}
+
+fig1_heatmap_wc <- make_heatmap(mc_all_wc)
+
+ggsave(fig1_heatmap_wc,
+       file   = "Figures/FigureS2.png",
+       height = 4.8, width = 12.5, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(fig1_heatmap_wc,
+       file   = "Figures/FigureS2.pdf",
+       height = 4.8, width = 12.5, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(fig1_heatmap_wc)
+
+# ---- 12c. FIGURE 2 — Expected importations with 95% CI ------
+# Horizontal dot-range chart: point = median Lambda,
+# whiskers = 95% MC uncertainty interval.
+# Each disease panel has a free x-axis so within-disease
+# city differences are clear regardless of scale differences.
+
+fig2_data <- mc_all_sched %>%
+  mutate(city_clean = factor(city_clean, levels = rev(city_order_main)))
+
+fig2_lambda_ci <- ggplot(fig2_data,
+    aes(x = lambda_median, xmin = lambda_lo, xmax = lambda_hi,
+        y = city_clean, color = disease)) +
+  geom_linerange(linewidth = 0.85, alpha = 0.65) +
+  geom_point(size = 3) +
+  facet_wrap(~ disease, scales = "free_x", ncol = 3) +
+  scale_color_manual(values = disease_colors, guide = "none") +
+  scale_x_continuous(
+    expand = expansion(mult = c(0.04, 0.20)),
+    labels = scales::number_format(accuracy = 0.001, drop0trailing = TRUE)
+  ) +
+  labs(
+    x        = expression(Lambda ~ "(expected importations, median and 95% UI)"),
+    y        = ""
+  ) +
+  # No title/subtitle baked into the plot: explanatory text belongs in
+  # the LaTeX caption, not duplicated in the image itself.
+  theme_minimal(base_size = 16) +
+  theme(
+    strip.text         = element_text(face = "bold", size = 15.5, color = "gray20"),
+    strip.background   = element_rect(fill = "gray96", color = NA),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    axis.text.y        = element_text(size = 12.5),
+    axis.text.x        = element_text(size = 12)
+  )
+
+ggsave(fig2_lambda_ci,
+       file   = "Figures/Figure2.png",
+       height = 9, width = 14, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(fig2_lambda_ci,
+       file   = "Figures/Figure2.pdf",
+       height = 9, width = 14, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(fig2_lambda_ci)
+
+# ---- 12d. 11-city totals helper ------------------------------
+# Sums city-level MC medians and interval bounds over the 11 cities.
+# Used by model1_baseline_2026.R.
+total_lambda <- function(mc_obj) {
+  mc_obj %>%
+    summarise(
+      median = sum(lambda_median),
+      lo     = sum(lambda_lo),
+      hi     = sum(lambda_hi)
+    )
+}
+
+# ---- 12e. FIGURE 4 — Source country drivers -----------------
+# Top 10 source countries per disease, colored by world region.
+# Built as 5 individual plots (so each has its own within-panel
+# country ordering) then combined with a shared legend.
+#
+# Region lookup is hard-coded to avoid unreliable joins between
+# disease data naming and arrivals data naming conventions.
+
+assign_region <- function(country) {
+  dplyr::case_when(
+    country %in% c(
+      "Brazil","Colombia","Venezuela","Peru","Ecuador","Bolivia",
+      "Argentina","Chile","Paraguay","Uruguay","Costa Rica","Honduras",
+      "Guatemala","El Salvador","Nicaragua","Panama","Dominican Republic",
+      "Cuba","Haiti","Jamaica","Trinidad and Tobago","Guyana","Suriname"
+    ) ~ "Latin America",
+    country %in% c("Mexico")              ~ "Mexico",
+    country %in% c("Canada")              ~ "Canada",
+    country %in% c(
+      "Nigeria","Ghana","Kenya","Ethiopia","Tanzania","Uganda",
+      "Cameroon","Zaire (formerly DRC)","Mozambique","Angola","Zambia",
+      "Zimbabwe","Rwanda","Burundi","Malawi","Madagascar","Senegal",
+      "Côte d'Ivoire","Guinea","Burkina Faso","Mali","Niger","Chad",
+      "Sudan","Somalia","South Africa","Egypt","Morocco","Algeria",
+      "Tunisia","Libya","Cape Verde"
+    ) ~ "Africa",
+    country %in% c(
+      "India","China","Japan","South Korea","Philippines","Vietnam",
+      "Thailand","Indonesia","Malaysia","Bangladesh","Pakistan",
+      "Nepal","Myanmar","Sri Lanka","Cambodia","Laos","Taiwan",
+      "Singapore","Hong Kong"
+    ) ~ "Asia",
+    country %in% c(
+      "Germany","France","United Kingdom","Italy","Spain","Netherlands",
+      "Belgium","Poland","Ukraine","Russia","Sweden","Norway","Denmark",
+      "Finland","Portugal","Austria","Switzerland","Czech Republic",
+      "Hungary","Romania","Greece","Turkey","Slovakia","Croatia",
+      "Bulgaria","Serbia","North Macedonia","Albania","Ireland",
+      "Scotland","England"
+    ) ~ "Europe",
+    country %in% c(
+      "Israel","Jordan","Saudi Arabia","United Arab Emirates",
+      "Iraq","Syria","Lebanon","Iran","Kuwait","Qatar","Bahrain",
+      "Oman","Yemen"
+    ) ~ "Middle East",
+    country %in% c("Australia","New Zealand","Fiji","Papua New Guinea")
+                   ~ "Oceania",
+    TRUE           ~ "Other"
+  )
+}
+
+top_countries_region <- top_countries_ci %>%
+  mutate(
+    new_region = assign_region(Country),
+    disease    = factor(disease,
+                        levels = c("Dengue","Influenza","Pertussis","Malaria","Measles"))
+  ) %>%
+  group_by(disease) %>%
+  slice_max(total_imports, n = 10, with_ties = FALSE) %>%
+  ungroup()
+
+make_country_panel <- function(dis) {
+  dat <- top_countries_region %>% filter(disease == dis)
+  ggplot(dat, aes(x = reorder(Country, total_imports),
+                  y = total_imports,
+                  fill = new_region)) +
+    geom_col(alpha = 0.85, width = 0.75) +
+    geom_errorbar(aes(ymin = imports_lo, ymax = imports_hi),
+                  width = 0.38, linewidth = 0.65, color = "gray30") +
+    coord_flip() +
+    scale_fill_manual(values = region_colors, name = "World region") +
+    scale_y_continuous(
+      expand = expansion(mult = c(0, 0.22)),
+      labels = scales::number_format(accuracy = 0.0001, drop0trailing = TRUE)
+    ) +
+    labs(x = "", y = expression(Lambda), title = dis) +
+    theme_minimal(base_size = 17.5) +
+    theme(
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor   = element_blank(),
+      plot.title         = element_text(face = "bold", size = 18.5, color = "gray15"),
+      legend.position    = "none",
+      plot.margin        = margin(5.5, 22, 5.5, 5.5)  # room for the last axis label
+    )
+}
+
+# Extract a shared legend from a plot that contains all regions.
+# Font sizes here and in make_country_panel() are chosen so that,
+# once both this figure and Figure 2 are scaled to the same page
+# width via \includegraphics[width=\textwidth], their text renders
+# at matching apparent size (font size / source canvas width held
+# constant across figures).
+shared_legend <- cowplot::get_legend(
+  ggplot(top_countries_region,
+         aes(x = Country, y = total_imports, fill = new_region)) +
+    geom_col() +
+    scale_fill_manual(values = region_colors, name = "World region") +
+    theme_minimal(base_size = 17.5) +
+    theme(
+      legend.position = "right",
+      legend.title    = element_text(size = 15.5, face = "bold"),
+      legend.text     = element_text(size = 14.5),
+      legend.key.size = unit(0.6, "cm")
+    )
+)
+
+# 5 disease panels + shared legend in the 6th (empty) slot.
+country_panels <- list(
+  make_country_panel("Dengue"),
+  make_country_panel("Influenza"),
+  make_country_panel("Pertussis"),
+  make_country_panel("Malaria"),
+  make_country_panel("Measles"),
+  shared_legend
+)
+
+fig4_country_drivers <- cowplot::plot_grid(
+  plotlist   = country_panels,
+  ncol       = 2,
+  labels     = c("A", "B", "C", "D", "E", ""),
+  label_size = 14.5
+)
+
+ggsave(fig4_country_drivers,
+       file   = "Figures/Figure4.png",
+       height = 13, width = 15, dpi = 300)
+# Vector PDF for journal submission (Elsevier line-art requirement)
+ggsave(fig4_country_drivers,
+       file   = "Figures/Figure4.pdf",
+       height = 13, width = 15, device = grDevices::quartz, type = "pdf")  # macOS native vector PDF (cairo_pdf needs XQuartz)
+print(fig4_country_drivers)
+
+# ============================================================
+# 13. SAVE OUTPUTS FOR DOWNSTREAM SCRIPTS
+# ============================================================
+# Objects saved here are loaded by importationRisk_diaspora_extension.R.
+# Re-run this script to refresh the file.
+
+save(
+  all_contributions,   # country × city × stream lambda (Model 3)
+  mc_all_sched,        # MC summaries for schedule-driven model
+  top_countries_ci,    # country rankings with 95% CI
+  city_order_main,     # canonical city order (by descending total lambda)
+  disease_colors,      # shared color palette
+  region_colors,       # shared region color palette
+  mc_ranges,           # MC parameter bounds per disease
+  mc_country_scales,   # per-disease MC scale factors (median, 2.5%, 97.5%)
+  assign_region,       # function: country → world region label
+  file = "Data/model_outputs.RData"
+)
+message("Model outputs saved to Data/model_outputs.RData")
+

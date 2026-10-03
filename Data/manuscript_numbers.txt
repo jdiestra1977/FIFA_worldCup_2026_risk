@@ -1,0 +1,627 @@
+
+
+==================== Three-tier 11-city totals (Monte Carlo medians) and increments ====================
+# A tibble: 5 × 6
+  disease        M1_new          M2          M3 wc_increment_naive_pct wc_increment_pct
+  <chr>           <dbl>       <dbl>       <dbl>                  <dbl>            <dbl>
+1 Dengue    1097.11     1178.41     1168.41                    7.41068         6.49937 
+2 Malaria    678.804     698.619     693.411                   2.91906         2.15185 
+3 Measles      0.897723    0.948951    0.919737                5.70649         2.45226 
+4 Pertussis  498.440     541.051     503.331                   8.54890         0.981383
+5 Influenza  125.466     134.082     130.876                   6.86684         4.31210 
+
+
+==================== Exact increments from central totals (should equal the row above) ====================
+# A tibble: 5 × 7
+  disease            M1          M2          M3 pct_M3_vs_M1 pct_M2_vs_M1 M1_share_of_M3
+  <chr>           <dbl>       <dbl>       <dbl>        <dbl>        <dbl>          <dbl>
+1 dengue    1743.12     1872.30     1856.41         6.49937       7.41068        93.8973
+2 malaria    760.072     782.259     776.428        2.15185       2.91906        97.8935
+3 measles      0.903432    0.954987    0.925587     2.45226       5.70649        97.6064
+4 pertussis  273.999     297.423     276.688        0.981383      8.54890        99.0282
+5 influenza  127.342     136.086     132.833        4.31210       6.86684        95.8662
+
+
+==================== M3 11-city totals with 95% CI ====================
+# A tibble: 5 × 4
+       median         lo         hi disease  
+        <dbl>      <dbl>      <dbl> <chr>    
+1 1168.41     554.525    3117.04    dengue   
+2  693.411    213.660    1902.37    malaria  
+3    0.919737   0.661284    1.40015 measles  
+4  503.331    171.139    2481.18    pertussis
+5  130.876     38.5851    652.965   influenza
+
+
+==================== Per-city dengue (sched) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>     <dbl>      <dbl>    <dbl>
+ 1 Miami                412.406   195.726   1100.20    1       
+ 2 New York             273.918   130.000    730.746   1       
+ 3 Houston              143.475    68.0928   382.757   1       
+ 4 Dallas                88.4387   41.9727   235.933   1       
+ 5 Atlanta               87.9115   41.7225   234.526   1       
+ 6 Los Angeles           74.9841   35.5872   200.039   1       
+ 7 San Francisco         33.1763   15.7453    88.5063  1.000000
+ 8 Philadelphia          27.3131   12.9627    72.8648  1.000000
+ 9 Boston                16.2819    7.72732   43.4361  1.000000
+10 Seattle                8.08475   3.83700   21.5682  0.999692
+11 Kansas City            2.42465   1.15073    6.46839 0.911491
+
+
+==================== Per-city malaria (sched) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi       P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>       <dbl>
+ 1 Atlanta          367.130       1.13123e+2 1.00722e+3 1          
+ 2 New York         247.904       7.63864e+1 6.80122e+2 1          
+ 3 Miami             45.0961      1.38954e+1 1.23721e+2 1          
+ 4 San Francisco     14.8606      4.57899e+0 4.07700e+1 1.000000   
+ 5 Boston             6.04666     1.86315e+0 1.65890e+1 0.997634   
+ 6 Philadelphia       5.58456     1.72077e+0 1.53212e+1 0.996245   
+ 7 Houston            4.43976     1.36802e+0 1.21804e+1 0.988201   
+ 8 Dallas             1.32900     4.09504e-1 3.64610e+0 0.735259   
+ 9 Los Angeles        1.02005     3.14307e-1 2.79850e+0 0.639423   
+10 Kansas City        0.000550107 1.69504e-4 1.50921e-3 0.000549955
+11 Seattle            0.000123827 3.81548e-5 3.39719e-4 0.000123820
+
+
+==================== Per-city measles (sched) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi      P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>      <dbl>
+ 1 New York            0.434052   0.312080   0.660773   0.352121  
+ 2 San Francisco       0.131279   0.0943888  0.199851   0.123027  
+ 3 Los Angeles         0.102209   0.0734878  0.155597   0.0971596 
+ 4 Atlanta             0.0741289  0.0532981  0.112849   0.0714480 
+ 5 Boston              0.0437805  0.0314778  0.0666486  0.0428359 
+ 6 Dallas              0.0313518  0.0225417  0.0477280  0.0308654 
+ 7 Miami               0.0307614  0.0221172  0.0468292  0.0302931 
+ 8 Seattle             0.0270449  0.0194451  0.0411715  0.0266825 
+ 9 Philadelphia        0.0218115  0.0156823  0.0332044  0.0215753 
+10 Houston             0.0217961  0.0156712  0.0331810  0.0215603 
+11 Kansas City         0.00152186 0.00109421 0.00231679 0.00152071
+
+
+==================== Per-city pertussis (sched) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>    <dbl>
+ 1 New York            144.891    49.2648    714.242    1       
+ 2 Los Angeles          79.5753   27.0566    392.268    1       
+ 3 San Francisco        65.2919   22.2001    321.857    1       
+ 4 Miami                40.8548   13.8911    201.394    1       
+ 5 Atlanta              37.7075   12.8210    185.880    1       
+ 6 Seattle              35.3326   12.0135    174.173    1       
+ 7 Dallas               33.0710   11.2445    163.024    1.000000
+ 8 Houston              27.8769    9.47851   137.420    1.000000
+ 9 Boston               24.9574    8.48584   123.028    1.000000
+10 Philadelphia         13.6070    4.62654    67.0758   0.999999
+11 Kansas City           0.165952  0.0564259   0.818065 0.152913
+
+
+==================== Per-city influenza (sched) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median lambda_lo lambda_hi    P_ge1
+   <chr>                    <dbl>     <dbl>     <dbl>    <dbl>
+ 1 Miami                27.4746    8.10009  137.076   1.000000
+ 2 Los Angeles          24.7520    7.29740  123.492   1.000000
+ 3 New York             24.5144    7.22736  122.307   1.000000
+ 4 San Francisco        13.4054    3.95221   66.8821  0.999998
+ 5 Houston              10.8870    3.20971   54.3171  0.999981
+ 6 Atlanta              10.4932    3.09361   52.3523  0.999972
+ 7 Dallas                9.56099   2.81878   47.7015  0.999930
+ 8 Seattle               4.66166   1.37435   23.2578  0.990549
+ 9 Boston                2.92959   0.863704  14.6162  0.946581
+10 Philadelphia          1.63631   0.482417   8.16382 0.805302
+11 Kansas City           0.561116  0.165429   2.79951 0.429428
+
+
+==================== Per-city dengue (m1new) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>    <dbl>
+ 1 Miami                387.490   183.901    1033.73    1       
+ 2 New York             251.159   119.199     670.032   1       
+ 3 Houston              143.452    68.0820    382.696   1       
+ 4 Dallas                88.3530   41.9320    235.704   1       
+ 5 Atlanta               87.8888   41.7117    234.466   1       
+ 6 Los Angeles           74.8992   35.5469    199.813   1       
+ 7 San Francisco         32.9483   15.6371     87.8980  1.000000
+ 8 Boston                16.2816    7.72718    43.4353  1.000000
+ 9 Seattle                8.02607   3.80915    21.4116  0.999673
+10 Philadelphia           4.91739   2.33378    13.1184  0.992682
+11 Kansas City            1.69291   0.803451    4.51629 0.816018
+
+
+==================== Per-city malaria (m1new) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median    lambda_lo    lambda_hi     P_ge1
+   <chr>                    <dbl>        <dbl>        <dbl>     <dbl>
+ 1 Atlanta            366.899     113.052      1006.58      1        
+ 2 New York           245.954      75.7855      674.772     1        
+ 3 Miami               43.3528     13.3583      118.938     1        
+ 4 San Francisco       14.8606      4.57899      40.7700    1.000000 
+ 5 Houston              4.43976     1.36802      12.1804    0.988201 
+ 6 Dallas               1.32900     0.409504      3.64610   0.735259 
+ 7 Los Angeles          1.01980     0.314230      2.79782   0.639333 
+ 8 Boston               0.917603    0.282740      2.51744   0.600525 
+ 9 Philadelphia         0.0315092   0.00970889    0.0864451 0.0310179
+10 Kansas City          0           0             0         0        
+11 Seattle              0           0             0         0        
+
+
+==================== Per-city measles (m1new) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median    lambda_lo   lambda_hi        P_ge1
+   <chr>                    <dbl>        <dbl>       <dbl>        <dbl>
+ 1 New York          0.432488     0.310955     0.658392    0.351107    
+ 2 San Francisco     0.128688     0.0925254    0.195906    0.120751    
+ 3 Los Angeles       0.100083     0.0719592    0.152361    0.0952381   
+ 4 Atlanta           0.0704544    0.0506562    0.107255    0.0680298   
+ 5 Boston            0.0425624    0.0306020    0.0647944   0.0416693   
+ 6 Miami             0.0296900    0.0213468    0.0451981   0.0292535   
+ 7 Dallas            0.0292898    0.0210591    0.0445889   0.0288650   
+ 8 Seattle           0.0248038    0.0178337    0.0377598   0.0244987   
+ 9 Philadelphia      0.0206693    0.0148611    0.0314656   0.0204571   
+10 Houston           0.0188964    0.0135864    0.0287667   0.0187190   
+11 Kansas City       0.0000982374 0.0000706319 0.000149551 0.0000982326
+
+
+==================== Per-city pertussis (m1new) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>    <dbl>
+ 1 New York            144.312    49.0680    711.390    1       
+ 2 Los Angeles          79.2485   26.9455    390.657    1       
+ 3 San Francisco        65.2861   22.1981    321.829    1       
+ 4 Miami                40.6242   13.8128    200.258    1       
+ 5 Atlanta              35.5763   12.0964    175.374    1       
+ 6 Seattle              35.2023   11.9692    173.530    1.00000 
+ 7 Dallas               32.2811   10.9760    159.130    1.000000
+ 8 Houston              27.4345    9.32808   135.239    1.000000
+ 9 Boston               24.9480    8.48265   122.982    1.000000
+10 Philadelphia         13.3704    4.54611    65.9098   0.999998
+11 Kansas City           0.155765  0.0529620   0.767845 0.144239
+
+
+==================== Per-city influenza (m1new) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median lambda_lo  lambda_hi     P_ge1
+   <chr>                    <dbl>     <dbl>      <dbl>     <dbl>
+ 1 Miami               27.0151    7.96462   134.783    1.000000 
+ 2 Los Angeles         24.6748    7.27465   123.107    1.000000 
+ 3 New York            24.0235    7.08263   119.857    1.000000 
+ 4 San Francisco       12.2648    3.61593    61.1915   0.999995 
+ 5 Houston             10.8390    3.19558    54.0779   0.999980 
+ 6 Atlanta             10.4564    3.08278    52.1691   0.999971 
+ 7 Dallas               8.51229   2.50960    42.4693   0.999799 
+ 8 Seattle              3.56297   1.05044    17.7763   0.971646 
+ 9 Boston               2.76073   0.813921   13.7738   0.936754 
+10 Philadelphia         1.30477   0.384673    6.50973  0.728765 
+11 Kansas City          0.0515271 0.0151913   0.257078 0.0502221
+
+
+==================== Per-city dengue (wc) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>    <dbl>
+ 1 Miami                419.475   199.081    1119.06    1       
+ 2 New York             266.570   126.513     711.144   1       
+ 3 Houston              152.532    72.3910    406.918   1       
+ 4 Atlanta               96.2886   45.6983    256.875   1       
+ 5 Dallas                95.2896   45.2241    254.210   1       
+ 6 Los Angeles           79.4712   37.7168    212.010   1       
+ 7 San Francisco         34.9900   16.6061     93.3447  1.000000
+ 8 Boston                18.1777    8.62710    48.4938  1.000000
+ 9 Seattle                8.54804   4.05687    22.8041  0.999806
+10 Philadelphia           5.26112   2.49691    14.0354  0.994811
+11 Kansas City            1.80880   0.858449    4.82543 0.836149
+
+
+==================== Per-city malaria (wc) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median   lambda_lo    lambda_hi     P_ge1
+   <chr>                    <dbl>       <dbl>        <dbl>     <dbl>
+ 1 Atlanta            367.238     113.157     1007.52      1        
+ 2 New York           260.715      80.3338     715.269     1        
+ 3 Miami               46.3902     14.2942     127.271     1        
+ 4 San Francisco       15.9898      4.92693     43.8680    1.000000 
+ 5 Houston              4.71526     1.45291     12.9363    0.991042 
+ 6 Dallas               1.46034     0.449973     4.00642   0.767842 
+ 7 Los Angeles          1.07065     0.329899     2.93732   0.657215 
+ 8 Boston               1.00626     0.310058     2.76067   0.634417 
+ 9 Philadelphia         0.0329875   0.0101644    0.0905010 0.0324494
+10 Kansas City          0           0            0         0        
+11 Seattle              0           0            0         0        
+
+
+==================== Per-city measles (wc) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median    lambda_lo   lambda_hi       P_ge1
+   <chr>                    <dbl>        <dbl>       <dbl>       <dbl>
+ 1 New York           0.459772    0.330572     0.699927    0.368572   
+ 2 San Francisco      0.136149    0.0978902    0.207265    0.127288   
+ 3 Los Angeles        0.105767    0.0760454    0.161013    0.100366   
+ 4 Atlanta            0.0730392   0.0525146    0.111190    0.0704356  
+ 5 Boston             0.0440883   0.0316991    0.0671173   0.0431305  
+ 6 Miami              0.0313238   0.0225216    0.0476854   0.0308383  
+ 7 Dallas             0.0311103   0.0223680    0.0473603   0.0306313  
+ 8 Seattle            0.0261236   0.0187827    0.0397689   0.0257853  
+ 9 Philadelphia       0.0216746   0.0155839    0.0329961   0.0214414  
+10 Houston            0.0197999   0.0142360    0.0301422   0.0196052  
+11 Kansas City        0.000104098 0.0000748454 0.000158472 0.000104092
+
+
+==================== Per-city pertussis (wc) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median  lambda_lo  lambda_hi    P_ge1
+   <chr>                    <dbl>      <dbl>      <dbl>    <dbl>
+ 1 New York            154.321    52.4710    760.727    1       
+ 2 Los Angeles          89.3975   30.3963    440.687    1       
+ 3 San Francisco        73.4188   24.9633    361.919    1       
+ 4 Miami                43.0679   14.6436    212.304    1       
+ 5 Seattle              38.3215   13.0298    188.907    1       
+ 6 Atlanta              37.6242   12.7927    185.469    1       
+ 7 Dallas               35.2755   11.9941    173.891    1       
+ 8 Houston              29.0295    9.87038   143.101    1.000000
+ 9 Boston               26.3020    8.94301   129.656    1.000000
+10 Philadelphia         14.1284    4.80385    69.6464   0.999999
+11 Kansas City           0.164681  0.0559937   0.811799 0.151836
+
+
+==================== Per-city influenza (wc) ====================
+# A tibble: 11 × 5
+   destination_city lambda_median lambda_lo  lambda_hi     P_ge1
+   <chr>                    <dbl>     <dbl>      <dbl>     <dbl>
+ 1 Miami               28.5585    8.41964   142.483    1.000000 
+ 2 Los Angeles         26.9729    7.95218   134.573    1.000000 
+ 3 New York            25.5105    7.52103   127.276    1.000000 
+ 4 San Francisco       13.3789    3.94438    66.7498   0.999998 
+ 5 Houston             11.3881    3.35746    56.8175   0.999989 
+ 6 Atlanta             10.9832    3.23807    54.7970   0.999983 
+ 7 Dallas               9.15837   2.70008    45.6928   0.999895 
+ 8 Seattle              3.77114   1.11181    18.8149   0.976974 
+ 9 Boston               2.92662   0.862828   14.6014   0.946422 
+10 Philadelphia         1.37846   0.406399    6.87739  0.748034 
+11 Kansas City          0.0548721 0.0161775   0.273767 0.0533938
+
+
+==================== Top source countries by disease (Figure 4) ====================
+# A tibble: 50 × 9
+   disease   Country     total_imports scale_mid scale_lo scale_hi  imports_lo   imports_hi new_region   
+   <fct>     <chr>               <dbl>     <dbl>    <dbl>    <dbl>       <dbl>        <dbl> <chr>        
+ 1 Dengue    Brazil        440.126      0.629393 0.298708  1.67907 208.882     1174.15      Latin America
+ 2 Dengue    Mexico        268.870      0.629393 0.298708  1.67907 127.605      717.279     Mexico       
+ 3 Dengue    Guyana        149.458      0.629393 0.298708  1.67907  70.9321     398.717     Latin America
+ 4 Dengue    Colombia       90.5614     0.629393 0.298708  1.67907  42.9801     241.596     Latin America
+ 5 Dengue    Honduras       78.6592     0.629393 0.298708  1.67907  37.3314     209.844     Latin America
+ 6 Dengue    Guatemala      48.1624     0.629393 0.298708  1.67907  22.8577     128.485     Latin America
+ 7 Dengue    Ecuador        24.7548     0.629393 0.298708  1.67907  11.7486      66.0399    Latin America
+ 8 Dengue    Nicaragua      13.6443     0.629393 0.298708  1.67907   6.47554     36.3997    Latin America
+ 9 Dengue    Costa Rica     12.4928     0.629393 0.298708  1.67907   5.92903     33.3277    Latin America
+10 Dengue    Panama          7.84409    0.629393 0.298708  1.67907   3.72278     20.9261    Latin America
+11 Influenza Canada         35.5897     0.985270 0.290478  4.91569  10.4926     177.563     Canada       
+12 Influenza Australia      23.4084     0.985270 0.290478  4.91569   6.90129    116.789     Oceania      
+13 Influenza Argentina      18.0341     0.985270 0.290478  4.91569   5.31682     89.9752    Latin America
+14 Influenza Chile          11.5467     0.985270 0.290478  4.91569   3.40421     57.6085    Latin America
+15 Influenza Costa Rica      9.85996    0.985270 0.290478  4.91569   2.90692     49.1931    Latin America
+16 Influenza Brazil          6.27924    0.985270 0.290478  4.91569   1.85125     31.3283    Latin America
+17 Influenza Mexico          6.03003    0.985270 0.290478  4.91569   1.77778     30.0849    Mexico       
+18 Influenza Norway          2.88076    0.985270 0.290478  4.91569   0.849309    14.3726    Europe       
+19 Influenza Colombia        1.98530    0.985270 0.290478  4.91569   0.585307     9.90499   Latin America
+20 Influenza Panama          1.79869    0.985270 0.290478  4.91569   0.530291     8.97398   Latin America
+21 Pertussis Canada        356.717      1.81913  0.618527  8.96743 121.288     1758.44      Canada       
+22 Pertussis China          32.4727     1.81913  0.618527  8.96743  11.0411     160.075     Asia         
+23 Pertussis Spain          30.2169     1.81913  0.618527  8.96743  10.2741     148.955     Europe       
+24 Pertussis Germany        18.8833     1.81913  0.618527  8.96743   6.42055     93.0854    Europe       
+25 Pertussis Poland         17.2517     1.81913  0.618527  8.96743   5.86579     85.0424    Europe       
+26 Pertussis Denmark         6.90663    1.81913  0.618527  8.96743   2.34834     34.0464    Europe       
+27 Pertussis New Zealand     6.08696    1.81913  0.618527  8.96743   2.06964     30.0058    Oceania      
+28 Pertussis Sweden          5.30885    1.81913  0.618527  8.96743   1.80508     26.1701    Europe       
+29 Pertussis Italy           4.13890    1.81913  0.618527  8.96743   1.40728     20.4028    Europe       
+30 Pertussis Brazil          3.75353    1.81913  0.618527  8.96743   1.27625     18.5031    Latin America
+31 Malaria   Nigeria       360.977      0.893079 0.275183  2.45015 111.228      990.338     Africa       
+32 Malaria   Ghana         113.896      0.893079 0.275183  2.45015  35.0945     312.471     Africa       
+33 Malaria   India          46.1380     0.893079 0.275183  2.45015  14.2164     126.579     Asia         
+34 Malaria   Kenya          39.5266     0.893079 0.275183  2.45015  12.1793     108.441     Africa       
+35 Malaria   Colombia       37.5066     0.893079 0.275183  2.45015  11.5569     102.899     Latin America
+36 Malaria   Guyana         33.9944     0.893079 0.275183  2.45015  10.4746      93.2632    Latin America
+37 Malaria   Senegal        23.1744     0.893079 0.275183  2.45015   7.14072     63.5789    Africa       
+38 Malaria   Ethiopia       18.1660     0.893079 0.275183  2.45015   5.59747     49.8382    Africa       
+39 Malaria   Brazil          8.58594    0.893079 0.275183  2.45015   2.64558     23.5554    Latin America
+40 Malaria   Haiti           6.08248    0.893079 0.275183  2.45015   1.87419     16.6872    Latin America
+41 Measles   Canada          0.176733   0.993680 0.714448  1.51272   0.127070     0.269047  Canada       
+42 Measles   India           0.156089   0.993680 0.714448  1.51272   0.112227     0.237620  Asia         
+43 Measles   Italy           0.0684789  0.993680 0.714448  1.51272   0.0492358    0.104248  Europe       
+44 Measles   Ireland         0.0623242  0.993680 0.714448  1.51272   0.0448106    0.0948785 Europe       
+45 Measles   Philippines     0.0622348  0.993680 0.714448  1.51272   0.0447463    0.0947424 Asia         
+46 Measles   France          0.0369260  0.993680 0.714448  1.51272   0.0265495    0.0562138 Europe       
+47 Measles   Uzbekistan      0.0365686  0.993680 0.714448  1.51272   0.0262925    0.0556697 Other        
+48 Measles   Germany         0.0359612  0.993680 0.714448  1.51272   0.0258558    0.0547450 Europe       
+49 Measles   Austria         0.0295036  0.993680 0.714448  1.51272   0.0212128    0.0449144 Europe       
+50 Measles   Belgium         0.0283177  0.993680 0.714448  1.51272   0.0203602    0.0431091 Europe       
+
+
+==================== Validation dengue 2024 ====================
+# A tibble: 9 × 6
+  state lambda_median lambda_lo lambda_hi reported_cases implied_detection_fraction
+  <chr>         <dbl>     <dbl>     <dbl>          <dbl>                      <dbl>
+1 FL        8515.67   4041.51   22717.7              959                  0.112616 
+2 TX        5781.02   2743.65   15422.3              239                  0.0413422
+3 NY        4529.28   2149.58   12083.0              338                  0.0746256
+4 CA        2755.57   1307.79    7351.20             702                  0.254756 
+5 GA        2448.43   1162.02    6531.82              56                  0.0228718
+6 MA         449.393   213.280   1198.87             143                  0.318207 
+7 WA         225.471   107.008    601.502             67                  0.297156 
+8 PA         140.792    66.8195   375.600             66                  0.468776 
+9 MO          49.0553   23.2815   130.868             12                  0.244622 
+
+
+==================== Spearman dengue, all nine states ====================
+
+	Spearman's rank correlation rho
+
+data:  validation_comparison_2024$lambda_median and validation_comparison_2024$reported_cases
+S = 20, p-value = 0.008267
+alternative hypothesis: true rho is not equal to 0
+sample estimates:
+      rho 
+0.8333333 
+
+
+
+==================== Spearman dengue, excluding GA ====================
+
+	Spearman's rank correlation rho
+
+data:  lambda_median and reported_cases
+S = 8, p-value = 0.004563
+alternative hypothesis: true rho is not equal to 0
+sample estimates:
+      rho 
+0.9047619 
+
+
+
+==================== Validation measles 2022 ====================
+# A tibble: 9 × 6
+  state lambda_median    lambda_lo    lambda_hi reported_cases implied_detection_fraction
+  <chr>         <dbl>        <dbl>        <dbl>          <dbl>                      <dbl>
+1 NY     1.39614      1.00604      2.10780                   0                      0    
+2 CA     0.642114     0.462696     0.969419                  0                      0    
+3 GA     0.305684     0.220271     0.461501                  0                      0    
+4 TX     0.0185365    0.0133571    0.0279851                 0                      0    
+5 MA     0.0158197    0.0113994    0.0238835                 0                      0    
+6 FL     0.0136107    0.00980767   0.0205485                 0                      0    
+7 WA     0.00849156   0.00611888   0.0128200                 1                    117.764
+8 PA     0.00315946   0.00227665   0.00476993                0                      0    
+9 MO     0.0000169932 0.0000122450 0.0000256551              0                      0    
+
+
+==================== Validation malaria 2022 ====================
+# A tibble: 9 × 6
+  state lambda_median   lambda_lo   lambda_hi reported_cases implied_detection_fraction
+  <chr>         <dbl>       <dbl>       <dbl>          <dbl>                      <dbl>
+1 GA      2840.17     862.570     7795.38                 69                  0.0242943
+2 NY      1596.35     484.818     4381.49                231                  0.144705 
+3 FL       297.682     90.4071     817.043                60                  0.201557 
+4 CA        70.7511    21.4873     194.189               115                  1.62542  
+5 TX        38.1620    11.5899     104.742               166                  4.34988  
+6 MA         5.10313    1.54984     14.0065               66                 12.9332   
+7 PA         0.261364   0.0793772    0.717362             95                363.477    
+8 MO         0          0            0                    23                Inf        
+9 WA         0          0            0                    44                Inf        
+
+
+==================== Validation pertussis 2022 ====================
+# A tibble: 9 × 6
+  state lambda_median lambda_lo  lambda_hi reported_cases implied_detection_fraction
+  <chr>         <dbl>     <dbl>      <dbl>          <dbl>                      <dbl>
+1 CA       26.6699    9.14892   133.628               291                   10.9112 
+2 NY       21.9889    7.54315   110.174               107                    4.86608
+3 TX        9.22308   3.16391    46.2116              193                   20.9258 
+4 FL        6.89154   2.36409    34.5296               60                    8.70633
+5 GA        5.08126   1.74309    25.4593               88                   17.3185 
+6 WA        4.05921   1.39248    20.3384               76                   18.7228 
+7 MA        3.29260   1.12950    16.4974                4                    1.21485
+8 PA        1.51395   0.519351    7.58557              99                   65.3917 
+9 MO        0.0315810 0.0108336   0.158235             26                  823.280  
+
+
+==================== Mechanism A probabilities by city (Figures S7, S9A) ====================
+# A tibble: 55 × 5
+   city          disease      omega_A     lambda        prob_A
+   <chr>         <chr>          <dbl>      <dbl>         <dbl>
+ 1 Dallas        Dengue    2.22914e+1 8.75088e+1 1.000000     
+ 2 Houston       Dengue    1.94434e+1 1.33531e+2 1.000000     
+ 3 Los Angeles   Dengue    1.69115e+1 7.08093e+1 1.000000     
+ 4 Miami         Dengue    1.17784e+1 3.53632e+2 0.999992     
+ 5 San Francisco Dengue    4.63524e+0 2.95429e+1 0.990296     
+ 6 Atlanta       Dengue    4.57836e+0 8.71030e+1 0.989728     
+ 7 New York      Dengue    3.54392e+0 1.68564e+2 0.971100     
+ 8 Boston        Dengue    9.01551e-1 1.59386e+1 0.594061     
+ 9 Seattle       Dengue    8.83337e-1 7.66159e+0 0.586599     
+10 Philadelphia  Dengue    7.64174e-1 2.71364e+1 0.534282     
+11 Kansas City   Dengue    4.80630e-1 2.42377e+0 0.381606     
+12 Dallas        Influenza 5.32317e-1 9.24402e+0 0.412757     
+13 Los Angeles   Influenza 4.62244e-1 2.31382e+1 0.370132     
+14 Houston       Influenza 4.55132e-1 1.02533e+1 0.365636     
+15 Miami         Influenza 4.54068e-1 2.62191e+1 0.364960     
+16 San Francisco Influenza 1.83717e-1 1.21526e+1 0.167829     
+17 New York      Influenza 1.76048e-1 1.94008e+1 0.161422     
+18 Atlanta       Influenza 1.52776e-1 1.03369e+1 0.141678     
+19 Seattle       Influenza 1.28359e-1 4.32589e+0 0.120463     
+20 Boston        Influenza 5.59134e-2 2.43454e+0 0.0543790    
+21 Philadelphia  Influenza 2.79003e-2 1.52473e+0 0.0275147    
+22 Kansas City   Influenza 1.18605e-2 5.60679e-1 0.0117904    
+23 Atlanta       Malaria   1.12628e+1 3.60840e+2 0.999987     
+24 New York      Malaria   3.21337e+0 1.73404e+2 0.959779     
+25 San Francisco Malaria   2.53897e+0 1.48606e+1 0.921052     
+26 Miami         Malaria   2.47414e+0 3.48447e+1 0.915765     
+27 Houston       Malaria   6.83016e-2 3.26683e+0 0.0660213    
+28 Boston        Malaria   6.75898e-2 6.01657e+0 0.0653562    
+29 Philadelphia  Malaria   5.44441e-2 5.56667e+0 0.0529886    
+30 Los Angeles   Malaria   2.63612e-2 1.02005e+0 0.0260168    
+31 Dallas        Malaria   1.08284e-2 1.31821e+0 0.0107700    
+32 Kansas City   Malaria   2.75134e-6 5.50107e-4 0.00000275133
+33 Seattle       Malaria   1.37439e-6 1.23827e-4 0.00000137439
+34 San Francisco Measles   1.08757e-2 1.14212e-1 0.0108168    
+35 New York      Measles   7.37722e-3 2.28200e-1 0.00735008   
+36 Los Angeles   Measles   2.52676e-3 7.42282e-2 0.00252357   
+37 Atlanta       Measles   1.02840e-3 5.25300e-2 0.00102788   
+38 Dallas        Measles   5.64195e-4 1.95882e-2 0.000564036  
+39 Seattle       Measles   5.61804e-4 2.07476e-2 0.000561647  
+40 Houston       Measles   4.66203e-4 1.70490e-2 0.000466094  
+41 Boston        Measles   2.97426e-4 1.82298e-2 0.000297382  
+42 Miami         Measles   2.36407e-4 2.16684e-2 0.000236379  
+43 Philadelphia  Measles   9.73512e-5 8.99331e-3 0.0000973465 
+44 Kansas City   Measles   9.93723e-6 9.82374e-5 0.00000993718
+45 Seattle       Pertussis 1.05499e+0 3.16228e+1 0.651805     
+46 New York      Pertussis 9.00851e-1 1.12066e+2 0.593776     
+47 Los Angeles   Pertussis 7.56297e-1 5.86415e+1 0.530599     
+48 San Francisco Pertussis 7.03558e-1 5.25251e+1 0.505178     
+49 Dallas        Pertussis 5.60106e-1 2.90746e+1 0.428851     
+50 Atlanta       Pertussis 5.09942e-1 3.65311e+1 0.399469     
+51 Miami         Pertussis 4.87473e-1 3.87863e+1 0.385824     
+52 Houston       Pertussis 4.74915e-1 2.64990e+1 0.378062     
+53 Boston        Pertussis 4.36111e-1 2.29431e+1 0.353454     
+54 Philadelphia  Pertussis 1.58771e-1 1.24159e+1 0.146808     
+55 Kansas City   Pertussis 8.11455e-3 1.64968e-1 0.00808172   
+
+
+==================== Mechanism B hubs, all diseases (Figures S5, S9B) ====================
+# A tibble: 130 × 5
+    hub_city      hub_type  disease      omega_B     prob_B
+    <chr>         <chr>     <chr>          <dbl>      <dbl>
+  1 Orlando       non-venue Dengue    5.21156e-1 4.06166e-1
+  2 Tampa         non-venue Dengue    2.94440e-1 2.55051e-1
+  3 Boston        venue     Dengue    2.81130e-1 2.45070e-1
+  4 Charlotte     non-venue Dengue    1.79256e-1 1.64108e-1
+  5 New York      venue     Dengue    1.75922e-1 1.61317e-1
+  6 Atlanta       venue     Dengue    1.56961e-1 1.45262e-1
+  7 Houston       venue     Dengue    1.11640e-1 1.05634e-1
+  8 Philadelphia  venue     Dengue    9.77325e-2 9.31085e-2
+  9 Denver        non-venue Dengue    8.96894e-2 8.57849e-2
+ 10 Washington DC non-venue Dengue    8.73627e-2 8.36553e-2
+ 11 San Antonio   non-venue Dengue    7.38905e-2 7.12266e-2
+ 12 Austin        non-venue Dengue    7.17151e-2 6.92040e-2
+ 13 Kansas City   venue     Dengue    6.29123e-2 6.09742e-2
+ 14 Las Vegas     non-venue Dengue    5.80308e-2 5.63791e-2
+ 15 Chicago       non-venue Dengue    5.79752e-2 5.63266e-2
+ 16 Dallas        venue     Dengue    5.50284e-2 5.35417e-2
+ 17 Minneapolis   non-venue Dengue    5.40571e-2 5.26220e-2
+ 18 San Francisco venue     Dengue    5.34455e-2 5.20424e-2
+ 19 San Diego     non-venue Dengue    5.30722e-2 5.16885e-2
+ 20 Seattle       venue     Dengue    4.89357e-2 4.77576e-2
+ 21 Phoenix       non-venue Dengue    4.46487e-2 4.36666e-2
+ 22 Detroit       non-venue Dengue    4.30269e-2 4.21144e-2
+ 23 Los Angeles   venue     Dengue    3.93584e-2 3.85940e-2
+ 24 Portland      non-venue Dengue    3.43362e-2 3.37534e-2
+ 25 Sacramento    non-venue Dengue    3.06503e-2 3.01853e-2
+ 26 Miami         venue     Dengue    1.57346e-2 1.56115e-2
+ 27 Orlando       non-venue Influenza 1.04113e-2 1.03573e-2
+ 28 Tampa         non-venue Influenza 6.17093e-3 6.15193e-3
+ 29 Boston        venue     Influenza 4.89744e-3 4.88547e-3
+ 30 New York      venue     Influenza 3.72640e-3 3.71946e-3
+ 31 Charlotte     non-venue Influenza 3.71336e-3 3.70648e-3
+ 32 Atlanta       venue     Influenza 3.13709e-3 3.13217e-3
+ 33 Houston       venue     Influenza 2.37247e-3 2.36966e-3
+ 34 Denver        non-venue Influenza 1.86080e-3 1.85907e-3
+ 35 Philadelphia  venue     Influenza 1.84173e-3 1.84003e-3
+ 36 Washington DC non-venue Influenza 1.79944e-3 1.79782e-3
+ 37 San Antonio   non-venue Influenza 1.56557e-3 1.56434e-3
+ 38 Austin        non-venue Influenza 1.43715e-3 1.43611e-3
+ 39 Kansas City   venue     Influenza 1.26132e-3 1.26053e-3
+ 40 Chicago       non-venue Influenza 1.21815e-3 1.21741e-3
+ 41 Las Vegas     non-venue Influenza 1.20485e-3 1.20412e-3
+ 42 Minneapolis   non-venue Influenza 1.10678e-3 1.10617e-3
+ 43 Dallas        venue     Influenza 1.09770e-3 1.09709e-3
+ 44 San Francisco venue     Influenza 1.08709e-3 1.08650e-3
+ 45 San Diego     non-venue Influenza 1.04311e-3 1.04257e-3
+ 46 Seattle       venue     Influenza 9.47395e-4 9.46946e-4
+ 47 Phoenix       non-venue Influenza 9.34736e-4 9.34299e-4
+ 48 Los Angeles   venue     Influenza 8.18700e-4 8.18365e-4
+ 49 Detroit       non-venue Influenza 7.86324e-4 7.86014e-4
+ 50 Portland      non-venue Influenza 7.21363e-4 7.21102e-4
+ 51 Sacramento    non-venue Influenza 6.22961e-4 6.22767e-4
+ 52 Miami         venue     Influenza 2.88239e-4 2.88197e-4
+ 53 Orlando       non-venue Malaria   1.61721e-1 1.49322e-1
+ 54 Tampa         non-venue Malaria   1.04329e-1 9.90708e-2
+ 55 New York      venue     Malaria   6.43519e-2 6.23250e-2
+ 56 Charlotte     non-venue Malaria   6.14070e-2 5.95596e-2
+ 57 Boston        venue     Malaria   4.93704e-2 4.81714e-2
+ 58 Atlanta       venue     Malaria   4.79774e-2 4.68447e-2
+ 59 Houston       venue     Malaria   4.08160e-2 3.99942e-2
+ 60 Denver        non-venue Malaria   2.86921e-2 2.82844e-2
+ 61 Washington DC non-venue Malaria   2.84613e-2 2.80601e-2
+ 62 San Antonio   non-venue Malaria   2.55815e-2 2.52570e-2
+ 63 Philadelphia  venue     Malaria   2.32905e-2 2.30214e-2
+ 64 Austin        non-venue Malaria   2.08169e-2 2.06017e-2
+ 65 Chicago       non-venue Malaria   1.99193e-2 1.97222e-2
+ 66 Kansas City   venue     Malaria   1.84161e-2 1.82475e-2
+ 67 Las Vegas     non-venue Malaria   1.79977e-2 1.78367e-2
+ 68 San Francisco venue     Malaria   1.70722e-2 1.69273e-2
+ 69 Minneapolis   non-venue Malaria   1.65902e-2 1.64533e-2
+ 70 Dallas        venue     Malaria   1.65159e-2 1.63803e-2
+ 71 Phoenix       non-venue Malaria   1.46500e-2 1.45432e-2
+ 72 San Diego     non-venue Malaria   1.38682e-2 1.37725e-2
+ 73 Los Angeles   venue     Malaria   1.21226e-2 1.20494e-2
+ 74 Seattle       venue     Malaria   1.16351e-2 1.15677e-2
+ 75 Portland      non-venue Malaria   9.69616e-3 9.64930e-3
+ 76 Detroit       non-venue Malaria   8.52655e-3 8.49030e-3
+ 77 Sacramento    non-venue Malaria   8.38582e-3 8.35076e-3
+ 78 Miami         venue     Malaria   2.94568e-4 2.94525e-4
+ 79 Washington DC non-venue Measles   2.11041e-7 2.11041e-7
+ 80 Portland      non-venue Measles   1.85567e-7 1.85567e-7
+ 81 Denver        non-venue Measles   1.84588e-7 1.84588e-7
+ 82 Austin        non-venue Measles   1.84503e-7 1.84503e-7
+ 83 Boston        venue     Measles   1.62763e-7 1.62763e-7
+ 84 Tampa         non-venue Measles   1.59496e-7 1.59496e-7
+ 85 San Diego     non-venue Measles   1.59496e-7 1.59496e-7
+ 86 Seattle       venue     Measles   1.54031e-7 1.54031e-7
+ 87 San Francisco venue     Measles   1.45782e-7 1.45782e-7
+ 88 Minneapolis   non-venue Measles   1.36313e-7 1.36313e-7
+ 89 Phoenix       non-venue Measles   1.30019e-7 1.30019e-7
+ 90 Detroit       non-venue Measles   1.27901e-7 1.27901e-7
+ 91 Miami         venue     Measles   1.26501e-7 1.26501e-7
+ 92 Atlanta       venue     Measles   1.25576e-7 1.25576e-7
+ 93 Chicago       non-venue Measles   1.18199e-7 1.18198e-7
+ 94 Los Angeles   venue     Measles   1.11262e-7 1.11262e-7
+ 95 Las Vegas     non-venue Measles   1.10376e-7 1.10376e-7
+ 96 Orlando       non-venue Measles   1.08220e-7 1.08220e-7
+ 97 Philadelphia  venue     Measles   1.07809e-7 1.07809e-7
+ 98 Charlotte     non-venue Measles   1.04180e-7 1.04180e-7
+ 99 San Antonio   non-venue Measles   9.24014e-8 9.24014e-8
+100 Houston       venue     Measles   9.19368e-8 9.19368e-8
+101 Dallas        venue     Measles   8.90755e-8 8.90755e-8
+102 Kansas City   venue     Measles   8.77117e-8 8.77117e-8
+103 Sacramento    non-venue Measles   8.71121e-8 8.71121e-8
+104 New York      venue     Measles   7.43728e-8 7.43728e-8
+105 Orlando       non-venue Pertussis 1.76734e-3 1.76578e-3
+106 Boston        venue     Pertussis 1.62643e-3 1.62511e-3
+107 Tampa         non-venue Pertussis 7.70613e-4 7.70316e-4
+108 Atlanta       venue     Pertussis 5.52004e-4 5.51851e-4
+109 Charlotte     non-venue Pertussis 5.15413e-4 5.15280e-4
+110 Philadelphia  venue     Pertussis 4.61227e-4 4.61120e-4
+111 New York      venue     Pertussis 4.26978e-4 4.26887e-4
+112 Denver        non-venue Pertussis 2.95860e-4 2.95816e-4
+113 Washington DC non-venue Pertussis 2.85967e-4 2.85926e-4
+114 Austin        non-venue Pertussis 2.72534e-4 2.72496e-4
+115 Houston       venue     Pertussis 2.71673e-4 2.71636e-4
+116 Kansas City   venue     Pertussis 2.37407e-4 2.37379e-4
+117 Detroit       non-venue Pertussis 2.34166e-4 2.34138e-4
+118 Seattle       venue     Pertussis 2.31734e-4 2.31707e-4
+119 San Diego     non-venue Pertussis 2.28052e-4 2.28026e-4
+120 San Antonio   non-venue Pertussis 2.04859e-4 2.04838e-4
+121 Minneapolis   non-venue Pertussis 2.01345e-4 2.01324e-4
+122 Dallas        venue     Pertussis 2.00710e-4 2.00690e-4
+123 Las Vegas     non-venue Pertussis 1.98754e-4 1.98735e-4
+124 San Francisco venue     Pertussis 1.74373e-4 1.74358e-4
+125 Chicago       non-venue Pertussis 1.69839e-4 1.69825e-4
+126 Miami         venue     Pertussis 1.41146e-4 1.41136e-4
+127 Phoenix       non-venue Pertussis 1.39691e-4 1.39682e-4
+128 Los Angeles   venue     Pertussis 1.37471e-4 1.37462e-4
+129 Portland      non-venue Pertussis 1.37009e-4 1.37000e-4
+130 Sacramento    non-venue Pertussis 1.25514e-4 1.25506e-4

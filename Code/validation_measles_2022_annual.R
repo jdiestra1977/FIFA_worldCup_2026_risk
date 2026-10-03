@@ -1,32 +1,15 @@
 # ============================================================
-# Empirical validation: measles, full-year 2022 reconstruction
+# Model evaluation: measles, full-year 2022 reconstruction (Table 2)
 # ============================================================
 #
 # PURPOSE
 # -------
-# Comment 3 from the senior collaborator, same design as the dengue
-# 2024 and malaria 2022 validations. Unlike the dropped pertussis
-# attempt, this one is usable: CDC's NNDSS table separates "Measles
-# Imported" from "Measles Indigenous" by state, so we can compare
-# Lambda (which, like the imported count, is scoped to independent
-# importation events, not outbreak chains -- see manuscript
-# Discussion limitation on this exact point) against a metric that
-# is genuinely comparable, not contaminated by local transmission
-# the way total pertussis cases were.
-#
-# WHY 2022, NOT A MORE RECENT YEAR
-# -----------------------------------
-# 2023/2024 were not pursued: no working state-level table was found
-# for 2023 in this session (one candidate record ID turned out to be
-# for unrelated diseases -- Leptospirosis/Listeriosis/Lyme -- not
-# measles), and 2024 has documented large outbreak clusters (e.g.
-# Chicago) that would reintroduce the same "local outbreak chain"
-# contamination this validation is specifically designed to avoid.
-# 2025/2026 are ruled out entirely: 2026 is the worst US measles
-# year since the early 1990s, almost entirely outbreak-driven, and
-# would not test what this model claims to estimate. 2022 (Ohio
-# outbreak aside) is the most recent year confirmed to have a clean
-# imported/indigenous split available at state level.
+# Compares an annual 2022 measles Lambda with NNDSS 2022 imported
+# measles cases by state. NNDSS separates imported from indigenous
+# cases, so Lambda (independent importation events) is compared with
+# the imported count only, not with cases from local outbreak chains.
+# 2022 matches the malaria and pertussis evaluation year. p_d uses
+# T_d = 365.25 days (p_*_measles_annual, main script Section 5g).
 #
 # WHAT "0" MEANS HERE
 # ---------------------
@@ -37,9 +20,9 @@
 #
 # PREREQUISITE
 # ------------
-# Run importationRisk_main_with_uncertainty_rho_corrected.R first
+# Run importationRisk_main.R first
 # (through the point where arrivals_COR, t100_routing,
-# population_of_world, under_rho_measles, p_travel_inf_measles,
+# population_of_world, under_rho_measles, p_travel_inf_measles_annual,
 # compute_importation_country_level(), and compute_mc_summary()
 # exist in the session).
 #
@@ -84,7 +67,7 @@ measles_2022_country_inc <- measles_data %>%
 measles_2022_results <- compute_importation_country_level(
   arrivals_df    = arrivals_2022,
   country_inc_df = measles_2022_country_inc,
-  p_travel_inf   = p_travel_inf_measles,
+  p_travel_inf   = p_travel_inf_measles_annual,  # annual run: p_d = D_d / 365.25
   title_text     = "Measles importation intensity -- annual 2022 (validation)"
 )
 
@@ -92,8 +75,8 @@ measles_2022_results <- compute_importation_country_level(
 measles_2022_mc <- compute_mc_summary(
   measles_2022_results$importation$imp_intensity,
   measles_2022_results$importation$destination_city,
-  under_rho_measles, p_travel_inf_measles,
-  0.40, 0.80, 0.02, 0.10,
+  under_rho_measles, p_travel_inf_measles_annual,
+  0.40,  0.80,  p_min_measles_annual,  p_max_measles_annual,
   n_mc = 5000
 )
 

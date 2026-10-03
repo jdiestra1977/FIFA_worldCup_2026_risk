@@ -1,11 +1,14 @@
 # ============================================================
-# Empirical validation: pertussis, full-year 2022 reconstruction
+# Model evaluation: pertussis, full-year 2022 reconstruction
 # ============================================================
 #
 # PURPOSE
 # -------
-# Comment 3 from the senior collaborator, same design as the dengue
-# 2024 and malaria 2022 validations.
+# Compares an annual 2022 pertussis Lambda with reported state-level
+# cases. Reported in the Results text (not in Table 2): US pertussis
+# counts are dominated by local transmission, and implied detection
+# fractions exceeded 100% in several states. p_d uses T_d = 365.25
+# days (p_*_pertussis_annual, main script Section 5g).
 #
 # WHY 2022
 # --------
@@ -25,9 +28,9 @@
 #
 # PREREQUISITE
 # ------------
-# Run importationRisk_main_with_uncertainty_rho_corrected.R first
+# Run importationRisk_main.R first
 # (through the point where arrivals_COR, t100_routing,
-# population_of_world, under_rho_pertussis, p_travel_inf_pertussis,
+# population_of_world, under_rho_pertussis, p_travel_inf_pertussis_annual,
 # compute_importation_country_level(), and compute_mc_summary()
 # exist in the session).
 #
@@ -76,7 +79,7 @@ pertussis_2022_country_inc <- pertussis_data %>%
 pertussis_2022_results <- compute_importation_country_level(
   arrivals_df    = arrivals_2022,
   country_inc_df = pertussis_2022_country_inc,
-  p_travel_inf   = p_travel_inf_pertussis,
+  p_travel_inf   = p_travel_inf_pertussis_annual,  # annual run: p_d = D_d / 365.25
   title_text     = "Pertussis importation intensity -- annual 2022 (validation)"
 )
 
@@ -84,8 +87,8 @@ pertussis_2022_results <- compute_importation_country_level(
 pertussis_2022_mc <- compute_mc_summary(
   pertussis_2022_results$importation$imp_intensity,
   pertussis_2022_results$importation$destination_city,
-  under_rho_pertussis, p_travel_inf_pertussis,
-  0.01, 0.10, 0.50, 0.90,
+  under_rho_pertussis, p_travel_inf_pertussis_annual,
+  0.01,  0.10,  p_min_pertussis_annual,  p_max_pertussis_annual,
   n_mc = 5000
 )
 
